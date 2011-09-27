@@ -17,7 +17,7 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
-packages = [ "git, "python-django", "django-openstack", "openstackx" ]
+packages = [ "git, "python-django", "openstack-dashboard", "openstackx" ]
 packages.each do |pkg|
   package pkg do
     action :install
@@ -36,7 +36,7 @@ directory "/var/lib/dash/.blackhole" do
   action :create
 end
   
-template "/var/lib/dash/dashboard/wsgi/django.wsgi" do
+cookbook_file "/var/lib/dash/dashboard/wsgi/django.wsgi" do
   source "django.wsgi"
   action :create
 end
