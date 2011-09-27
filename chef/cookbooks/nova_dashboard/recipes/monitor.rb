@@ -20,10 +20,11 @@
 # if monitored by nagios, install the nrpe commands
 
 # Node addresses are dynamic and can't be set from attributes only.
-node[:nova_dashboard][:monitor][:ports]["nova_dashboard-api"] = [node[:nova_dashboard][:api_bind_host], node[:nova_dashboard][:api_bind_port]]
+node[:nova_dashboard][:monitor][:ports]["nova_dashboard-server"] = [node[:nova_dashboard][:api_bind_host], node[:nova_dashboard][:api_bind_port]]
 
 svcs = node[:nova_dashboard][:monitor][:svcs]
 ports = node[:nova_dashboard][:monitor][:ports]
+
 log ("will monitor nova_dashboard svcs: #{svcs.join(',')} and ports #{ports.values.join(',')}")
 
 template "/etc/nagios/nrpe.d/nova_dashboard_nrpe.cfg" do
@@ -32,9 +33,9 @@ template "/etc/nagios/nrpe.d/nova_dashboard_nrpe.cfg" do
   group node[:nagios][:group]
   owner node[:nagios][:user]
   variables( {
-    :svcs => svcs ,
+    :svcs => svcs,
     :ports => ports
   })    
-   notifies :restart, resources(:service => "nagios-nrpe-server")
+  notifies :restart, resources(:service => "nagios-nrpe-server")
 end if node["roles"].include?("nagios-client")    
 

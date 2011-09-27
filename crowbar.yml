@@ -17,25 +17,21 @@
 
 barclamp:
   name: nova_dashboard
-  display: Nova_dashboard
-  description: A way to maximize awesomeness for Nova_dashboard
+  display: Nova Dashboard
+  description: A way to maximize awesomeness for Nova Dashboard
   version: 0
 
 crowbar:
   layout: 1
   order: 1000
 
-nav:
-  add:
-    nova_dashboard: barclamp_index_barclamp_path
-
 debs:
   repos:
-    # pull from internet: 
-    # - deb http://www.rabbitmq.com/debian/ testing main
+    - deb http://ops.rcb.me/packages maverick diablo-d5
   pkgs:
-    # put your packages here
-    # - mod_fcgid
+    - openstack-dashboard
+    - python-django
+    - openstackx
     
 rpms:
   pkgs:

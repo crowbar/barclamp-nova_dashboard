@@ -13,9 +13,9 @@
 # limitations under the License. 
 # 
 
-class Nova_dashboardController < BarclampController
+class NovaDashboardController < BarclampController
   def initialize
-    @service_object = Nova_dashboardService.new logger
+    @service_object = NovaDashboardService.new logger
   end
 end
 

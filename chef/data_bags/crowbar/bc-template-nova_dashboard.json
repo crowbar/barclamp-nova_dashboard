@@ -1,6 +1,6 @@
 {
   "id": "bc-template-nova_dashboard",
-  "description": "Installation for Nova_dashboard",
+  "description": "Installation for Nova Dashboard",
   "attributes": {
     "nova_dashboard": {
       "foo": "bar"

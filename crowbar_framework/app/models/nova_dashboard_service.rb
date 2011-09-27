@@ -13,7 +13,7 @@
 # limitations under the License. 
 # 
 
-class Nova_dashboardService < ServiceObject
+class NovaDashboardService < ServiceObject
 
   def initialize(thelogger)
     @bc_name = "nova_dashboard"

@@ -12,14 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-package "nova_dashboard" do
-  options "--force-yes"
-  action :install
-end
 
-template node[:nova_dashboard][:config_file] do
-  source "nova_dashboard.conf.erb"
-  owner node[:nova_dashboard][:user]
-  group "root"
-  mode 0644
-end
