@@ -74,6 +74,10 @@ file "/var/lib/dash/local/dashboard_openstack.sqlite3" do
   notifies :run, "bash[dash-db]"
 end
 
+apache_site "000-default" do
+  enable false
+end
+
 web_app "nova_dashboard" do
   server_name "nova_dashboard"
   docroot "/var/lib/dash/.blackhole"
