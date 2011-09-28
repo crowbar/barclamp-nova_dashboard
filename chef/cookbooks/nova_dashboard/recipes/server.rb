@@ -17,7 +17,7 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
-packages = [ "git, "python-django", "openstack-dashboard", "openstackx" ]
+packages = [ "git", "python-django", "openstack-dashboard", "openstackx" ]
 packages.each do |pkg|
   package pkg do
     action :install
@@ -41,7 +41,7 @@ cookbook_file "/var/lib/dash/dashboard/wsgi/django.wsgi" do
   action :create
 end
 
-directory var/lib/dash/local" do
+directory "var/lib/dash/local" do
   owner "www-data"
   mode "0755"
   action :create
@@ -71,7 +71,7 @@ file "/var/lib/dash/local/dashboard_openstack.sqlite3" do
   owner "www-data"
   mode "0600"
   action :create
-  notifies :run, "bash[dash-d]"
+  notifies :run, "bash[dash-db]"
 end
 
 web_app "nova_dashboard" do

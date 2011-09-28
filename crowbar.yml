@@ -32,6 +32,7 @@ debs:
     - openstack-dashboard
     - python-django
     - openstackx
+    - git
     
 rpms:
   pkgs:
