@@ -47,11 +47,10 @@ gems:
 
 locale_additions:
   en:
-    nav:
-      nova_dashboard: Nova_dashboard
     barclamp:
-      nova_dashboard_edit_attributes: 
-        attributes: Attributes
-        foo: Comic Choice
-      nova_dashboard_edit_deployment: 
-        deployment: Deployment
+      nova_dashboard:
+        edit_attributes: 
+          attributes: Attributes
+          foo: Comic Choice
+        edit_deployment: 
+          deployment: Deployment
