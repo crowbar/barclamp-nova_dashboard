@@ -38,6 +38,7 @@ end
   
 cookbook_file "/var/lib/dash/dashboard/wsgi/django.wsgi" do
   source "django.wsgi"
+  owner "www-data"
   action :create
 end
 
