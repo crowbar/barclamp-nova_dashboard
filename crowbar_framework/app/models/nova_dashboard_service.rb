@@ -42,7 +42,7 @@ class NovaDashboardService < ServiceObject
 
     # Make sure the nodes have a link to the dashboard on them.
     all_nodes.each do |n|
-      node = NodeObject.find_node_by_name(name)
+      node = NodeObject.find_node_by_name(n)
       server_ip = node.get_network_by_type("admin")["address"]
       node.crowbar["crowbar"] = {} if node.crowbar["crowbar"].nil?
       node.crowbar["crowbar"]["links"] = {} if node.crowbar["crowbar"]["links"].nil?
