@@ -40,14 +40,13 @@ class NovaDashboardService < ServiceObject
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: entering #{all_nodes.inspect}")
     return if all_nodes.empty?
 
-    # Make sure the bind hosts are in the admin network
+    # Make sure the nodes have a link to the dashboard on them.
     all_nodes.each do |n|
-      node = NodeObject.find_node_by_name n
-
-      admin_address = node.get_network_by_type("admin")["address"]
-      node.crowbar[:nova_dashboard] = {} if node.crowbar[:nova_dashboard].nil?
-      node.crowbar[:nova_dashboard][:api_bind_host] = admin_address
-
+      node = NodeObject.find_node_by_name(name)
+      server_ip = node.get_network_by_type("admin")["address"]
+      node.crowbar["crowbar"] = {} if node.crowbar["crowbar"].nil?
+      node.crowbar["crowbar"]["links"] = {} if node.crowbar["crowbar"]["links"].nil?
+      node.crowbar["crowbar"]["links"]["Nova Dashboard"] = "http://#{server_ip}/"
       node.save
     end
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: leaving")
