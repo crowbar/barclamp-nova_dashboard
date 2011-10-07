@@ -20,6 +20,8 @@ barclamp:
   display: Nova Dashboard
   description: A way to maximize awesomeness for Nova Dashboard
   version: 0
+  member:
+    - openstack
 
 crowbar:
   layout: 1
