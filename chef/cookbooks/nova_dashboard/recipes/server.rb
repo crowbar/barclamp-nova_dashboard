@@ -17,7 +17,7 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
-packages = [ "openstack-dashboard", "django-openstack", "openstackx", "python-django" ]
+packages = [ "openstack-dashboard", "django-openstack", "openstackx", "python-django", "python-mysqldb" ]
 packages.each do |pkg|
   package pkg do
     action :install
