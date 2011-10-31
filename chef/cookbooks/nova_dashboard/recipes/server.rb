@@ -109,6 +109,9 @@ end
 # Need to template the "EXTERNAL_MONITORING" array
 template "/var/lib/dash/local/local_settings.py" do
   source "local_settings.py.erb"
+  owner "root"
+  group "root"
+  mode "0644"
   variables(
     :keystone_admin_token => keystone[:keystone][:dashboard]['long-lived-token'],
     :keystone_address => keystone_address,
