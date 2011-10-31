@@ -39,6 +39,7 @@ debs:
     - python-django
     - openstackx
     - python-mysqldb
+    - python-httplib2
     
 rpms:
   pkgs:
