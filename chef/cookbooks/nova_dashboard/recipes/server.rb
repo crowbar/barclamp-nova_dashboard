@@ -56,6 +56,8 @@ apache_site "dash" do
   enable true
 end
 
+node.set_unless['dashboard']['db']['password'] = secure_password
+
 mysqls = search(:node, "recipes:mysql\\:\\:server") || []
 if mysqls.length > 0
   mysql = mysqls[0]
@@ -81,7 +83,7 @@ mysql_database "create dashboard database user" do
   password mysql[:mysql][:db_maker_password]
   database node[:dashboard][:db][:database]
   action :query
-  sql "GRANT ALL on #{node[:dashboard][:db][:database]}.* to '#{node[:dashboard][:db][:user]}'@'%' IDENTIFIED BY '#{node[:dashboard][:db][:password]}';"
+  sql "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER on #{node[:dashboard][:db][:database]}.* to '#{node[:dashboard][:db][:user]}'@'%' IDENTIFIED BY '#{node[:dashboard][:db][:password]}';"
 end
 
 # Need to figure out environment filter
@@ -96,27 +98,27 @@ keystone_address = keystone[:keystone][:address]
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
-# Need to template the "EXTERNAL_MONITORING" array
-template "/var/lib/dash/local/local_settings.py" do
-  source "local_settings.py.erb"
-  variables(
-    :keystone_admin_token => keystone[:keystone][:dashboard][:long-lived-token],
-    :keystone_address => keystone_address,
-    :mysql_address => mysql_address,
-    :mysql_db_name => node[:dashboard][:db][:database],
-    :mysql_user => node[:dashboard][:db][:user],
-    :mysql_passwd => node[:dashboard][:db][:passwd]
-  )
-  notifies :run, resources(:execute => "dashboard/manage.py syncdb"), :immediately
-  action :create
-end
-
 execute "dashboard/manage.py syncdb" do
   cwd "/var/lib/dash"
   environment ({'PYTHONPATH' => '/var/lib/dash/'})
   command "python dashboard/manage.py syncdb"
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
+end
+
+# Need to template the "EXTERNAL_MONITORING" array
+template "/var/lib/dash/local/local_settings.py" do
+  source "local_settings.py.erb"
+  variables(
+    :keystone_admin_token => keystone[:keystone][:dashboard]['long-lived-token'],
+    :keystone_address => keystone_address,
+    :mysql_address => mysql_address,
+    :mysql_db_name => node[:dashboard][:db][:database],
+    :mysql_user => node[:dashboard][:db][:user],
+    :mysql_passwd => node[:dashboard][:db][:password]
+  )
+  notifies :run, resources(:execute => "dashboard/manage.py syncdb"), :immediately
+  action :create
 end
 
 node[:nova_dashboard][:monitor][:svcs] <<["nova_dashboard-server"]
