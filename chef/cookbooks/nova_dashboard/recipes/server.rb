@@ -98,7 +98,7 @@ keystone_address = keystone[:keystone][:address]
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
-execute "dashboard/manage.py syncdb" do
+execute "python dashboard/manage.py syncdb" do
   cwd "/var/lib/dash"
   environment ({'PYTHONPATH' => '/var/lib/dash/'})
   command "python dashboard/manage.py syncdb"
@@ -117,7 +117,7 @@ template "/var/lib/dash/local/local_settings.py" do
     :mysql_user => node[:dashboard][:db][:user],
     :mysql_passwd => node[:dashboard][:db][:password]
   )
-  notifies :run, resources(:execute => "dashboard/manage.py syncdb"), :immediately
+  notifies :run, resources(:execute => "python dashboard/manage.py syncdb"), :immediately
   action :create
 end
 
