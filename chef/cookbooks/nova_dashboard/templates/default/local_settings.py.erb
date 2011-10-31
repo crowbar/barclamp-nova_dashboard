@@ -9,9 +9,9 @@ LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '<%= @db_name %>',
-        'USER': '<%= @user %>',
-        'PASSWORD': '<%= @passwd %>',
+        'NAME': '<%= @mysql_db_name %>',
+        'USER': '<%= @mysql_user %>',
+        'PASSWORD': '<%= @mysql_passwd %>',
         'HOST': '<%= @mysql_address %>',
         'default-character-set': 'utf8'
     },
@@ -35,7 +35,7 @@ MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 # EMAIL_HOST_PASSWORD = 'top-secret!'
 
 
-OPENSTACK_ADMIN_TOKEN = "999888777666"
+OPENSTACK_ADMIN_TOKEN = "<%= @keystone_admin_token %>"
 OPENSTACK_KEYSTONE_URL = "http://<%= @keystone_address %>:5000/v2.0/"
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
