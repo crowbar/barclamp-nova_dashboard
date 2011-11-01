@@ -57,6 +57,6 @@ locale_additions:
       nova_dashboard:
         edit_attributes: 
           attributes: Attributes
-          foo: Comic Choice
+          sql_engine: SQL Engine
         edit_deployment: 
           deployment: Deployment

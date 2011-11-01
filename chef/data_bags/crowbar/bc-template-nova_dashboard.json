@@ -3,7 +3,7 @@
   "description": "Installation for Nova Dashboard",
   "attributes": {
     "nova_dashboard": {
-      "foo": "bar"
+      "sql_engine": "mysql"
     }
   },
   "deployment": {
