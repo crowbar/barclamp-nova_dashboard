@@ -8,12 +8,9 @@ USE_SSL = False
 LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': '<%= @mysql_db_name %>',
-        'USER': '<%= @mysql_user %>',
-        'PASSWORD': '<%= @mysql_passwd %>',
-        'HOST': '<%= @mysql_address %>',
-        'default-character-set': 'utf8'
+        <% @db_settings.each_key do |key,value| -%>
+        '<%= key %>': '<%= value %>',
+        <% end -%>
     },
 }
 
