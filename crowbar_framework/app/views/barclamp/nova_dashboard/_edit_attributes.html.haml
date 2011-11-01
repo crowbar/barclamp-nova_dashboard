@@ -5,4 +5,6 @@
   = link_to t('raw'), proposal_barclamp_path(:id => @proposal.name, :controller => @proposal.barclamp, :dep_raw => @dep_raw, :attr_raw => true), :style => "float: right;"
   %div.container
     %p
+      %label{ :for => :sql_engine }= t('.sql_engine')
+      = select_tag :sql_engine, options_for_select([['MySQL', 'mysql'], ['SQLite','sqlite']], @proposal.raw_data['attributes'][@proposal.barclamp]["sql_engine"]), :onchange => "update_value('sql_engine', 'sql_engine', 'string')"
 
