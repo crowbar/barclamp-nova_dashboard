@@ -8,8 +8,8 @@ USE_SSL = False
 LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 DATABASES = {
     'default': {
-        <% @db_settings.each_key do |key,value| -%>
-        '<%= key %>': '<%= value %>',
+        <% @db_settings.each do |key,value| -%>
+        '<%= key %>': <%= value %>,
         <% end -%>
     },
 }

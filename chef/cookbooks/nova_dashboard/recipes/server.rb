@@ -78,17 +78,18 @@ if node[:nova_dashboard][:sql_engine] == "mysql"
     end
 
     db_settings = {
-      'ENGINE': 'django.db.backends.mysq',
-      'NAME': node[:dashboard][:db][:database],
-      'USER': node[:dashboard][:db][:user],
-      'PASSWORD': node[:dashboard][:db][:password],
-      'HOST': mysql_address,
-      'default-character-set': 'utf8'
+      'ENGINE' => "'django.db.backends.mysql'",
+      'NAME' => "'#{node[:dashboard][:db][:database]}'",
+      'USER' => "'#{node[:dashboard][:db][:user]}'",
+      'PASSWORD' => "'#{node[:dashboard][:db][:password]}'",
+      'HOST' => "'#{mysql_address}'",
+      'default-character-set' => "'utf8'"
     }
-elseif node[:nova_dashboard][:sql_engine] == "sqlite"
+elsif node[:nova_dashboard][:sql_engine] == "sqlite"
+    Chef::Log.info("Configuring Horizion to use SQLite3 backend")
     db_settings = {
-      'ENGINE': 'django.db.backends.sqlite3',
-      'NAME': os.path.join(LOCAL_PATH, 'dashboard_openstack.sqlite3')
+      'ENGINE' => "'django.db.backends.sqlite3'",
+      'NAME' => "os.path.join(LOCAL_PATH, 'dashboard_openstack.sqlite3')"
     }
 end
 
