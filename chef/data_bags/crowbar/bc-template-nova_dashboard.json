@@ -3,7 +3,9 @@
   "description": "Installation for Nova Dashboard",
   "attributes": {
     "nova_dashboard": {
-      "sql_engine": "mysql"
+      "sql_engine": "mysql",
+      "keystone_instance": "none",
+      "mysql_instance": "none"
     }
   },
   "deployment": {

@@ -49,7 +49,9 @@ if node[:nova_dashboard][:sql_engine] == "mysql"
         action :install
     end
 
-    mysqls = search(:node, "recipes:mysql\\:\\:server") || []
+
+    env_filter = " AND mysql_config_environment:mysql-config-#{node[:nova_dashboard][:mysql_instance]}"
+    mysqls = search(:node, "recipes:mysql\\:\\:server#{env_filter}") || []
     if mysqls.length > 0
         mysql = mysqls[0]
     else
@@ -94,7 +96,8 @@ elsif node[:nova_dashboard][:sql_engine] == "sqlite"
 end
 
 # Need to figure out environment filter
-keystones = search(:node, "recipes:keystone\\:\\:server") || []
+env_filter = " AND keystone_config_environment:keystone-config-#{node[:nova_dashboard][:keystone_instance]}"
+keystones = search(:node, "recipes:keystone\\:\\:server#{env_filter}") || []
 if keystones.length > 0
   keystone = keystones[0]
 else
