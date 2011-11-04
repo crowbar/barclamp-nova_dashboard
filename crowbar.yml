@@ -31,8 +31,8 @@ crowbar:
 
 debs:
   repos:
-#    - deb http://ops.rcb.me/packages maverick diablo-final
-    - deb http://ops.monkeypuppetlabs.com/packages maverick diablo-final
+#    - deb http://ops.rcb.me/packages maverick diablo-d5
+    - deb http://ops.monkeypuppetlabs.com/packages maverick diablo-d5
   pkgs:
     - openstack-dashboard
     - django-openstack
