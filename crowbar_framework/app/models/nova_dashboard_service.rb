@@ -32,22 +32,22 @@ class NovaDashboardService < ServiceObject
       }
     end
 
-    base["attributes"]["glance"]["mysql_instance"] = ""
+    base["attributes"]["nova_dashboard"]["mysql_instance"] = ""
     begin
       mysqlService = MysqlService.new(@logger)
       mysqls = mysqlService.list_active
-      base["attributes"]["glance"]["mysql_instance"] = mysqls[0] unless mysqls.empty?
+      base["attributes"]["nova_dashboard"]["mysql_instance"] = mysqls[0] unless mysqls.empty?
     rescue
-      @logger.info("Glance create_proposal: no mysql found")
+      @logger.info("Nova dashboard create_proposal: no mysql found")
     end
 
-    base["attributes"]["glance"]["keystone_instance"] = ""
+    base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
     begin
       keystoneService = KeystoneService.new(@logger)
       keystones = keystoneService.list_active
-      base["attributes"]["glance"]["keystone_instance"] = keystones[0] unless keystone.empty?
+      base["attributes"]["nova_dashboard"]["keystone_instance"] = keystones[0] unless keystones.empty?
     rescue
-      @logger.info("Glance create_proposal: no keystone found")
+      @logger.info("Nova dashboard create_proposal: no keystone found")
     end
 
     @logger.debug("Nova_dashboard create_proposal: exiting")
