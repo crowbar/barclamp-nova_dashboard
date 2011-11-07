@@ -59,5 +59,7 @@ locale_additions:
         edit_attributes: 
           attributes: Attributes
           sql_engine: SQL Engine
+          mysql_instance: MySQL Instance
+          keystone_instance: Keystone Instance
         edit_deployment: 
           deployment: Deployment
