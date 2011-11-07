@@ -123,7 +123,7 @@ template "/var/lib/dash/local/local_settings.py" do
   group "root"
   mode "0644"
   variables(
-    :keystone_admin_token => keystone[:keystone][:dashboard]['long-lived-token'],
+    :keystone_admin_token => keystone[:keystone][:admin]['token'],
     :keystone_address => keystone_address,
     :db_settings => db_settings
   )
