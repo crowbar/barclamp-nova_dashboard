@@ -54,6 +54,7 @@ if node[:nova_dashboard][:sql_engine] == "mysql"
     mysqls = search(:node, "recipes:mysql\\:\\:server#{env_filter}") || []
     if mysqls.length > 0
         mysql = mysqls[0]
+        mysql = node if mysql.name == node.name
     else
         mysql = node
     end
@@ -100,6 +101,7 @@ env_filter = " AND keystone_config_environment:keystone-config-#{node[:nova_dash
 keystones = search(:node, "recipes:keystone\\:\\:server#{env_filter}") || []
 if keystones.length > 0
   keystone = keystones[0]
+  keystone = node if keystone.name = node.name
 else
   keystone = node
 end
