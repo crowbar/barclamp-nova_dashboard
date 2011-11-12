@@ -17,6 +17,7 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
+::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 packages = [ "openstack-dashboard", "django-openstack", "openstackx", "python-django" ]
 packages.each do |pkg|
@@ -110,10 +111,15 @@ keystone_address = keystone[:keystone][:address]
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
+execute "chown -R www-data /var/lib/dash" do
+  command "chown -R www-data /var/lib/dash"
+end
+
 execute "python dashboard/manage.py syncdb" do
   cwd "/var/lib/dash"
   environment ({'PYTHONPATH' => '/var/lib/dash/'})
   command "python dashboard/manage.py syncdb"
+  user "www-data"
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
 end
