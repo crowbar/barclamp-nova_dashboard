@@ -37,8 +37,10 @@ class NovaDashboardService < ServiceObject
       mysqlService = MysqlService.new(@logger)
       mysqls = mysqlService.list_active[1]
       base["attributes"]["nova_dashboard"]["mysql_instance"] = mysqls[0] unless mysqls.empty?
+      base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
     rescue
       @logger.info("Nova dashboard create_proposal: no mysql found")
+      base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
     end
 
     base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
