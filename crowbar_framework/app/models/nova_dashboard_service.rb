@@ -20,6 +20,10 @@ class NovaDashboardService < ServiceObject
     @logger = thelogger
   end
 
+  def self.allow_multiple_proposals?
+    true
+  end
+
   def create_proposal
     @logger.debug("Nova_dashboard create_proposal: entering")
     base = super
