@@ -102,14 +102,14 @@ env_filter = " AND keystone_config_environment:keystone-config-#{node[:nova_dash
 keystones = search(:node, "recipes:keystone\\:\\:server#{env_filter}") || []
 if keystones.length > 0
   keystone = keystones[0]
-  keystone = node if keystone.name = node.name
+  keystone = node if keystone.name == node.name
 else
   keystone = node
 end
 
-keystone_address = keystone[:keystone][:address] rescue nil
+keystone_address = keystone["keystone"]["address"] rescue nil
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
-keystone_token = keystone[:keystone][:admin]['token'] rescue nil
+keystone_token = keystone["keystone"]["admin"]["token"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
 execute "chown -R www-data /var/lib/dash" do
