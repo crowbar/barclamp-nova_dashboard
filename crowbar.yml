@@ -28,6 +28,8 @@ barclamp:
 crowbar:
   layout: 1
   order: 90
+  run_order: 90
+  chef_order: 90
 
 debs:
   repos:
