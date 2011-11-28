@@ -24,6 +24,15 @@ class NovaDashboardService < ServiceObject
     true
   end
 
+  def proposal_dependencies(role)
+    answer = []
+    if role.default_attributes["nova_dashboard"]["sql_engine"] == "mysql"
+      answer << { "barclamp" => "mysql", "inst" => role.default_attributes["nova_dashboard"]["mysql_instance"] }
+    end
+    answer << { "barclamp" => "keystone", "inst" => role.default_attributes["nova_dashboard"]["keystone_instance"] }
+    answer
+  end
+
   def create_proposal
     @logger.debug("Nova_dashboard create_proposal: entering")
     base = super
@@ -41,6 +50,10 @@ class NovaDashboardService < ServiceObject
       mysqlService = MysqlService.new(@logger)
       mysqls = mysqlService.list_active[1]
       if mysqls.empty?
+        # No actives, look for proposals
+        mysqls = mysqlService.proposals[1]
+      end
+      if mysqls.empty?
         base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
       else
         base["attributes"]["nova_dashboard"]["mysql_instance"] = mysqls[0]
@@ -55,6 +68,10 @@ class NovaDashboardService < ServiceObject
     begin
       keystoneService = KeystoneService.new(@logger)
       keystones = keystoneService.list_active[1]
+      if keystones.empty?
+        # No actives, look for proposals
+        keystones = keystoneService.proposals[1]
+      end
       base["attributes"]["nova_dashboard"]["keystone_instance"] = keystones[0] unless keystones.empty?
     rescue
       @logger.info("Nova dashboard create_proposal: no keystone found")
