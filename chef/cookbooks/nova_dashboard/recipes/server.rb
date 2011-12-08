@@ -110,6 +110,8 @@ end
 keystone_address = keystone["keystone"]["address"] rescue nil
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
 keystone_token = keystone["keystone"]["admin"]["token"] rescue nil
+keystone_admin_port = keystone["keystone"]["api"]["admin_port"] rescue nil
+keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
 execute "chown -R www-data /var/lib/dash" do
@@ -134,6 +136,7 @@ template "/var/lib/dash/local/local_settings.py" do
   variables(
     :keystone_admin_token => keystone_token,
     :keystone_address => keystone_address,
+    :keystone_service_port => keystone_service_port,
     :db_settings => db_settings
   )
   notifies :run, resources(:execute => "python dashboard/manage.py syncdb"), :immediately
