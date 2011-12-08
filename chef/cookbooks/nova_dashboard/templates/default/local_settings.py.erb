@@ -33,7 +33,7 @@ MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 
 
 OPENSTACK_ADMIN_TOKEN = "<%= @keystone_admin_token %>"
-OPENSTACK_KEYSTONE_URL = "http://<%= @keystone_address %>:5000/v2.0/"
+OPENSTACK_KEYSTONE_URL = "http://<%= @keystone_address %>:<%= @keystone_service_port %>/v2.0/"
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
 # NOTE(tres): Available services should come from the service
