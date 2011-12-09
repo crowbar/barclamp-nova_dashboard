@@ -27,6 +27,8 @@ ports = node[:nova_dashboard][:monitor][:ports]
 
 log ("will monitor nova_dashboard svcs: #{svcs.join(',')} and ports #{ports.values.join(',')}")
 
+include_recipe "nagios::common" if node["roles"].include?("nagios-client")
+
 template "/etc/nagios/nrpe.d/nova_dashboard_nrpe.cfg" do
   source "nova_dashboard_nrpe.cfg.erb"
   mode "0644"
