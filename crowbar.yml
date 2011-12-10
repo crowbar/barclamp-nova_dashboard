@@ -42,6 +42,9 @@ debs:
     - python-mysqldb
     - python-httplib2
     - python-keystone
+    - python-glance
+    - python-novaclient
+    - python-swift
     
 rpms:
   pkgs:

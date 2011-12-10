@@ -19,7 +19,8 @@ include_recipe "apache2::mod_rewrite"
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
-packages = [ "openstack-dashboard", "django-openstack", "openstackx", "python-django" ]
+# Explicitly added client dependencies for now.
+packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "django-openstack", "openstackx", "python-django" ]
 packages.each do |pkg|
   package pkg do
     action :install
