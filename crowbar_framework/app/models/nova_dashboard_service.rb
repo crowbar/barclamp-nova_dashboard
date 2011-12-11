@@ -20,6 +20,19 @@ class NovaDashboardService < ServiceObject
     @logger = thelogger
   end
 
+  def self.allow_multiple_proposals?
+    true
+  end
+
+  def proposal_dependencies(role)
+    answer = []
+    if role.default_attributes["nova_dashboard"]["sql_engine"] == "mysql"
+      answer << { "barclamp" => "mysql", "inst" => role.default_attributes["nova_dashboard"]["mysql_instance"] }
+    end
+    answer << { "barclamp" => "keystone", "inst" => role.default_attributes["nova_dashboard"]["keystone_instance"] }
+    answer
+  end
+
   def create_proposal
     @logger.debug("Nova_dashboard create_proposal: entering")
     base = super
@@ -30,6 +43,38 @@ class NovaDashboardService < ServiceObject
       base["deployment"]["nova_dashboard"]["elements"] = {
         "nova_dashboard-server" => [ nodes.first[:fqdn] ]
       }
+    end
+
+    base["attributes"]["nova_dashboard"]["mysql_instance"] = ""
+    begin
+      mysqlService = MysqlService.new(@logger)
+      mysqls = mysqlService.list_active[1]
+      if mysqls.empty?
+        # No actives, look for proposals
+        mysqls = mysqlService.proposals[1]
+      end
+      if mysqls.empty?
+        base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
+      else
+        base["attributes"]["nova_dashboard"]["mysql_instance"] = mysqls[0]
+        base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
+      end
+    rescue
+      @logger.info("Nova dashboard create_proposal: no mysql found")
+      base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
+    end
+
+    base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
+    begin
+      keystoneService = KeystoneService.new(@logger)
+      keystones = keystoneService.list_active[1]
+      if keystones.empty?
+        # No actives, look for proposals
+        keystones = keystoneService.proposals[1]
+      end
+      base["attributes"]["nova_dashboard"]["keystone_instance"] = keystones[0] unless keystones.empty?
+    rescue
+      @logger.info("Nova dashboard create_proposal: no keystone found")
     end
 
     @logger.debug("Nova_dashboard create_proposal: exiting")

@@ -20,22 +20,28 @@ barclamp:
   display: Nova Dashboard
   description: User Interface for OpenStack projects (aka code name Horizon)
   version: 0
+  requires:
+    - keystone
   member:
     - openstack
 
 crowbar:
   layout: 1
-  order: 1000
+  order: 90
+  run_order: 90
+  chef_order: 90
 
 debs:
   repos:
-#    - deb http://ops.rcb.me/packages maverick diablo-d5
-    - deb http://ops.monkeypuppetlabs.com/packages maverick diablo-d5
+    - deb http://ops.rcb.me/packages maverick diablo-final
   pkgs:
     - openstack-dashboard
+    - django-openstack
     - python-django
     - openstackx
-    - git
+    - python-mysqldb
+    - python-httplib2
+    - python-keystone
     
 rpms:
   pkgs:
@@ -53,6 +59,8 @@ locale_additions:
       nova_dashboard:
         edit_attributes: 
           attributes: Attributes
-          foo: Comic Choice
+          sql_engine: SQL Engine
+          mysql_instance: MySQL Instance
+          keystone_instance: Keystone Instance
         edit_deployment: 
           deployment: Deployment

@@ -3,7 +3,9 @@
   "description": "User Interface for OpenStack projects (code name Horizon)",
   "attributes": {
     "nova_dashboard": {
-      "foo": "bar"
+      "sql_engine": "mysql",
+      "keystone_instance": "none",
+      "mysql_instance": "none"
     }
   },
   "deployment": {
