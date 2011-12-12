@@ -27,11 +27,18 @@ packages.each do |pkg|
   end
 end
 
-#directory "/var/lib/dash/.blackhole" do
-#  owner "www-data"
-#  mode "0755"
-#  action :create
-#end
+# Change service test to work with ssl - HACK HACK
+bash "add ssl ignore test to curl" do
+  code <<-'EOH'
+  sed -i "s/subprocess.check_call(\['curl', '-m', '1', url\],/subprocess.check_call(['curl', '-k', '-m', '1', url],/g" /usr/share/pyshared/django_openstack/syspanel/views/services.py
+EOH
+end
+
+directory "/var/lib/dash/.blackhole" do
+  owner "www-data"
+  mode "0755"
+  action :create
+end
   
 apache_site "000-default" do
   enable false
