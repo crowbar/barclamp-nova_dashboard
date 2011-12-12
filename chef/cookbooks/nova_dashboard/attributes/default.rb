@@ -19,6 +19,7 @@ default[:dashboard][:db][:password] = "" # Set by Recipe
 
 override[:nova_dashboard][:user]="nova_dashboard"
 default[:nova_dashboard][:site_branding] = "Openstack Nova Dashboard"
+default[:nova_dashboard][:show_swift] = false
 
 # declare what needs to be monitored
 node[:nova_dashboard][:monitor]={}

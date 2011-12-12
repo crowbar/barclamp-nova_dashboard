@@ -138,6 +138,7 @@ template "/var/lib/dash/local/local_settings.py" do
     :keystone_admin_token => keystone_token,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
+    :show_swift => node["nova_dashboard"]["show_swift"],
     :db_settings => db_settings
   )
   notifies :run, resources(:execute => "python dashboard/manage.py syncdb"), :immediately

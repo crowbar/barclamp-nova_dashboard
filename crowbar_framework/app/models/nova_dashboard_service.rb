@@ -64,6 +64,24 @@ class NovaDashboardService < ServiceObject
       base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
     end
 
+    base["attributes"]["nova_dashboard"]["show_swift"] = false
+    begin
+      swiftService = SwiftService.new(@logger)
+      swifts = swiftService.list_active[1]
+      if swifts.empty?
+        # No actives, look for proposals
+        swifts = swiftService.proposals[1]
+      end
+      if swifts.empty?
+        base["attributes"]["nova_dashboard"]["show_swift"] = false
+      else
+        base["attributes"]["nova_dashboard"]["show_swift"] = true
+      end
+    rescue
+      @logger.info("Nova dashboard create_proposal: no swift found")
+      base["attributes"]["nova_dashboard"]["show_swift"] = false
+    end
+
     base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
     begin
       keystoneService = KeystoneService.new(@logger)
