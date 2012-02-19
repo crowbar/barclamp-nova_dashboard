@@ -43,7 +43,6 @@ debs:
       - deb http://ops.rcb.me/packages oneiric diablo-final
   pkgs:
     - openstack-dashboard
-    - django-openstack
     - python-django
     - openstackx
     - python-mysqldb
