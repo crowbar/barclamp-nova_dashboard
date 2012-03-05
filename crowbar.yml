@@ -43,7 +43,8 @@ debs:
       - deb http://ops.rcb.me/packages oneiric diablo-final
   ubuntu-12.04:
     pkgs:
-      - horizon
+      - python-django-openstack
+      - python-django-horizon
   pkgs:
     - openstack-dashboard
     - python-django
