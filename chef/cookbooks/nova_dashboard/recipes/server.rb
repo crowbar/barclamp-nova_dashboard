@@ -20,18 +20,11 @@ include_recipe "apache2::mod_rewrite"
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 # Explicitly added client dependencies for now.
-packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django" ]
+packages = [ "horizon", "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django" ]
 packages.each do |pkg|
   package pkg do
     action :install
   end
-end
-
-# Change service test to work with ssl - HACK HACK
-bash "add ssl ignore test to curl" do
-  code <<-'EOH'
-  sed -i "s/subprocess.check_call(\['curl', '-m', '1', url\],/subprocess.check_call(['curl', '-k', '-m', '1', url],/g" /usr/share/pyshared/django_openstack/syspanel/views/services.py
-EOH
 end
 
 directory "/var/lib/dash/.blackhole" do
