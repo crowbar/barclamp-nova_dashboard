@@ -27,7 +27,7 @@ packages.each do |pkg|
   end
 end
 
-directory "/var/lib/dash/.blackhole" do
+directory "/usr/share/openstack-dashboard/.blackhole" do
   owner "www-data"
   mode "0755"
   action :create
@@ -115,21 +115,17 @@ keystone_admin_port = keystone["keystone"]["api"]["admin_port"] rescue nil
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
-execute "chown -R www-data /var/lib/dash" do
-  command "chown -R www-data /var/lib/dash"
-end
-
-execute "python dashboard/manage.py syncdb" do
-  cwd "/var/lib/dash"
-  environment ({'PYTHONPATH' => '/var/lib/dash/'})
-  command "python dashboard/manage.py syncdb"
+execute "python manage.py syncdb" do
+  cwd "/usr/share/openstack-dashboard"
+  environment ({'PYTHONPATH' => '/usr/share/openstack-dashboard/'})
+  command "python manage.py syncdb"
   user "www-data"
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
 # Need to template the "EXTERNAL_MONITORING" array
-template "/var/lib/dash/local/local_settings.py" do
+template "/etc/horizon/local_settings.py" do
   source "local_settings.py.erb"
   owner "root"
   group "root"
@@ -141,7 +137,7 @@ template "/var/lib/dash/local/local_settings.py" do
     :show_swift => node["nova_dashboard"]["show_swift"],
     :db_settings => db_settings
   )
-  notifies :run, resources(:execute => "python dashboard/manage.py syncdb"), :immediately
+  notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
 end
 
