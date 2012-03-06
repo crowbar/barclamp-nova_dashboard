@@ -37,7 +37,16 @@ apache_site "000-default" do
   enable false
 end
 
-apache_site "dash" do
+template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
+  source "nova-dashboard.conf.erb"
+  mode 0644
+  variables :horizon_dir => "/usr/share/openstack-dashboard"
+  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf")
+    notifies :reload, resources(:service => "apache2")
+  end
+end
+
+apache_site "nova-dashboard.conf" do
   enable true
 end
 
@@ -110,7 +119,6 @@ end
 
 keystone_address = keystone["keystone"]["address"] rescue nil
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
-keystone_token = keystone["keystone"]["admin"]["token"] rescue nil
 keystone_admin_port = keystone["keystone"]["api"]["admin_port"] rescue nil
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
@@ -125,16 +133,15 @@ execute "python manage.py syncdb" do
 end
 
 # Need to template the "EXTERNAL_MONITORING" array
-template "/etc/horizon/local_settings.py" do
+template "/usr/share/openstack-dashboard/openstack-dashboard/local_settings.py" do
   source "local_settings.py.erb"
   owner "root"
   group "root"
   mode "0644"
   variables(
-    :keystone_admin_token => keystone_token,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
-    :show_swift => node["nova_dashboard"]["show_swift"],
+    :keystone_admin_port => keystone_admin_port,
     :db_settings => db_settings
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
