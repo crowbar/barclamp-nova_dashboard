@@ -20,21 +20,14 @@ include_recipe "apache2::mod_rewrite"
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 # Explicitly added client dependencies for now.
-packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "django-openstack", "openstackx", "python-django" ]
+packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon" ]
 packages.each do |pkg|
   package pkg do
     action :install
   end
 end
 
-# Change service test to work with ssl - HACK HACK
-bash "add ssl ignore test to curl" do
-  code <<-'EOH'
-  sed -i "s/subprocess.check_call(\['curl', '-m', '1', url\],/subprocess.check_call(['curl', '-k', '-m', '1', url],/g" /usr/share/pyshared/django_openstack/syspanel/views/services.py
-EOH
-end
-
-directory "/var/lib/dash/.blackhole" do
+directory "/usr/share/openstack-dashboard/.blackhole" do
   owner "www-data"
   mode "0755"
   action :create
@@ -44,7 +37,16 @@ apache_site "000-default" do
   enable false
 end
 
-apache_site "dash" do
+template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
+  source "nova-dashboard.conf.erb"
+  mode 0644
+  variables :horizon_dir => "/usr/share/openstack-dashboard"
+  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf")
+    notifies :reload, resources(:service => "apache2")
+  end
+end
+
+apache_site "nova-dashboard.conf" do
   enable true
 end
 
@@ -117,38 +119,32 @@ end
 
 keystone_address = keystone["keystone"]["address"] rescue nil
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
-keystone_token = keystone["keystone"]["admin"]["token"] rescue nil
 keystone_admin_port = keystone["keystone"]["api"]["admin_port"] rescue nil
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
-execute "chown -R www-data /var/lib/dash" do
-  command "chown -R www-data /var/lib/dash"
-end
-
-execute "python dashboard/manage.py syncdb" do
-  cwd "/var/lib/dash"
-  environment ({'PYTHONPATH' => '/var/lib/dash/'})
-  command "python dashboard/manage.py syncdb"
+execute "python manage.py syncdb" do
+  cwd "/usr/share/openstack-dashboard"
+  environment ({'PYTHONPATH' => '/usr/share/openstack-dashboard/'})
+  command "python manage.py syncdb"
   user "www-data"
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
 # Need to template the "EXTERNAL_MONITORING" array
-template "/var/lib/dash/local/local_settings.py" do
+template "/usr/share/openstack-dashboard/openstack-dashboard/local_settings.py" do
   source "local_settings.py.erb"
   owner "root"
   group "root"
   mode "0644"
   variables(
-    :keystone_admin_token => keystone_token,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
-    :show_swift => node["nova_dashboard"]["show_swift"],
+    :keystone_admin_port => keystone_admin_port,
     :db_settings => db_settings
   )
-  notifies :run, resources(:execute => "python dashboard/manage.py syncdb"), :immediately
+  notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
 end
 
