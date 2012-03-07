@@ -20,7 +20,7 @@ include_recipe "apache2::mod_rewrite"
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 # Explicitly added client dependencies for now.
-packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon" ]
+packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
 packages.each do |pkg|
   package pkg do
     action :install
@@ -133,7 +133,7 @@ execute "python manage.py syncdb" do
 end
 
 # Need to template the "EXTERNAL_MONITORING" array
-template "/usr/share/openstack-dashboard/openstack-dashboard/local_settings.py" do
+template "/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
   owner "root"
   group "root"
