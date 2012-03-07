@@ -44,6 +44,7 @@ debs:
   ubuntu-12.04:
     pkgs:
       - python-django-horizon
+      - python-django-nose
   pkgs:
     - openstack-dashboard
     - python-django

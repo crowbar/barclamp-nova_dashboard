@@ -133,7 +133,7 @@ execute "python manage.py syncdb" do
 end
 
 # Need to template the "EXTERNAL_MONITORING" array
-template "/usr/share/openstack-dashboard/openstack-dashboard/local_settings.py" do
+template "/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
   owner "root"
   group "root"
