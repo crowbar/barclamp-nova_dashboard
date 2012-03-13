@@ -29,6 +29,14 @@ end
 
 directory "/usr/share/openstack-dashboard/.blackhole" do
   owner "www-data"
+  group "www-data"
+  mode "0755"
+  action :create
+end
+  
+directory "/var/www" do
+  owner "www-data"
+  group "www-data"
   mode "0755"
   action :create
 end
