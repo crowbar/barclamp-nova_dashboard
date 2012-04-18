@@ -98,23 +98,38 @@ if node[:nova_dashboard][:sql_engine] == "mysql"
 
     mysql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(mysql, "admin").address if mysql_address.nil?
     Chef::Log.info("Mysql server found at #{mysql_address}")
+    db_conn = { :host => mysql_address,
+                :username => "db_maker",
+                :password => mysql[:mysql][:db_maker_password] }
+
 
     # Create the Dashboard Database
-    mysql_database "create #{node[:dashboard][:db][:database]} database" do
-        host	mysql_address
-        username "db_maker"
-        password mysql[:mysql][:db_maker_password]
-        database node[:dashboard][:db][:database]
-        action :create_db
+    database "create #{node[:dashboard][:db][:database]} database" do
+        connection db_conn
+        database_name node[:dashboard][:db][:database]
+        provider Chef::Provider::Database::Mysql
+        action :create
+    end
+ 
+    database_user "create dashboard database user" do
+        connection db_conn
+        database_name node[:dashboard][:db][:database]
+        username node[:dashboard][:db][:user]
+        password node[:dashboard][:db][:password]
+        provider Chef::Provider::Database::MysqlUser
+        action :create
     end
 
-    mysql_database "create dashboard database user" do
-        host	mysql_address
-        username "db_maker"
-        password mysql[:mysql][:db_maker_password]
-        database node[:dashboard][:db][:database]
-        action :query
-        sql "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER on #{node[:dashboard][:db][:database]}.* to '#{node[:dashboard][:db][:user]}'@'%' IDENTIFIED BY '#{node[:dashboard][:db][:password]}';"
+    database_user "create dashboard database user" do
+        connection db_conn
+        database_name node[:dashboard][:db][:database]
+        username node[:dashboard][:db][:user]
+        password node[:dashboard][:db][:password]
+        host mysql_address
+        privileges ["SELECT", "INSERT", "UPDATE", "DELETE", "CREATE",
+                    "DROP", "INDEX", "ALTER" ]
+        provider Chef::Provider::Database::MysqlUser
+        action :grant
     end
 
     db_settings = {
