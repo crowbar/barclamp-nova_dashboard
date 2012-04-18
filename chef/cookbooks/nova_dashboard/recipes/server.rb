@@ -19,37 +19,55 @@ include_recipe "apache2::mod_rewrite"
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
+if node.platform == "suse"
+  dashboard_path = "/var/lib/openstack-dashboard"
+else
+  dashboard_path = "/usr/share/openstack-dashboard" 
+end
+
 # Explicitly added client dependencies for now.
 packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
+packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "openstack-swift", "python-keystone", "python-django", "python-horizon", "python-django-nose" ] if node.platform == "suse"
 packages.each do |pkg|
   package pkg do
     action :install
   end
 end
 
-directory "/usr/share/openstack-dashboard/.blackhole" do
-  owner "www-data"
-  group "www-data"
-  mode "0755"
-  action :create
+if node.platform != "suse"
+  directory "/usr/share/openstack-dashboard/.blackhole" do
+    owner "www-data"
+    group "www-data"
+    mode "0755"
+    action :create
+  end
+
+  directory "/var/www" do
+    owner "www-data"
+    group "www-data"
+    mode "0755"
+    action :create
+  end
 end
-  
-directory "/var/www" do
-  owner "www-data"
-  group "www-data"
-  mode "0755"
-  action :create
-end
-  
+
 apache_site "000-default" do
   enable false
 end
 
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
-  source "nova-dashboard.conf.erb"
+  if node.platform == "suse"
+    path "#{node[:apache][:dir]}/vhosts.d/nova-dashboard.conf"
+    source "nova-dashboard.conf.suse.erb"
+  else
+    source "nova-dashboard.conf.erb"
+  end
   mode 0644
-  variables :horizon_dir => "/usr/share/openstack-dashboard"
-  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf")
+  variables(
+      :horizon_dir => dashboard_path,
+      :user => node[:apache][:user],
+      :group => node[:apache][:group]
+  )
+  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
     notifies :reload, resources(:service => "apache2")
   end
 end
@@ -132,16 +150,16 @@ keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
 execute "python manage.py syncdb" do
-  cwd "/usr/share/openstack-dashboard"
-  environment ({'PYTHONPATH' => '/usr/share/openstack-dashboard/'})
+  cwd dashboard_path
+  environment ({'PYTHONPATH' => dashboard_path})
   command "python manage.py syncdb"
-  user "www-data"
+  user node[:apache][:user]
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
 # Need to template the "EXTERNAL_MONITORING" array
-template "/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py" do
+template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
   owner "root"
   group "root"
