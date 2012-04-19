@@ -78,36 +78,65 @@ end
 
 node.set_unless['dashboard']['db']['password'] = secure_password
 
-if node[:nova_dashboard][:sql_engine] == "mysql"
-    Chef::Log.info("Configuring Horizion to use MySQL backend")
-    include_recipe "mysql::client"
+sql_engine = node[:nova_dashboard][:sql_engine]
 
+db_provider = nil
+db_user_provider = nil
+privs = nil
+
+if sql_engine == "mysql"
     package "python-mysqldb" do
+        package_name "python-mysql" if node.platform == "suse"
         action :install
     end
 
-
-    env_filter = " AND mysql_config_environment:mysql-config-#{node[:nova_dashboard][:mysql_instance]}"
-    mysqls = search(:node, "recipes:mysql\\:\\:server#{env_filter}") || []
-    if mysqls.length > 0
-        mysql = mysqls[0]
-        mysql = node if mysql.name == node.name
-    else
-        mysql = node
+    db_provider = Chef::Provider::Database::Mysql
+    db_user_provider = Chef::Provider::Database::MysqlUser
+    privs = [ "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE",
+              "DROP", "INDEX", "ALTER" ]
+    django_db_backend = "'django.db.backends.mysql'"
+elsif sql_engine == "postgresql"
+    package "python-psycopg2" do
+         action :install
     end
 
-    mysql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(mysql, "admin").address if mysql_address.nil?
-    Chef::Log.info("Mysql server found at #{mysql_address}")
-    db_conn = { :host => mysql_address,
+    db_provider = Chef::Provider::Database::Postgresql
+    db_user_provider = Chef::Provider::Database::PostgresqlUser
+    privs = [ "CREATE", "CONNECT", "TEMP" ]
+    django_db_backend = "'django.db.backends.postgresql_psycopg2'"
+end
+
+if node[:nova_dashboard][:sql_engine] == "sqlite"
+   Chef::Log.info("Configuring Horizion to use SQLite3 backend")
+    db_settings = {
+      'ENGINE' => "'django.db.backends.sqlite3'",
+      'NAME' => "os.path.join(LOCAL_PATH, 'dashboard_openstack.sqlite3')"
+    }
+else
+    Chef::Log.info("Configuring Horizion to use #{sql_engine} backend")
+    include_recipe "#{sql_engine}::client"
+
+    env_filter = " AND #{sql_engine}_config_environment:#{sql_engine}-config-#{node[:nova_dashboard][:sql_instance]}"
+    sqls = search(:node, "roles:#{sql_engine}-server#{env_filter}") || []
+    if sqls.length > 0
+        sql = sqls[0]
+        sql = node if sql.name == node.name
+    else
+        sql = node
+    end
+
+    sql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(sql, "admin").address if sql_address.nil?
+    Chef::Log.info("#{sql_engine} server found at #{sql_address}")
+    db_conn = { :host => sql_address,
                 :username => "db_maker",
-                :password => mysql[:mysql][:db_maker_password] }
+                :password => sql[sql_engine][:db_maker_password] }
 
 
     # Create the Dashboard Database
     database "create #{node[:dashboard][:db][:database]} database" do
         connection db_conn
         database_name node[:dashboard][:db][:database]
-        provider Chef::Provider::Database::Mysql
+        provider db_provider
         action :create
     end
  
@@ -116,7 +145,7 @@ if node[:nova_dashboard][:sql_engine] == "mysql"
         database_name node[:dashboard][:db][:database]
         username node[:dashboard][:db][:user]
         password node[:dashboard][:db][:password]
-        provider Chef::Provider::Database::MysqlUser
+        provider db_user_provider
         action :create
     end
 
@@ -125,26 +154,19 @@ if node[:nova_dashboard][:sql_engine] == "mysql"
         database_name node[:dashboard][:db][:database]
         username node[:dashboard][:db][:user]
         password node[:dashboard][:db][:password]
-        host mysql_address
-        privileges ["SELECT", "INSERT", "UPDATE", "DELETE", "CREATE",
-                    "DROP", "INDEX", "ALTER" ]
-        provider Chef::Provider::Database::MysqlUser
+        host sql_address
+        privileges privs
+        provider db_user_provider
         action :grant
     end
 
     db_settings = {
-      'ENGINE' => "'django.db.backends.mysql'",
+      'ENGINE' => django_db_backend,
       'NAME' => "'#{node[:dashboard][:db][:database]}'",
       'USER' => "'#{node[:dashboard][:db][:user]}'",
       'PASSWORD' => "'#{node[:dashboard][:db][:password]}'",
-      'HOST' => "'#{mysql_address}'",
+      'HOST' => "'#{sql_address}'",
       'default-character-set' => "'utf8'"
-    }
-elsif node[:nova_dashboard][:sql_engine] == "sqlite"
-    Chef::Log.info("Configuring Horizion to use SQLite3 backend")
-    db_settings = {
-      'ENGINE' => "'django.db.backends.sqlite3'",
-      'NAME' => "os.path.join(LOCAL_PATH, 'dashboard_openstack.sqlite3')"
     }
 end
 

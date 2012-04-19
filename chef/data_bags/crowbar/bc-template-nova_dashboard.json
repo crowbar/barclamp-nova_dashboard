@@ -5,7 +5,7 @@
     "nova_dashboard": {
       "sql_engine": "mysql",
       "keystone_instance": "none",
-      "mysql_instance": "none"
+      "sql_instance": "none"
     }
   },
   "deployment": {

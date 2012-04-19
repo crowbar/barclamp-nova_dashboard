@@ -73,7 +73,7 @@ locale_additions:
         edit_attributes: 
           attributes: Attributes
           sql_engine: SQL Engine
-          mysql_instance: MySQL Instance
+          sql_instance: SQL Instance
           keystone_instance: Keystone Instance
           show_swift: Show Swift
         edit_deployment: 

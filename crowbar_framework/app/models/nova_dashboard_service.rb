@@ -26,8 +26,9 @@ class NovaDashboardService < ServiceObject
 
   def proposal_dependencies(role)
     answer = []
-    if role.default_attributes["nova_dashboard"]["sql_engine"] == "mysql"
-      answer << { "barclamp" => "mysql", "inst" => role.default_attributes["nova_dashboard"]["mysql_instance"] }
+    sql_engine = role.default_attributes["nova_dashboard"]["sql_engine"]
+    if sql_engine == "mysql" or sql_engine == "postgresql"
+      answer << { "barclamp" => sql_engine, "inst" => role.default_attributes["nova_dashboard"]["sql_instance"] }
     end
     answer << { "barclamp" => "keystone", "inst" => role.default_attributes["nova_dashboard"]["keystone_instance"] }
     answer
@@ -45,24 +46,52 @@ class NovaDashboardService < ServiceObject
       }
     end
 
-    base["attributes"]["nova_dashboard"]["mysql_instance"] = ""
+    base["attributes"]["nova_dashboard"]["sql_instance"] = ""
     begin
       mysqlService = MysqlService.new(@logger)
+      # Look for active roles
       mysqls = mysqlService.list_active[1]
       if mysqls.empty?
         # No actives, look for proposals
         mysqls = mysqlService.proposals[1]
       end
       if mysqls.empty?
-        base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
+        @logger.info("Dashboard create_proposal: no mysql proposal found")
+        base["attributes"]["nova_dashboard"]["sql_engine"] = ""
       else
-        base["attributes"]["nova_dashboard"]["mysql_instance"] = mysqls[0]
+        base["attributes"]["nova_dashboard"]["sql_instance"] = mysqls[0]
         base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
       end
     rescue
       @logger.info("Nova dashboard create_proposal: no mysql found")
-      base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
+      base["attributes"]["nova_dashboard"]["sql_engine"] = ""
     end
+
+    if base["attributes"]["nova_dashboard"]["sql_engine"] == ""
+      begin
+        pgsqlService = PostgresqlService.new(@logger)
+        # Look for active roles
+        pgsqls = pgsqlService.list_active[1]
+        if pgsqls.empty?
+          @logger.info("Dashboard create_proposal: no active postgresql proposal found")
+          # No actives, look for proposals
+          pgsqls = pgsqlService.proposals[1]
+        end
+        if pgsqls.empty?
+          @logger.info("Dashboard create_proposal: no postgressql proposal found")
+          base["attributes"]["nova_dashboard"]["sql_engine"] = ""
+        else
+          @logger.info("Dashboard create_proposal: postgresql instance #{pgsqls[0]}")
+          base["attributes"]["nova_dashboard"]["sql_instance"] = pgsqls[0]
+          base["attributes"]["nova_dashboard"]["sql_engine"] = "postgresql"
+        end
+      rescue
+        @logger.info("Dashboard create_proposal: no postgresql found")
+        base["attributes"]["nova_dashboard"]["sql_engine"] = ""
+      end
+    end
+
+    base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite" if base["attributes"]["nova_dashboard"]["sql_engine"] == ""
 
     base["attributes"]["nova_dashboard"]["show_swift"] = false
     begin
