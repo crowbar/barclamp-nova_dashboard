@@ -28,7 +28,7 @@ ports = node[:nova_dashboard][:monitor][:ports]
 log ("will monitor nova_dashboard svcs: #{svcs.join(',')} and ports #{ports.values.join(',')}")
 
 use_nagios = node["roles"].include?("nagios-client")
-use_nagios = false if svcs.size == 0 or ports.size == 0
+use_nagios = false if svcs.size == 0 and ports.size == 0
 
 if use_nagios
   include_recipe "nagios::common"
