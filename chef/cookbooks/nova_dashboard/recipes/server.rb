@@ -54,6 +54,10 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   end
 end
 
+file "/etc/apache2/conf.d/openstack-dashboard.conf" do
+  action :delete
+end
+
 apache_site "nova-dashboard.conf" do
   enable true
 end
