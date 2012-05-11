@@ -1,6 +1,8 @@
 import os
 
-DEBUG = True
+from django.utils.translation import ugettext_lazy as _
+
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 PROD = False
 USE_SSL = False
@@ -40,13 +42,10 @@ HORIZON_CONFIG = {
 
 OPENSTACK_HOST = "<%= @keystone_address %>"
 OPENSTACK_KEYSTONE_URL = "http://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
-# FIXME: this is only needed until keystone fixes its GET /tenants call
-# so that it doesn't return everything for admins
-OPENSTACK_KEYSTONE_ADMIN_URL = "http://%s:<%= @keystone_admin_port %>/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
-API_PAGINATE_LIMIT = 100
-SWIFT_PAGINATE_LIMIT = 100
+API_PAGINATE_LIMIT = 1000
+SWIFT_PAGINATE_LIMIT = 1000
 
 # If you have external monitoring links
 # EXTERNAL_MONITORING = [
@@ -54,46 +53,46 @@ SWIFT_PAGINATE_LIMIT = 100
 #    ['Ganglia','http://bar.com'],
 # ]
 
-#LOGGING = {
-# 'version': 1,
-# # When set to True this will disable all logging except
-# # for loggers specified in this configuration dictionary. Note that
-# # if nothing is specified here and disable_existing_loggers is True,
-# # django.db.backends will still log unless it is disabled explicitly.
-# 'disable_existing_loggers': False,
-# 'handlers': {
-# 'null': {
-# 'level': 'DEBUG',
-# 'class': 'django.utils.log.NullHandler',
-# },
-# 'console': {
-# # Set the level to "DEBUG" for verbose output logging.
-# 'level': 'INFO',
-# 'class': 'logging.StreamHandler',
-# },
-# },
-# 'loggers': {
-# # Logging from django.db.backends is VERY verbose, send to null
-# # by default.
-# 'django.db.backends': {
-# 'handlers': ['null'],
-# 'propagate': False,
-# },
-# 'horizon': {
-# 'handlers': ['console'],
-# 'propagate': False,
-# },
-# 'novaclient': {
-# 'handlers': ['console'],
-# 'propagate': False,
-# },
-# 'keystoneclient': {
-# 'handlers': ['console'],
-# 'propagate': False,
-# },
-# 'nose.plugins.manager': {
-# 'handlers': ['console'],
-# 'propagate': False,
-# }
-# }
-#}
+LOGGING = {
+  'version': 1,
+  # When set to True this will disable all logging except
+  # for loggers specified in this configuration dictionary. Note that
+  # if nothing is specified here and disable_existing_loggers is True,
+  # django.db.backends will still log unless it is disabled explicitly.
+  'disable_existing_loggers': False,
+  'handlers': {
+    'null': {
+      'level': 'DEBUG',
+      'class': 'django.utils.log.NullHandler',
+    },
+    'console': {
+      # Set the level to "DEBUG" for verbose output logging.
+      'level': 'INFO',
+      'class': 'logging.StreamHandler',
+    },
+  },
+  'loggers': {
+    # Logging from django.db.backends is VERY verbose, send to null
+    # by default.
+    'django.db.backends': {
+      'handlers': ['null'],
+      'propagate': False,
+    },
+    'horizon': {
+      'handlers': ['console'],
+      'propagate': False,
+    },
+    'novaclient': {
+      'handlers': ['console'],
+      'propagate': False,
+    },
+    'keystoneclient': {
+      'handlers': ['console'],
+      'propagate': False,
+    },
+    'nose.plugins.manager': {
+      'handlers': ['console'],
+      'propagate': False,
+    }
+  }
+}
