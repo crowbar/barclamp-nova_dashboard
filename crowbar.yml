@@ -41,9 +41,12 @@ debs:
   ubuntu-11.10:
     repos:
       - deb http://ops.rcb.me/packages oneiric diablo-final
+  ubuntu-12.04:
+    pkgs:
+      - python-django-horizon
+      - python-django-nose
   pkgs:
     - openstack-dashboard
-    - django-openstack
     - python-django
     - openstackx
     - python-mysqldb

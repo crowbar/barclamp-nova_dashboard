@@ -13,7 +13,4 @@
     %p
       %label{ :for => :keystone_instance }= t('.keystone_instance')
       = instance_selector("keystone", :keystone_instance, "keystone_instance", @proposal)
-    %p
-      %label{ :for => :show_swift }= t('.show_swift')
-      = select_tag :show_swift, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["show_swift"].to_s), :onchange => "update_value('show_swift', 'show_swift', 'boolean')"
 
