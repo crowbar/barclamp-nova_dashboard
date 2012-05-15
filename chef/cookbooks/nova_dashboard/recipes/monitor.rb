@@ -27,17 +27,22 @@ ports = node[:nova_dashboard][:monitor][:ports]
 
 log ("will monitor nova_dashboard svcs: #{svcs.join(',')} and ports #{ports.values.join(',')}")
 
-include_recipe "nagios::common" if node["roles"].include?("nagios-client")
+use_nagios = node["roles"].include?("nagios-client")
+use_nagios = false if svcs.size == 0 and ports.size == 0
 
-template "/etc/nagios/nrpe.d/nova_dashboard_nrpe.cfg" do
-  source "nova_dashboard_nrpe.cfg.erb"
-  mode "0644"
-  group node[:nagios][:group]
-  owner node[:nagios][:user]
-  variables( {
-    :svcs => svcs,
-    :ports => ports
-  })    
-  notifies :restart, "service[nagios-nrpe-server]"
-end if node["roles"].include?("nagios-client")    
+if use_nagios
+  include_recipe "nagios::common"
+
+  template "/etc/nagios/nrpe.d/nova_dashboard_nrpe.cfg" do
+    source "nova_dashboard_nrpe.cfg.erb"
+    mode "0644"
+    group node[:nagios][:group]
+    owner node[:nagios][:user]
+    variables( {
+      :svcs => svcs,
+      :ports => ports
+    })    
+    notifies :restart, "service[nagios-nrpe-server]"
+  end
+end
 
