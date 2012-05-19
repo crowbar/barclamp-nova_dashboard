@@ -28,7 +28,7 @@ packages.each do |pkg|
 end
 
 rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
-packages.each do |pkg|
+rm_pkgs.each do |pkg|
   package pkg do
     action :purge
   end
