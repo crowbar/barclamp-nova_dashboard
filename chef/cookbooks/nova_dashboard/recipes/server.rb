@@ -27,6 +27,13 @@ packages.each do |pkg|
   end
 end
 
+rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
+rm_pkgs.each do |pkg|
+  package pkg do
+    action :purge
+  end
+end
+
 directory "/usr/share/openstack-dashboard/.blackhole" do
   owner "www-data"
   group "www-data"
