@@ -43,6 +43,10 @@ HORIZON_CONFIG = {
 OPENSTACK_HOST = "<%= @keystone_address %>"
 OPENSTACK_KEYSTONE_URL = "http://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
+OPENSTACK_KEYSTONE_BACKEND = {
+    'name': 'native',
+    'can_edit_user': True
+}
 
 API_PAGINATE_LIMIT = 1000
 SWIFT_PAGINATE_LIMIT = 1000
