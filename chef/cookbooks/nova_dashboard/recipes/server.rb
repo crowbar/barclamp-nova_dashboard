@@ -89,7 +89,7 @@ if node[:nova_dashboard][:sql_engine] == "mysql"
         mysql = node
     end
 
-    mysql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(mysql, "admin").address if mysql_address.nil?
+    mysql_address = mysql.address.addr
     Chef::Log.info("Mysql server found at #{mysql_address}")
 
     # Create the Dashboard Database
@@ -137,7 +137,7 @@ else
 end
 
 keystone_address = keystone["keystone"]["address"] rescue nil
-keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
+keystone_address = keystone.address.addr
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
