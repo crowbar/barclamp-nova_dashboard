@@ -108,7 +108,9 @@ class NovaDashboardService < ServiceObject
     all_nodes.each do |n|
       net_svc.allocate_ip "default", "public", "host", n
       node = NodeObject.find_node_by_name(n)
-      server_ip = node.address("public").addr rescue node.address.addr
+      # We really should be able to use the public address if one is assigned.
+      # server_ip = node.address("public").addr rescue 
+      server_ip = node.address.addr
       node.crowbar["crowbar"] = {} if node.crowbar["crowbar"].nil?
       node.crowbar["crowbar"]["links"] = {} if node.crowbar["crowbar"]["links"].nil?
       node.crowbar["crowbar"]["links"]["Nova Dashboard"] = "http://#{server_ip}/"
