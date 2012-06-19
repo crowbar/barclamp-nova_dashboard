@@ -23,5 +23,7 @@
         allow from all
     </Directory>
 
+    ErrorLog /var/log/openstack-dashboard/error.log
     LogLevel warn
+    CustomLog /var/log/openstack-dashboard/access.log combined
 </VirtualHost>
