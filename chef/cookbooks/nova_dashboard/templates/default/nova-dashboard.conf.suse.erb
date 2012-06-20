@@ -5,24 +5,23 @@
     SetEnv APACHE_RUN_GROUP <%= @group %>
     WSGIProcessGroup horizon
 
-    DocumentRoot <%= @horizon_dir %>/.blackhole/
-    Alias /media <%= @horizon_dir %>/openstack_dashboard/static
-    Alias /vpn /opt/stack/vpn
-    Alias /static <%= @horizon_dir %>/openstack_dashboard/static/
+    DocumentRoot <%= @horizon_dir %>
+    Alias /static/horizon <%= @horizon_dir %>/horizon/static/horizon
+    Alias /static <%= @horizon_dir %>/openstack_dashboard/static
 
     <Directory />
-        Options FollowSymLinks
+        Options None
         AllowOverride None
+        Order deny,allow
+        Deny from all
     </Directory>
 
     <Directory <%= @horizon_dir %>/>
-        Options Indexes FollowSymLinks MultiViews
+        Options FollowSymLinks MultiViews
         AllowOverride None
         Order allow,deny
         allow from all
     </Directory>
 
-    ErrorLog /var/log/apache2/error.log
     LogLevel warn
-    CustomLog /var/log/apache2/access.log combined
 </VirtualHost>
