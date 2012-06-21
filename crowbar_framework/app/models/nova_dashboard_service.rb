@@ -53,19 +53,16 @@ class NovaDashboardService < ServiceObject
         # No actives, look for proposals
         mysqls = mysqlService.proposals[1]
       end
-      if mysqls.empty?
-        base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
-      else
+      unless mysqls.empty?
         base["attributes"]["nova_dashboard"]["mysql_instance"] = mysqls[0]
-        base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
       end
+      base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
     rescue
       @logger.info("Nova dashboard create_proposal: no mysql found")
-      base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite"
+      base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
     end
 
     base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
-    begin
       keystoneService = KeystoneService.new(@logger)
       keystones = keystoneService.list_active[1]
       if keystones.empty?

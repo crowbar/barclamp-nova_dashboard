@@ -124,6 +124,12 @@ elsif node[:nova_dashboard][:sql_engine] == "sqlite"
       'ENGINE' => "'django.db.backends.sqlite3'",
       'NAME' => "os.path.join(LOCAL_PATH, 'dashboard_openstack.sqlite3')"
     }
+    
+    file "/etc/openstack-dashboard/dashboard_openstack.sqlite3" do
+        action :touch
+        user "www-data"
+        group "www-data"
+    end
 end
 
 # Need to figure out environment filter
