@@ -63,6 +63,7 @@ class NovaDashboardService < ServiceObject
     end
 
     base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
+    begin
       keystoneService = KeystoneService.new(@logger)
       keystones = keystoneService.list_active[1]
       if keystones.empty?
