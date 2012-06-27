@@ -79,42 +79,10 @@ end
 node.set_unless['dashboard']['db']['password'] = secure_password
 
 sql_engine = node[:nova_dashboard][:sql_engine]
+url_scheme = ""
 
-db_provider = nil
-db_user_provider = nil
-privs = nil
-
-if sql_engine == "mysql"
-    package "python-mysqldb" do
-        package_name "python-mysql" if node.platform == "suse"
-        action :install
-    end
-
-    db_provider = Chef::Provider::Database::Mysql
-    db_user_provider = Chef::Provider::Database::MysqlUser
-    privs = [ "SELECT", "INSERT", "UPDATE", "DELETE", "CREATE",
-              "DROP", "INDEX", "ALTER" ]
-    django_db_backend = "'django.db.backends.mysql'"
-elsif sql_engine == "postgresql"
-    package "python-psycopg2" do
-         action :install
-    end
-
-    db_provider = Chef::Provider::Database::Postgresql
-    db_user_provider = Chef::Provider::Database::PostgresqlUser
-    privs = [ "CREATE", "CONNECT", "TEMP" ]
-    django_db_backend = "'django.db.backends.postgresql_psycopg2'"
-end
-
-if node[:nova_dashboard][:sql_engine] == "sqlite"
-   Chef::Log.info("Configuring Horizion to use SQLite3 backend")
-    db_settings = {
-      'ENGINE' => "'django.db.backends.sqlite3'",
-      'NAME' => "os.path.join(LOCAL_PATH, 'dashboard_openstack.sqlite3')"
-    }
-else
+if sql_engine == "database"
     Chef::Log.info("Configuring Horizion to use #{sql_engine} backend")
-    include_recipe "#{sql_engine}::client"
 
     env_filter = " AND #{sql_engine}_config_environment:#{sql_engine}-config-#{node[:nova_dashboard][:sql_instance]}"
     sqls = search(:node, "roles:#{sql_engine}-server#{env_filter}") || []
@@ -123,6 +91,21 @@ else
         sql = node if sql.name == node.name
     else
         sql = node
+    end
+    include_recipe "database::client"
+    backend_name = Chef::Recipe::Database::Util.get_backend_name(sql)
+    include_recipe "#{backend_name}::client"
+    include_recipe "#{backend_name}::python-client"
+
+    db_provider = Chef::Recipe::Database::Util.get_database_provider(sql)
+    db_user_provider = Chef::Recipe::Database::Util.get_user_provider(sql)
+    privs = Chef::Recipe::Database::Util.get_default_priviledges(sql)
+    url_scheme = backend_name
+    case backend_name
+    when "mysql"
+        django_db_backend = "'django.db.backends.mysql'"
+    when "postgresql"
+        django_db_backend = "'django.db.backends.postgresql_psycopg2'"
     end
 
     sql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(sql, "admin").address if sql_address.nil?
@@ -139,7 +122,7 @@ else
         provider db_provider
         action :create
     end
- 
+
     database_user "create dashboard database user" do
         connection db_conn
         database_name node[:dashboard][:db][:database]
@@ -167,6 +150,12 @@ else
       'PASSWORD' => "'#{node[:dashboard][:db][:password]}'",
       'HOST' => "'#{sql_address}'",
       'default-character-set' => "'utf8'"
+    }
+elsif node[:nova_dashboard][:sql_engine] == "sqlite"
+   Chef::Log.info("Configuring Horizion to use SQLite3 backend")
+    db_settings = {
+      'ENGINE' => "'django.db.backends.sqlite3'",
+      'NAME' => "os.path.join(LOCAL_PATH, 'dashboard_openstack.sqlite3')"
     }
 end
 
