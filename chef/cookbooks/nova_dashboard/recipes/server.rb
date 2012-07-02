@@ -72,6 +72,15 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   end
 end
 
+if node.platform == "suse"
+  template "/etc/logrotate.d/openstack-dashboard" do
+    source "nova-dashboard.logrotate.erb"
+    mode 0644
+    owner "root"
+    group "root"
+  end
+end
+
 apache_site "nova-dashboard.conf" do
   enable true
 end
