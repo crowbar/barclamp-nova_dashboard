@@ -196,9 +196,9 @@ end
 # Need to template the "EXTERNAL_MONITORING" array
 template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
-  owner "root"
+  owner "wwwrun"
   group "root"
-  mode "0644"
+  mode "0640"
   variables(
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
