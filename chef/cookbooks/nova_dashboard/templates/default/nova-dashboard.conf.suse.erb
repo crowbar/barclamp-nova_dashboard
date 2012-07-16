@@ -1,3 +1,4 @@
+<% if @use_http && !@redirect_to_https %>
 <VirtualHost *:80>
     WSGIScriptAlias / <%= @horizon_dir %>/openstack_dashboard/wsgi/django.wsgi
     WSGIDaemonProcess horizon user=<%= @user %> group=<%= @group %> processes=3 threads=10
@@ -27,3 +28,48 @@
     LogLevel warn
     CustomLog /var/log/openstack-dashboard/access.log combined
 </VirtualHost>
+<% end %>
+
+<% if @use_https %>
+<IfDefine SSL>
+    <% if @redirect_to_https %>
+    RewriteEngine On
+    RewriteCond %{SERVER_PORT} !^443$
+    RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
+    <% end %>
+
+    <VirtualHost *:443>
+        SSLEngine On
+        SSLCertificateFile <%= @ssl_crt_file %>
+        SSLCertificateKeyFile <%= @ssl_key_file %>
+
+        WSGIScriptAlias / <%= @horizon_dir %>/openstack_dashboard/wsgi/django.wsgi
+        WSGIDaemonProcess horizon user=<%= @user %> group=<%= @group %> processes=3 threads=10
+        SetEnv APACHE_RUN_USER  <%= @user %>
+        SetEnv APACHE_RUN_GROUP <%= @group %>
+        WSGIProcessGroup horizon
+
+        DocumentRoot <%= @horizon_dir %>
+        Alias /static/horizon <%= @horizon_dir %>/horizon/static/horizon
+        Alias /static <%= @horizon_dir %>/openstack_dashboard/static
+
+        <Directory />
+            Options None
+            AllowOverride None
+            Order deny,allow
+            Deny from all
+        </Directory>
+
+        <Directory <%= @horizon_dir %>/>
+            Options FollowSymLinks MultiViews
+            AllowOverride None
+            Order allow,deny
+            allow from all
+        </Directory>
+
+        ErrorLog /var/log/openstack-dashboard/error.log
+        LogLevel warn
+        CustomLog /var/log/openstack-dashboard/access.log combined
+    </VirtualHost>
+</IfDefine>
+<% end %>

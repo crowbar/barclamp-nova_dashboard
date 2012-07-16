@@ -5,7 +5,12 @@
     "nova_dashboard": {
       "sql_engine": "mysql",
       "keystone_instance": "none",
-      "sql_instance": "none"
+      "sql_instance": "none",
+      "apache_use_http": true,
+      "apache_use_https": false,
+      "apache_redirect_to_https": false,
+      "apache_ssl_crt_file": "/etc/apache2/ssl.crt/openstack-dashboard-server.crt",
+      "apache_ssl_key_file": "/etc/apache2/ssl.key/openstack-dashboard-server.key"
     }
   },
   "deployment": {

@@ -76,5 +76,11 @@ locale_additions:
           sql_instance: SQL Instance
           keystone_instance: Keystone Instance
           show_swift: Show Swift
+          apache: Apache Attributes
+          apache_use_http: Use HTTP
+          apache_use_https: Use HTTPS
+          apache_redirect_to_https: Redirect HTTP Traffic to HTTPS
+          apache_ssl_crt_file: SSL Certificate File
+          apache_ssl_key_file: SSL Key File
         edit_deployment: 
           deployment: Deployment

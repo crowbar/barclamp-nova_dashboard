@@ -17,6 +17,10 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
+if node[:nova_dashboard][:apache_use_https]
+  include_recipe "apache2::mod_ssl"
+end
+
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 if node.platform == "suse"
@@ -65,8 +69,30 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   variables(
       :horizon_dir => dashboard_path,
       :user => node[:apache][:user],
-      :group => node[:apache][:group]
+      :group => node[:apache][:group],
+      :use_http => node[:nova_dashboard][:apache_use_http],
+      :use_https => node[:nova_dashboard][:apache_use_https],
+      :redirect_to_https => node[:nova_dashboard][:apache_redirect_to_https],
+      :ssl_crt_file => node[:nova_dashboard][:apache_ssl_crt_file],
+      :ssl_key_file => node[:nova_dashboard][:apache_ssl_key_file]
   )
+  if node[:nova_dashboard][:apache_use_https] && node.platform == "suse"
+    #TODO/FIXME: Temporary solution, should move to 'apache' chef recipe:
+    file = File.open("/etc/sysconfig/apache2", "r")
+    lines, modified = file.readlines, false
+    file.close
+    lines.each do |line|
+      if line.start_with?('APACHE_SERVER_FLAGS') && line.scan('SSL') == []
+        line.gsub!(/\"(.*)\"/, '"\\1 SSL"')
+        modified = true
+      end
+    end
+    if modified
+      file = File.open("/etc/sysconfig/apache2", "w")
+      lines.each {|line| file.write(line)}
+      file.close
+    end
+  end
   if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
     notifies :reload, resources(:service => "apache2")
   end
