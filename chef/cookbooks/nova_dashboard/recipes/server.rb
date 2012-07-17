@@ -76,23 +76,6 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
       :ssl_crt_file => node[:nova_dashboard][:apache_ssl_crt_file],
       :ssl_key_file => node[:nova_dashboard][:apache_ssl_key_file]
   )
-  if node[:nova_dashboard][:apache_use_https] && node.platform == "suse"
-    #TODO/FIXME: Temporary solution, should move to 'apache' chef recipe:
-    file = File.open("/etc/sysconfig/apache2", "r")
-    lines, modified = file.readlines, false
-    file.close
-    lines.each do |line|
-      if line.start_with?('APACHE_SERVER_FLAGS') && line.scan('SSL') == []
-        line.gsub!(/\"(.*)\"/, '"\\1 SSL"')
-        modified = true
-      end
-    end
-    if modified
-      file = File.open("/etc/sysconfig/apache2", "w")
-      lines.each {|line| file.write(line)}
-      file.close
-    end
-  end
   if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
     notifies :reload, resources(:service => "apache2")
   end
