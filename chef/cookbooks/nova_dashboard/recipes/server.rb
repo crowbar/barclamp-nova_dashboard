@@ -70,11 +70,11 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
       :horizon_dir => dashboard_path,
       :user => node[:apache][:user],
       :group => node[:apache][:group],
-      :use_http => node[:nova_dashboard][:apache_use_http],
-      :use_https => node[:nova_dashboard][:apache_use_https],
-      :redirect_to_https => node[:nova_dashboard][:apache_redirect_to_https],
-      :ssl_crt_file => node[:nova_dashboard][:apache_ssl_crt_file],
-      :ssl_key_file => node[:nova_dashboard][:apache_ssl_key_file]
+      :use_http => node[:nova_dashboard][:apache][:use_http],
+      :use_https => node[:nova_dashboard][:apache][:use_https],
+      :redirect_to_https => node[:nova_dashboard][:apache][:redirect_to_https],
+      :ssl_crt_file => node[:nova_dashboard][:apache][:ssl_crt_file],
+      :ssl_key_file => node[:nova_dashboard][:apache][:ssl_key_file]
   )
   if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
     notifies :reload, resources(:service => "apache2")

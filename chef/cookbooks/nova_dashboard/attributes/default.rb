@@ -27,8 +27,8 @@ node[:nova_dashboard][:monitor][:svcs] = []
 node[:nova_dashboard][:monitor][:ports]={}
 
 # Secure Apache config
-default[:nova_dashboard][:apache_use_http] = true # Provide dashboard vhost on port 80
-default[:nova_dashboard][:apache_use_https] = false # Provide dashboard vhost on port 443
-default[:nova_dashboard][:apache_redirect_to_https] = false # Redirect all requests to port 443
-default[:nova_dashboard][:apache_ssl_crt_file] = '/etc/apache2/ssl.crt/openstack-dashboard-server.crt'
-default[:nova_dashboard][:apache_ssl_key_file] = '/etc/apache2/ssl.key/openstack-dashboard-server.key'
+default[:nova_dashboard][:apache][:use_http] = true # Provide dashboard vhost on port 80
+default[:nova_dashboard][:apache][:use_https] = false # Provide dashboard vhost on port 443
+default[:nova_dashboard][:apache][:redirect_to_https] = false # Redirect all requests to port 443
+default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/openstack-dashboard-server.crt'
+default[:nova_dashboard][:apache][:ssl_key_file] = '/etc/apache2/ssl.key/openstack-dashboard-server.key'

@@ -18,28 +18,25 @@
   %div.container{ :id => :apache }
     %p
       %label{ :for => :apache_use_http }= t('.apache_use_http')
-      //= check_box_tag :apache_use_http, t('.apache_use_http'), @proposal.raw_data['attributes'][@proposal.barclamp]["apache_use_http"].to_s, :onchange => "update_value('apache_use_http', 'apache_use_http', 'boolean')"
-      = select_tag :apache_use_http, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache_use_http"].to_s), :onchange => "update_value('apache_use_http', 'apache_use_http', 'boolean')"
+      = select_tag :apache_use_http, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["use_http"].to_s), :onchange => "update_value('apache/use_http', 'apache_use_http', 'boolean')"
 
     %p
       %label{ :for => :apache_use_https }= t('.apache_use_https')
-      //= check_box_tag :apache_use_https, t('.apache_use_https'), @proposal.raw_data['attributes'][@proposal.barclamp]["apache_use_https"].to_s, :onchange => "update_value('apache_use_https', 'apache_use_https', 'boolean')"
-      = select_tag :apache_use_https, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache_use_https"].to_s), :onchange => "update_value('apache_use_https', 'apache_use_https', 'boolean')"
+      = select_tag :apache_use_https, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["use_https"].to_s), :onchange => "update_value('apache/use_https', 'apache_use_https', 'boolean')"
 
     %div{ :id => :apache_use_https_div }
       %p
         %label{ :for => :apache_redirect_to_https }= t('.apache_redirect_to_https')
-        //= check_box_tag :apache_redirect_to_https, t('.apache_redirect_to_https'), @proposal.raw_data['attributes'][@proposal.barclamp]["apache_redirect_to_https"].to_s, :onchange => "update_value('apache_redirect_to_https', 'apache_redirect_to_https', 'boolean')"
-        = select_tag :apache_redirect_to_https, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache_redirect_to_https"].to_s), :onchange => "update_value('apache_redirect_to_https', 'apache_redirect_to_https', 'boolean')"
+        = select_tag :apache_redirect_to_https, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["redirect_to_https"].to_s), :onchange => "update_value('apache/redirect_to_https', 'apache_redirect_to_https', 'boolean')"
 
       //TODO/Fixme: provide upload dialog for these. For now we have to rely on the files being present on the machine:
       %p
         %label{ :for => :apache_ssl_crt_file }= t('.apache_ssl_crt_file')
-        = text_field_tag :apache_ssl_crt_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache_ssl_crt_file"], :size => 80, :onchange => "update_value('apache_ssl_crt_file', 'apache_ssl_crt_file', 'string')"
+        = text_field_tag :apache_ssl_crt_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_crt_file"], :size => 80, :onchange => "update_value('apache/ssl_crt_file', 'apache_ssl_crt_file', 'string')"
 
       %p
         %label{ :for => :apache_ssl_key_file }= t('.apache_ssl_key_file')
-        = text_field_tag :apache_ssl_key_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache_ssl_key_file"], :size => 80, :onchange => "update_value('apache_ssl_key_file', 'apache_ssl_key_file', 'string')"
+        = text_field_tag :apache_ssl_key_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_key_file"], :size => 80, :onchange => "update_value('apache/ssl_key_file', 'apache_ssl_key_file', 'string')"
 
 
 :javascript

@@ -16,11 +16,17 @@
             "keystone_instance": { "type": "str", "required": true },
             "sql_instance": { "type": "str", "required": true },
             "sql_engine": { "type": "str", "required": true },
-            "apache_use_http": { "type": "bool", "required": true },
-            "apache_use_https": { "type": "bool", "required": true },
-            "apache_redirect_to_https": { "type": "bool", "required": true },
-            "apache_ssl_crt_file": { "type": "str" },
-            "apache_ssl_key_file": { "type": "str" }
+            "apache" : {
+              "type" : "map",
+              "required" : true,
+              "mapping": {
+                "use_http": { "type": "bool", "required": true },
+                "use_https": { "type": "bool", "required": true },
+                "redirect_to_https": { "type": "bool", "required": true },
+                "ssl_crt_file": { "type": "str" },
+                "ssl_key_file": { "type": "str" }
+              }
+            }
           }
         }
       }
