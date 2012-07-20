@@ -39,10 +39,10 @@ HORIZON_CONFIG = {
 }
 
 OPENSTACK_HOST = "<%= @keystone_address %>"
-OPENSTACK_KEYSTONE_URL = "http://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
+OPENSTACK_KEYSTONE_URL = "<%= @keystone_protocol %>://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
 # FIXME: this is only needed until keystone fixes its GET /tenants call
 # so that it doesn't return everything for admins
-OPENSTACK_KEYSTONE_ADMIN_URL = "http://%s:<%= @keystone_admin_port %>/v2.0" % OPENSTACK_HOST
+OPENSTACK_KEYSTONE_ADMIN_URL = "<%= @keystone_protocol %>://%s:<%= @keystone_admin_port %>/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
 API_PAGINATE_LIMIT = 100

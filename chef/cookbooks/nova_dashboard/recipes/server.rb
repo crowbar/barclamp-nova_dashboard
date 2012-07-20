@@ -189,6 +189,7 @@ end
 
 keystone_address = keystone["keystone"]["address"] rescue nil
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
+keystone_protocol = keystone["keystone"]["api"]["protocol"]
 keystone_admin_port = keystone["keystone"]["api"]["admin_port"] rescue nil
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
@@ -209,6 +210,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   group "root"
   mode "0640"
   variables(
+    :keystone_protocol => keystone_protocol,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
     :keystone_admin_port => keystone_admin_port,
