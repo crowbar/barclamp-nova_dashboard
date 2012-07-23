@@ -13,6 +13,10 @@
     %p
       %label{ :for => :keystone_instance }= t('.keystone_instance')
       = instance_selector("keystone", :keystone_instance, "keystone_instance", @proposal)
+    %p
+      %label{ :for => :ssl_no_verify }= t('.ssl_no_verify')
+      = select_tag :ssl_no_verify, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["ssl_no_verify"].to_s), :onchange => "update_value('ssl_no_verify', 'ssl_no_verify', 'boolean')"
+      %em= t('.ssl_no_verify_hint')
 
   %label{ :for => :apache }= t('.apache')
   %div.container{ :id => :apache }

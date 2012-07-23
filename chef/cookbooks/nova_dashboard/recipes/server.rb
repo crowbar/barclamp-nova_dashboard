@@ -95,7 +95,6 @@ apache_site "nova-dashboard.conf" do
 end
 
 node.set_unless['dashboard']['db']['password'] = secure_password
-
 sql_engine = node[:nova_dashboard][:sql_engine]
 url_scheme = ""
 
@@ -214,7 +213,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
     :keystone_admin_port => keystone_admin_port,
-    :db_settings => db_settings
+    :db_settings => db_settings,
+    :ssl_no_verify => node[:nova_dashboard][:ssl_no_verify]
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create

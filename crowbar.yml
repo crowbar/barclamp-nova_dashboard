@@ -75,6 +75,8 @@ locale_additions:
           sql_engine: SQL Engine
           sql_instance: SQL Instance
           keystone_instance: Keystone Instance
+          ssl_no_verify: Disable SSL Certificate Verification
+          ssl_no_verify_hint: Useful when using self-signed certificates for OpenStack API services
           show_swift: Show Swift
           apache: Apache Attributes
           apache_use_http: Use HTTP

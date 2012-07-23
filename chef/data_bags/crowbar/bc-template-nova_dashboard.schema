@@ -16,6 +16,7 @@
             "keystone_instance": { "type": "str", "required": true },
             "sql_instance": { "type": "str", "required": true },
             "sql_engine": { "type": "str", "required": true },
+            "ssl_no_verify": { "type": "bool", "required": true },
             "apache" : {
               "type" : "map",
               "required" : true,

@@ -32,3 +32,6 @@ default[:nova_dashboard][:apache][:use_https] = false # Provide dashboard vhost 
 default[:nova_dashboard][:apache][:redirect_to_https] = false # Redirect all requests to port 443
 default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/openstack-dashboard-server.crt'
 default[:nova_dashboard][:apache][:ssl_key_file] = '/etc/apache2/ssl.key/openstack-dashboard-server.key'
+
+# SSL certificate verification, disable when using self-signed certificates
+default[:nova_dashboard][:ssl_no_verify] = false
