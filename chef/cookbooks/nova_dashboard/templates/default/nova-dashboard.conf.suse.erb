@@ -24,9 +24,9 @@
         allow from all
     </Directory>
 
-    ErrorLog /var/log/openstack-dashboard/error.log
+    ErrorLog /var/log/apache2/openstack-dashboard-error_log
     LogLevel warn
-    CustomLog /var/log/openstack-dashboard/access.log combined
+    CustomLog /var/log/apache2/openstack-dashboard-access_log combined
 </VirtualHost>
 <% end %>
 
@@ -69,9 +69,9 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
         allow from all
     </Directory>
 
-    ErrorLog /var/log/openstack-dashboard/error.log
+    ErrorLog /var/log/apache2/openstack-dashboard-error_log
     LogLevel warn
-    CustomLog /var/log/openstack-dashboard/access.log combined
+    CustomLog /var/log/apache2/openstack-dashboard-access_log combined
 </VirtualHost>
 
 </IfDefine>

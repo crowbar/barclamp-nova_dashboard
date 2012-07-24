@@ -60,7 +60,7 @@ end
 
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   if node.platform == "suse"
-    path "#{node[:apache][:dir]}/vhosts.d/nova-dashboard.conf"
+    path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
     source "nova-dashboard.conf.suse.erb"
   else
     source "nova-dashboard.conf.erb"
