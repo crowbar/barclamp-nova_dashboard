@@ -101,3 +101,8 @@ SWIFT_PAGINATE_LIMIT = 100
 # }
 # }
 #}
+
+<% if @secure_cookies %>
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+<% end %>

@@ -202,6 +202,15 @@ execute "python manage.py syncdb" do
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
+# Secure cookies only work over HTTPS:
+if node[:nova_dashboard][:apache][:use_https] &&
+   (!node[:nova_dashboard][:apache][:use_http] ||
+    node[:nova_dashboard][:apache][:redirect_to_https])
+  secure_cookies = true
+else
+  secure_cookies = false
+end
+
 # Need to template the "EXTERNAL_MONITORING" array
 template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
@@ -214,7 +223,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_service_port => keystone_service_port,
     :keystone_admin_port => keystone_admin_port,
     :db_settings => db_settings,
-    :ssl_no_verify => node[:nova_dashboard][:ssl_no_verify]
+    :ssl_no_verify => node[:nova_dashboard][:ssl_no_verify],
+    :secure_cookies => secure_cookies
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
