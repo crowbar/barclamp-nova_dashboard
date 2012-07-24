@@ -58,6 +58,14 @@ apache_site "000-default" do
   enable false
 end
 
+# Get rid of unwanted vhost config files:
+["#{node[:apache][:dir]}/vhosts.d/default-redirect.conf",
+ "#{node[:apache][:dir]}/vhosts.d/nova-dashboard.conf"].each do |f|
+  file f do
+    action :delete
+  end
+end
+
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   if node.platform == "suse"
     path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
