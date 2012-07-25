@@ -66,14 +66,3 @@ gems:
     # put your gems here.
     # - i18n
 
-locale_additions:
-  en:
-    barclamp:
-      nova_dashboard:
-        edit_attributes: 
-          attributes: Attributes
-          sql_engine: SQL Engine
-          mysql_instance: MySQL Instance
-          keystone_instance: Keystone Instance
-        edit_deployment: 
-          deployment: Deployment
