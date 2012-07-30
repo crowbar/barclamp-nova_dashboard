@@ -46,7 +46,7 @@ OPENSTACK_KEYSTONE_ADMIN_URL = "<%= @keystone_protocol %>://%s:<%= @keystone_adm
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 <% if @ssl_no_verify %>
 # Disable SSL certificate checks (useful for self-signed certificates):
-OPENSTACK_KEYSTONE_SSL_NO_VERIFY = True
+OPENSTACK_SSL_NO_VERIFY = True
 <% end %>
 
 API_PAGINATE_LIMIT = 100
