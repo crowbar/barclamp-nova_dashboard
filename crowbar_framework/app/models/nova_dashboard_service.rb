@@ -64,6 +64,9 @@ class NovaDashboardService < ServiceObject
       base["attributes"]["nova_dashboard"]["sql_engine"] = ""
     end
 
+    if base["attributes"]["nova_dashboard"]["sql_engine"] == ""
+      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "database"))
+    end
 
     base["attributes"]["nova_dashboard"]["show_swift"] = false
     begin
@@ -94,6 +97,10 @@ class NovaDashboardService < ServiceObject
       base["attributes"]["nova_dashboard"]["keystone_instance"] = keystones[0] unless keystones.empty?
     rescue
       @logger.info("Nova dashboard create_proposal: no keystone found")
+    end
+
+    if base["attributes"]["nova_dashboard"]["keystone_instance"] == ""
+      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "keystone"))
     end
 
     @logger.debug("Nova_dashboard create_proposal: exiting")
