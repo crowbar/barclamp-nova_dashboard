@@ -34,7 +34,7 @@ packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "pytho
 packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "openstack-swift", "python-keystone", "python-django", "python-horizon", "python-django-nose" ] if node.platform == "suse"
 packages.each do |pkg|
   package pkg do
-    action :install
+    action :upgrade
   end
 end
 
