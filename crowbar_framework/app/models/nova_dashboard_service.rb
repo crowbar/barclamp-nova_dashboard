@@ -26,9 +26,7 @@ class NovaDashboardService < ServiceObject
 
   def proposal_dependencies(role)
     answer = []
-    if role.default_attributes["nova_dashboard"]["sql_engine"] == "database"
-      answer << { "barclamp" => "database", "inst" => role.default_attributes["nova_dashboard"]["sql_instance"] }
-    end
+    answer << { "barclamp" => "database", "inst" => role.default_attributes["nova_dashboard"]["sql_instance"] }
     answer << { "barclamp" => "keystone", "inst" => role.default_attributes["nova_dashboard"]["keystone_instance"] }
     answer
   end
@@ -66,7 +64,6 @@ class NovaDashboardService < ServiceObject
       base["attributes"]["nova_dashboard"]["sql_engine"] = ""
     end
 
-    base["attributes"]["nova_dashboard"]["sql_engine"] = "sqlite" if base["attributes"]["nova_dashboard"]["sql_engine"] == ""
 
     base["attributes"]["nova_dashboard"]["show_swift"] = false
     begin
