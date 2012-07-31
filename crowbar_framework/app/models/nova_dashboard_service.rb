@@ -72,6 +72,9 @@ class NovaDashboardService < ServiceObject
 
     # SQLite is not a fallback solution
     # base["attributes"]["nova_dashboard"]["database_engine"] = "sqlite" if base["attributes"]["nova_dashboard"]["database_engine"] == ""
+    if base["attributes"]["nova_dashboard"]["database_engine"] == ""
+      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "database"))
+    end
 
     base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
     begin
@@ -86,6 +89,10 @@ class NovaDashboardService < ServiceObject
       @logger.info("Nova dashboard create_proposal: no keystone found")
     end
 
+    if base["attributes"]["nova_dashboard"]["keystone_instance"] == ""
+      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "keystone"))
+    end
+
     base["attributes"]["nova_dashboard"]["nova_instance"] = ""
     begin
       novaService = NovaService.new(@logger)
@@ -97,6 +104,10 @@ class NovaDashboardService < ServiceObject
       base["attributes"]["nova_dashboard"]["nova_instance"] = novas[0] unless novas.empty?
     rescue
       @logger.info("Nova dashboard create_proposal: no nova found")
+    end
+
+    if base["attributes"]["nova_dashboard"]["nova_instance"] == ""
+      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "nova"))
     end
 
     base["attributes"][@bc_name]["git_instance"] = ""
