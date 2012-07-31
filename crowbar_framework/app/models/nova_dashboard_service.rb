@@ -70,7 +70,8 @@ class NovaDashboardService < ServiceObject
       base["attributes"]["nova_dashboard"]["database_engine"] = ""
     end
 
-    base["attributes"]["nova_dashboard"]["database_engine"] = "sqlite" if base["attributes"]["nova_dashboard"]["database_engine"] == ""
+    # SQLite is not a fallback solution
+    # base["attributes"]["nova_dashboard"]["database_engine"] = "sqlite" if base["attributes"]["nova_dashboard"]["database_engine"] == ""
 
     base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
     begin
