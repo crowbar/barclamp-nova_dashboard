@@ -20,6 +20,7 @@ barclamp:
   display: Nova Dashboard
   description: User Interface for OpenStack projects (aka code name Horizon)
   version: 0
+  allow_multiple_proposals: true
   requires:
     - keystone
   member:
