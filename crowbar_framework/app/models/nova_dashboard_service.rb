@@ -18,10 +18,10 @@ class NovaDashboardService < ServiceObject
   def proposal_dependencies(new_config)
     answer = []
     hash = new_config.config_hash
-    if hash["sql_engine"] == "mysql"
-      answer << { "barclamp" => "mysql", "inst" => hash["mysql_instance"] }
+    if hash["nova_dashboard"]["sql_engine"] == "mysql"
+      answer << { "barclamp" => "mysql", "inst" => hash["nova_dashboard"]["mysql_instance"] }
     end
-    answer << { "barclamp" => "keystone", "inst" => hash["keystone_instance"] }
+    answer << { "barclamp" => "keystone", "inst" => hash["nova_dashboard"]["keystone_instance"] }
     answer
   end
 
@@ -36,7 +36,7 @@ class NovaDashboardService < ServiceObject
     end
 
     hash = base.config_hash
-    hash["mysql_instance"] = ""
+    hash["nova_dashboard"]["mysql_instance"] = ""
     begin
       mysqlService = Barclamp.find_by_name('mysql')
       mysqls = mysqlService.active_proposals
@@ -45,15 +45,15 @@ class NovaDashboardService < ServiceObject
         mysqls = mysqlService.proposals
       end
       unless mysqls.empty?
-        hash["mysql_instance"] = mysqls[0].name
+        hash["nova_dashboard"]["mysql_instance"] = mysqls[0].name
       end
-      hash["sql_engine"] = "mysql"
+      hash["nova_dashboard"]["sql_engine"] = "mysql"
     rescue
       @logger.info("Nova dashboard create_proposal: no mysql found")
-      hash["sql_engine"] = "mysql"
+      hash["nova_dashboard"]["sql_engine"] = "mysql"
     end
 
-    hash["keystone_instance"] = ""
+    hash["nova_dashboard"]["keystone_instance"] = ""
     begin
       keystoneService = Barclamp.find_by_name('keystone')
       keystones = keystoneService.active_proposals
@@ -61,7 +61,7 @@ class NovaDashboardService < ServiceObject
         # No actives, look for proposals
         keystones = keystoneService.proposals
       end
-      hash["keystone_instance"] = keystones[0].name unless keystones.empty?
+      hash["nova_dashboard"]["keystone_instance"] = keystones[0].name unless keystones.empty?
     rescue
       @logger.info("Nova dashboard create_proposal: no keystone found")
     end
