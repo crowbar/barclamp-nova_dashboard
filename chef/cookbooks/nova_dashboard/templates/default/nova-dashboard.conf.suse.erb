@@ -1,7 +1,8 @@
+WSGIDaemonProcess horizon user=<%= @user %> group=<%= @group %> processes=3 threads=10
+
 <% if @use_http && !@redirect_to_https %>
 <VirtualHost *:80>
     WSGIScriptAlias / <%= @horizon_dir %>/openstack_dashboard/wsgi/django.wsgi
-    WSGIDaemonProcess horizon user=<%= @user %> group=<%= @group %> processes=3 threads=10
     SetEnv APACHE_RUN_USER  <%= @user %>
     SetEnv APACHE_RUN_GROUP <%= @group %>
     WSGIProcessGroup horizon
@@ -46,7 +47,6 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
     SSLCertificateKeyFile <%= @ssl_key_file %>
 
     WSGIScriptAlias / <%= @horizon_dir %>/openstack_dashboard/wsgi/django.wsgi
-    WSGIDaemonProcess horizon user=<%= @user %> group=<%= @group %> processes=3 threads=10
     SetEnv APACHE_RUN_USER  <%= @user %>
     SetEnv APACHE_RUN_GROUP <%= @group %>
     WSGIProcessGroup horizon
