@@ -17,7 +17,7 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
-if node[:nova_dashboard][:apache_use_https]
+if node[:nova_dashboard][:apache][:use_https]
   include_recipe "apache2::mod_ssl"
 end
 
