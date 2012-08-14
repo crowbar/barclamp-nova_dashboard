@@ -49,6 +49,15 @@ OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 OPENSTACK_SSL_NO_VERIFY = True
 <% end %>
 
+# The OPENSTACK_KEYSTONE_BACKEND settings can be used to identify the
+# capabilities of the auth backend for Keystone.
+# If Keystone has been configured to use LDAP as the auth backend then set
+# can_edit_user to False and name to 'ldap'.
+OPENSTACK_KEYSTONE_BACKEND = {
+    'name': 'native',
+    'can_edit_user': True
+}
+
 API_PAGINATE_LIMIT = 100
 SWIFT_PAGINATE_LIMIT = 100
 
