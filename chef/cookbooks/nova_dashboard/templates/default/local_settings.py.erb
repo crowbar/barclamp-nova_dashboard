@@ -38,6 +38,10 @@ HORIZON_CONFIG = {
     'dashboards': ('nova', 'syspanel', 'settings',),
     'default_dashboard': 'nova',
     'user_home': 'openstack_dashboard.views.user_home',
+    'password_validator': {
+        "regex": '.{8,}',
+        "help_text": "Your password must be at least 8 characters long."
+    }
 }
 
 COMPRESS_OFFLINE = <%= @compress_offline ? "True" : "False" %>
