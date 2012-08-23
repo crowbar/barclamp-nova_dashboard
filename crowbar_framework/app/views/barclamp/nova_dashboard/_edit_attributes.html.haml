@@ -21,18 +21,10 @@
   %label{ :for => :apache }= t('.apache')
   %div.container{ :id => :apache }
     %p
-      %label{ :for => :apache_use_http }= t('.apache_use_http')
-      = select_tag :apache_use_http, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["use_http"].to_s), :onchange => "update_value('apache/use_http', 'apache_use_http', 'boolean')"
-
-    %p
       %label{ :for => :apache_use_https }= t('.apache_use_https')
       = select_tag :apache_use_https, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["use_https"].to_s), :onchange => "update_value('apache/use_https', 'apache_use_https', 'boolean')"
 
     %div{ :id => :apache_use_https_div }
-      %p
-        %label{ :for => :apache_redirect_to_https }= t('.apache_redirect_to_https')
-        = select_tag :apache_redirect_to_https, options_for_select([['true','true'], ['false', 'false']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["redirect_to_https"].to_s), :onchange => "update_value('apache/redirect_to_https', 'apache_redirect_to_https', 'boolean')"
-
       //TODO/Fixme: provide upload dialog for these. For now we have to rely on the files being present on the machine:
       %p
         %label{ :for => :apache_ssl_crt_file }= t('.apache_ssl_crt_file')
@@ -45,8 +37,7 @@
 
 :javascript
   function toggle_redirect_to_https() {
-    if ($('#apache_use_http option:selected').text() == 'true' &&
-        $('#apache_use_https option:selected').text() == 'true') {
+    if ($('#apache_use_https option:selected').text() == 'true') {
       $('#apache_use_https_div').show();
     } else {
       $('#apache_use_https_div').hide();
@@ -54,5 +45,4 @@
   };
 
   $(document).ready(function () { toggle_redirect_to_https(); });
-  $('#apache_use_http').change(toggle_redirect_to_https);
   $('#apache_use_https').change(toggle_redirect_to_https);

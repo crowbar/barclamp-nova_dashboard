@@ -78,9 +78,9 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
       :horizon_dir => dashboard_path,
       :user => node[:apache][:user],
       :group => node[:apache][:group],
-      :use_http => node[:nova_dashboard][:apache][:use_http],
+      :use_http => ! node[:nova_dashboard][:apache][:use_https],
       :use_https => node[:nova_dashboard][:apache][:use_https],
-      :redirect_to_https => node[:nova_dashboard][:apache][:redirect_to_https],
+      :redirect_to_https => node[:nova_dashboard][:apache][:use_https],
       :ssl_crt_file => node[:nova_dashboard][:apache][:ssl_crt_file],
       :ssl_key_file => node[:nova_dashboard][:apache][:ssl_key_file]
   )
