@@ -115,6 +115,9 @@ SWIFT_PAGINATE_LIMIT = 100
 # }
 #}
 
+from horizon.utils import secret_key
+SECRET_KEY = secret_key.generate_or_read_from_file(os.path.join(LOCAL_PATH, '.secret_key_store'))
+
 <% if @secure_cookies %>
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
