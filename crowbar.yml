@@ -20,13 +20,14 @@ barclamp:
   display: Nova Dashboard
   description: User Interface for OpenStack projects (aka code name Horizon)
   version: 0
+  allow_multiple_proposals: true
   requires:
     - keystone
   member:
     - openstack
 
 crowbar:
-  layout: 1
+  layout: 2
   order: 90
   run_order: 90
   chef_order: 90
@@ -66,14 +67,3 @@ gems:
     # put your gems here.
     # - i18n
 
-locale_additions:
-  en:
-    barclamp:
-      nova_dashboard:
-        edit_attributes: 
-          attributes: Attributes
-          sql_engine: SQL Engine
-          mysql_instance: MySQL Instance
-          keystone_instance: Keystone Instance
-        edit_deployment: 
-          deployment: Deployment

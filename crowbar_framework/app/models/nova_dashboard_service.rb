@@ -1,4 +1,4 @@
-# Copyright 2011, Dell, Inc. 
+# Copyright 2012, Dell, Inc. 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
 # you may not use this file except in compliance with the License. 
@@ -15,21 +15,13 @@
 
 class NovaDashboardService < ServiceObject
 
-  def initialize(thelogger)
-    @bc_name = "nova_dashboard"
-    @logger = thelogger
-  end
-
-  def self.allow_multiple_proposals?
-    true
-  end
-
-  def proposal_dependencies(role)
+  def proposal_dependencies(new_config)
     answer = []
-    if role.default_attributes["nova_dashboard"]["sql_engine"] == "mysql"
-      answer << { "barclamp" => "mysql", "inst" => role.default_attributes["nova_dashboard"]["mysql_instance"] }
+    hash = new_config.config_hash
+    if hash["nova_dashboard"]["sql_engine"] == "mysql"
+      answer << { "barclamp" => "mysql", "inst" => hash["nova_dashboard"]["mysql_instance"] }
     end
-    answer << { "barclamp" => "keystone", "inst" => role.default_attributes["nova_dashboard"]["keystone_instance"] }
+    answer << { "barclamp" => "keystone", "inst" => hash["nova_dashboard"]["keystone_instance"] }
     answer
   end
 
@@ -37,60 +29,61 @@ class NovaDashboardService < ServiceObject
     @logger.debug("Nova_dashboard create_proposal: entering")
     base = super
 
-    nodes = NodeObject.all
-    nodes.delete_if { |n| n.nil? or n.admin? }
+    nodes = Node.all
+    nodes.delete_if { |n| n.nil? or n.is_admin? }
     if nodes.size >= 1
-      base["deployment"]["nova_dashboard"]["elements"] = {
-        "nova_dashboard-server" => [ nodes.first[:fqdn] ]
-      }
+      add_role_to_instance_and_node(nodes[0].name, base.name, "nova_dashboard-server")
     end
 
-    base["attributes"]["nova_dashboard"]["mysql_instance"] = ""
+    hash = base.config_hash
+    hash["nova_dashboard"]["mysql_instance"] = ""
     begin
-      mysqlService = MysqlService.new(@logger)
-      mysqls = mysqlService.list_active[1]
+      mysqlService = Barclamp.find_by_name('mysql')
+      mysqls = mysqlService.active_proposals
       if mysqls.empty?
         # No actives, look for proposals
-        mysqls = mysqlService.proposals[1]
+        mysqls = mysqlService.proposals
       end
       unless mysqls.empty?
-        base["attributes"]["nova_dashboard"]["mysql_instance"] = mysqls[0]
+        hash["nova_dashboard"]["mysql_instance"] = mysqls[0].name
       end
-      base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
+      hash["nova_dashboard"]["sql_engine"] = "mysql"
     rescue
       @logger.info("Nova dashboard create_proposal: no mysql found")
-      base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
+      hash["nova_dashboard"]["sql_engine"] = "mysql"
     end
 
-    base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
+    hash["nova_dashboard"]["keystone_instance"] = ""
     begin
-      keystoneService = KeystoneService.new(@logger)
-      keystones = keystoneService.list_active[1]
+      keystoneService = Barclamp.find_by_name('keystone')
+      keystones = keystoneService.active_proposals
       if keystones.empty?
         # No actives, look for proposals
-        keystones = keystoneService.proposals[1]
+        keystones = keystoneService.proposals
       end
-      base["attributes"]["nova_dashboard"]["keystone_instance"] = keystones[0] unless keystones.empty?
+      hash["nova_dashboard"]["keystone_instance"] = keystones[0].name unless keystones.empty?
     rescue
       @logger.info("Nova dashboard create_proposal: no keystone found")
     end
+
+    base.config_hash = hash
 
     @logger.debug("Nova_dashboard create_proposal: exiting")
     base
   end
 
-  def apply_role_pre_chef_call(old_role, role, all_nodes)
+  def apply_role_pre_chef_call(old_config, new_config, all_nodes)
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: entering #{all_nodes.inspect}")
     return if all_nodes.empty?
 
     # Make sure the nodes have a link to the dashboard on them.
-    all_nodes.each do |n|
-      node = NodeObject.find_node_by_name(n)
-      server_ip = node.get_network_by_type("admin")["address"]
-      node.crowbar["crowbar"] = {} if node.crowbar["crowbar"].nil?
-      node.crowbar["crowbar"]["links"] = {} if node.crowbar["crowbar"]["links"].nil?
-      node.crowbar["crowbar"]["links"]["Nova Dashboard"] = "http://#{server_ip}/"
-      node.save
+    all_nodes.each do |node|
+      server_ip = node.address.addr
+      chash = new_config.get_node_config_hash(node)
+      chash["crowbar"] = {} if chash["crowbar"].nil?
+      chash["crowbar"]["links"] = {} if chash["crowbar"]["links"].nil?
+      chash["crowbar"]["links"]["Nova Dashboard"] = "http://#{server_ip}/"
+      new_config.set_node_config_hash(node, chash)
     end
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: leaving")
   end
