@@ -11,7 +11,7 @@ LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 
 DATABASES = {
     'default': {
-        <% @db_settings.each do |key,value| -%>
+        <% @db_settings.sort_by { |key, value| key }.each do |key,value| -%>
         '<%= key %>': <%= value %>,
         <% end -%>
     },
