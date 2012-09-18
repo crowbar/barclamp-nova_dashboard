@@ -5,7 +5,27 @@
     "nova_dashboard": {
       "sql_engine": "mysql",
       "keystone_instance": "none",
-      "mysql_instance": "none"
+      "mysql_instance": "none",
+      "gitrepo": "http://github.com/openstack/horizon.git",
+      "git_refspec": "master",
+      "use_gitbarclamp": true,
+      "pfs_deps": [
+        "apache2",
+        "libapache2-mod-wsgi",
+        "python-lockfile",
+        "pip://warlock<2",
+        "pip://django>=1.4",
+        "pip://django_compressor",
+        "pip://django_openstack_auth",
+        "pip://python-cinderclient",
+        "pip://python-glanceclient<2",
+        "pip://python-keystoneclient",
+        "pip://python-novaclient",
+        "pip://python-quantumclient>=2.0",
+        "pip://python-swiftclient>1.1,<1.2",
+        "pip://pytz"
+      ],
+      "use_gitrepo": true
     }
   },
   "deployment": {

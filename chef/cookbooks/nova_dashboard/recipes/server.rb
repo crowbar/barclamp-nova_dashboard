@@ -19,22 +19,31 @@ include_recipe "apache2::mod_rewrite"
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
-# Explicitly added client dependencies for now.
-packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
-packages.each do |pkg|
-  package pkg do
-    action :install
+dashboard_path = "/usr/share/openstack-dashboard"
+
+unless node[:nova_dashboard][:use_gitrepo]
+  # Explicitly added client dependencies for now.
+  packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
+  packages.each do |pkg|
+    package pkg do
+      action :install
+    end
+  end
+  
+  rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
+  rm_pkgs.each do |pkg|
+    package pkg do
+      action :purge
+    end
+  end
+else
+  pfs_and_install_deps "nova_dashboard" do
+    path dashboard_path
   end
 end
 
-rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
-rm_pkgs.each do |pkg|
-  package pkg do
-    action :purge
-  end
-end
 
-directory "/usr/share/openstack-dashboard/.blackhole" do
+directory "#{dashboard_path}/.blackhole" do
   owner "www-data"
   group "www-data"
   mode "0755"
@@ -55,7 +64,7 @@ end
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   source "nova-dashboard.conf.erb"
   mode 0644
-  variables :horizon_dir => "/usr/share/openstack-dashboard"
+  variables :horizon_dir => dashboard_path 
   if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf")
     notifies :reload, resources(:service => "apache2")
   end
@@ -148,8 +157,8 @@ keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
 execute "python manage.py syncdb" do
-  cwd "/usr/share/openstack-dashboard"
-  environment ({'PYTHONPATH' => '/usr/share/openstack-dashboard/'})
+  cwd dashboard_path
+  environment ({'PYTHONPATH' => dashboard_path})
   command "python manage.py syncdb"
   user "www-data"
   action :nothing
@@ -157,7 +166,7 @@ execute "python manage.py syncdb" do
 end
 
 # Need to template the "EXTERNAL_MONITORING" array
-template "/etc/openstack-dashboard/local_settings.py" do
+template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
   owner "root"
   group "root"

@@ -55,7 +55,8 @@ debs:
     - python-glance
     - python-novaclient
     - python-swift
-    
+    - apache2
+    - libapache2-mod-wsgi
 rpms:
   pkgs:
     # put your rpms here
@@ -77,3 +78,6 @@ locale_additions:
           keystone_instance: Keystone Instance
         edit_deployment: 
           deployment: Deployment
+
+git_repos:
+  - http://github.com/openstack/horizon.git nova_dashboard
