@@ -7,7 +7,7 @@
       "keystone_instance": "none",
       "mysql_instance": "none",
       "gitrepo": "http://github.com/openstack/horizon.git",
-      "git_refspec": "master",
+      "git_refspec": "folsom-rc1",
       "use_gitbarclamp": true,
       "pfs_deps": [
         "apache2",
