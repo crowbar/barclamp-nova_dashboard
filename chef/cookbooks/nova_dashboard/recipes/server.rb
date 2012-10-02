@@ -40,6 +40,9 @@ else
   pfs_and_install_deps "nova_dashboard" do
     path dashboard_path
   end
+  execute "chown_www-data" do
+    command "chown -R www-data:www-data #{dashboard_path}"
+  end
 end
 
 
@@ -159,7 +162,7 @@ Chef::Log.info("Keystone server found at #{keystone_address}")
 execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
-  command "python manage.py syncdb"
+  command "python manage.py syncdb --noinput"
   user "www-data"
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately

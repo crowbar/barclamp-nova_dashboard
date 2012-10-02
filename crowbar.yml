@@ -57,6 +57,8 @@ debs:
     - python-swift
     - apache2
     - libapache2-mod-wsgi
+    - nodejs
+    - python-netaddr
 rpms:
   pkgs:
     # put your rpms here
