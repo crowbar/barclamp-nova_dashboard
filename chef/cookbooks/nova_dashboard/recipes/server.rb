@@ -154,6 +154,13 @@ else
   keystone = node
 end
 
+if node[:nova_dashboard][:use_gitrepo]
+  pfs_and_install_deps "keystone" do
+    cookbook "keystone"
+    cnode keystone
+  end
+end
+
 keystone_address = keystone["keystone"]["address"] rescue nil
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
