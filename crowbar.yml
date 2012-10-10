@@ -81,5 +81,5 @@ locale_additions:
         edit_deployment: 
           deployment: Deployment
 
-git_repos:
-  - http://github.com/openstack/horizon.git nova_dashboard
+git:
+  - nova_dashboard http://github.com/openstack/horizon.git stable/folsom
