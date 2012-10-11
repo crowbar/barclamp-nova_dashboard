@@ -7,8 +7,9 @@
       "keystone_instance": "none",
       "mysql_instance": "none",
       "gitrepo": "http://github.com/openstack/horizon.git",
-      "git_refspec": "2012.2",
+      "git_refspec": "stable/folsom",
       "use_gitbarclamp": true,
+      "use_pip_cache": true,
       "pfs_deps": [
         "nodejs",
         "apache2",
@@ -24,7 +25,6 @@
         "pip://python-keystoneclient",
         "pip://python-novaclient",
         "pip://python-quantumclient>=2.0",
-        "pip://python-swiftclient>1.1,<1.2",
         "pip://pytz"
       ],
       "use_gitrepo": true
