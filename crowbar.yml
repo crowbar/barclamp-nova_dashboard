@@ -43,6 +43,8 @@ debs:
     repos:
       - deb http://ops.rcb.me/packages oneiric diablo-final
   ubuntu-12.04:
+    repos:
+      - deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/folsom main
     pkgs:
       - python-django-horizon
       - python-django-nose
