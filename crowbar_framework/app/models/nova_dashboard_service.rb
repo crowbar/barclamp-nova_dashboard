@@ -25,9 +25,9 @@ class NovaDashboardService < ServiceObject
     answer
   end
 
-  def create_proposal
+  def create_proposal(name)
     @logger.debug("Nova_dashboard create_proposal: entering")
-    base = super
+    base = super(name)
 
     nodes = Node.all
     nodes.delete_if { |n| n.nil? or n.is_admin? }
