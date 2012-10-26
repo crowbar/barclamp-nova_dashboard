@@ -48,6 +48,7 @@ debs:
     - python-glance
     - python-novaclient
     - python-swift
+    - node-less
 
 locale_additions:
   en:
