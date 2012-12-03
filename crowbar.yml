@@ -25,6 +25,8 @@ barclamp:
     - keystone
   member:
     - openstack
+  os_support:
+    - ubuntu-12.04
 
 crowbar:
   layout: 2
@@ -33,15 +35,6 @@ crowbar:
   chef_order: 90
 
 debs:
-  ubuntu-10.10:
-    repos:
-      - deb http://ops.rcb.me/packages maverick diablo-final
-  ubuntu-11.04:
-    repos:
-      - deb http://ops.rcb.me/packages natty diablo-final
-  ubuntu-11.10:
-    repos:
-      - deb http://ops.rcb.me/packages oneiric diablo-final
   ubuntu-12.04:
     repos:
       - deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/folsom main
@@ -58,14 +51,4 @@ debs:
     - python-glance
     - python-novaclient
     - python-swift
-    
-rpms:
-  pkgs:
-    # put your rpms here
-    # - httpd
-    
-gems:
-  pkgs:
-    # put your gems here.
-    # - i18n
 
