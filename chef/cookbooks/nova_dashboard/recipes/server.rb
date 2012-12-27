@@ -69,6 +69,10 @@ apache_site "nova-dashboard.conf" do
   enable true
 end
 
+service "apache2" do
+  action :restart
+end
+
 node.set_unless['dashboard']['db']['password'] = secure_password
 
 if node[:nova_dashboard][:sql_engine] == "mysql"
