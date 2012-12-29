@@ -21,7 +21,7 @@ override[:nova_dashboard][:user]="nova_dashboard"
 default[:nova_dashboard][:site_branding] = "Openstack Nova Dashboard"
 
 # declare what needs to be monitored
-node[:nova_dashboard][:monitor]={}
-node[:nova_dashboard][:monitor][:svcs] = []
-node[:nova_dashboard][:monitor][:ports]={}
+node.set[:nova_dashboard][:monitor]={}
+node.set[:nova_dashboard][:monitor][:svcs] = []
+node.set[:nova_dashboard][:monitor][:ports]={}
 
