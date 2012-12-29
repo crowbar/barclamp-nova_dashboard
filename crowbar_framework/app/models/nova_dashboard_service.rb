@@ -35,7 +35,7 @@ class NovaDashboardService < ServiceObject
       add_role_to_instance_and_node(nodes[0].name, base.name, "nova_dashboard-server")
     end
 
-    hash = base.config_hash
+    hash = base.current_config.config_hash
     hash["nova_dashboard"]["mysql_instance"] = ""
     begin
       mysqlService = Barclamp.find_by_name('mysql')
@@ -66,7 +66,7 @@ class NovaDashboardService < ServiceObject
       @logger.info("Nova dashboard create_proposal: no keystone found")
     end
 
-    base.config_hash = hash
+    base.current_config.config_hash = hash
 
     @logger.debug("Nova_dashboard create_proposal: exiting")
     base
