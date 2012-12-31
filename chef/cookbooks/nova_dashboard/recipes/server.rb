@@ -26,8 +26,8 @@ else
 end
 
 # Explicitly added client dependencies for now.
-packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
-packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "openstack-swift", "python-keystone", "python-django", "python-horizon", "python-django-nose" ] if node.platform == "suse"
+packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "node-less" ]
+packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "openstack-swift", "python-keystone", "python-django", "python-horizon", "python-django-nose", "node-less" ] if node.platform == "suse"
 packages.each do |pkg|
   package pkg do
     action :install
