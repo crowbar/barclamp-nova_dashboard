@@ -66,11 +66,8 @@ file "/etc/apache2/conf.d/openstack-dashboard.conf" do
 end
 
 apache_site "nova-dashboard.conf" do
+  notifies :reload, resources(:service => "apache2")
   enable true
-end
-
-service "apache2" do
-  action :restart
 end
 
 node.set_unless['dashboard']['db']['password'] = secure_password
