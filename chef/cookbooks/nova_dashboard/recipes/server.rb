@@ -80,11 +80,11 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
 end
 
 file "/etc/apache2/conf.d/openstack-dashboard.conf" do
+  notifies :reload, resources(:service => "apache2")
   action :delete
 end
 
 apache_site "nova-dashboard.conf" do
-  notifies :reload, resources(:service => "apache2")
   enable true
 end
 
