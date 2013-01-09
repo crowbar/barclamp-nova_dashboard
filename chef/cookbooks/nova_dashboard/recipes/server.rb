@@ -85,6 +85,7 @@ file "/etc/apache2/conf.d/openstack-dashboard.conf" do
 end
 
 apache_site "nova-dashboard.conf" do
+  notifies :reload, resources(:service => "apache2")
   enable true
 end
 
