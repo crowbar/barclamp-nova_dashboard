@@ -14,8 +14,5 @@
 # 
 
 class NovaDashboardController < BarclampController
-  def initialize
-    @service_object = NovaDashboardService.new logger
-  end
 end
 

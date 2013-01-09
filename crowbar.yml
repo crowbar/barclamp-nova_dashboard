@@ -20,28 +20,24 @@ barclamp:
   display: Nova Dashboard
   description: User Interface for OpenStack projects (aka code name Horizon)
   version: 0
+  allow_multiple_proposals: true
   requires:
     - keystone
   member:
     - openstack
+  os_support:
+    - ubuntu-12.04
 
 crowbar:
-  layout: 1
+  layout: 2
   order: 90
   run_order: 90
   chef_order: 90
 
 debs:
-  ubuntu-10.10:
-    repos:
-      - deb http://ops.rcb.me/packages maverick diablo-final
-  ubuntu-11.04:
-    repos:
-      - deb http://ops.rcb.me/packages natty diablo-final
-  ubuntu-11.10:
-    repos:
-      - deb http://ops.rcb.me/packages oneiric diablo-final
   ubuntu-12.04:
+    repos:
+      - deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/folsom main
     pkgs:
       - python-django-horizon
       - python-django-nose
@@ -55,25 +51,4 @@ debs:
     - python-glance
     - python-novaclient
     - python-swift
-    
-rpms:
-  pkgs:
-    # put your rpms here
-    # - httpd
-    
-gems:
-  pkgs:
-    # put your gems here.
-    # - i18n
 
-locale_additions:
-  en:
-    barclamp:
-      nova_dashboard:
-        edit_attributes: 
-          attributes: Attributes
-          sql_engine: SQL Engine
-          mysql_instance: MySQL Instance
-          keystone_instance: Keystone Instance
-        edit_deployment: 
-          deployment: Deployment

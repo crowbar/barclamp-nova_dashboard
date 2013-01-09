@@ -19,53 +19,71 @@ include_recipe "apache2::mod_rewrite"
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
+if node.platform == "suse"
+  dashboard_path = "/var/lib/openstack-dashboard"
+else
+  dashboard_path = "/usr/share/openstack-dashboard"
+end
+
 # Explicitly added client dependencies for now.
 packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
+packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "openstack-swift", "python-keystone", "python-django", "python-horizon", "python-django-nose" ] if node.platform == "suse"
 packages.each do |pkg|
   package pkg do
     action :install
   end
 end
 
-rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
-rm_pkgs.each do |pkg|
-  package pkg do
-    action :purge
+if node.platform != "suse"
+  rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
+  rm_pkgs.each do |pkg|
+    package pkg do
+      action :purge
+    end
+  end
+
+  directory "/usr/share/openstack-dashboard/.blackhole" do
+    owner "www-data"
+    group "www-data"
+    mode "0755"
+    action :create
+  end
+
+  directory "/var/www" do
+    owner "www-data"
+    group "www-data"
+    mode "0755"
+    action :create
   end
 end
 
-directory "/usr/share/openstack-dashboard/.blackhole" do
-  owner "www-data"
-  group "www-data"
-  mode "0755"
-  action :create
-end
-  
-directory "/var/www" do
-  owner "www-data"
-  group "www-data"
-  mode "0755"
-  action :create
-end
-  
 apache_site "000-default" do
   enable false
 end
 
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
-  source "nova-dashboard.conf.erb"
-  mode 0644
-  variables :horizon_dir => "/usr/share/openstack-dashboard"
-  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf")
-    notifies :reload, resources(:service => "apache2")
+  if node.platform == "suse"
+    path "#{node[:apache][:dir]}/vhosts.d/nova-dashboard.conf"
+    source "nova-dashboard.conf.suse.erb"
+  else
+    source "nova-dashboard.conf.erb"
   end
+  mode 0644
+  variables(
+      :horizon_dir => dashboard_path,
+      :user => node[:apache][:user],
+      :group => node[:apache][:group]
+  )
+  notifies :reload, resources(:service => "apache2")
 end
 
 file "/etc/apache2/conf.d/openstack-dashboard.conf" do
+  notifies :reload, resources(:service => "apache2")
   action :delete
 end
 
 apache_site "nova-dashboard.conf" do
+  notifies :reload, resources(:service => "apache2")
   enable true
 end
 
@@ -89,7 +107,7 @@ if node[:nova_dashboard][:sql_engine] == "mysql"
         mysql = node
     end
 
-    mysql_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(mysql, "admin").address if mysql_address.nil?
+    mysql_address = mysql.address.addr
     Chef::Log.info("Mysql server found at #{mysql_address}")
 
     # Create the Dashboard Database
@@ -143,15 +161,15 @@ else
 end
 
 keystone_address = keystone["keystone"]["address"] rescue nil
-keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
+keystone_address = keystone.address.addr
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
 execute "python manage.py syncdb" do
-  cwd "/usr/share/openstack-dashboard"
-  environment ({'PYTHONPATH' => '/usr/share/openstack-dashboard/'})
+  cwd dashboard_path
+  environment ({'PYTHONPATH' => dashboard_path})
   command "python manage.py syncdb"
-  user "www-data"
+  user node[:apache][:user]
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
 end
