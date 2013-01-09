@@ -74,9 +74,7 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
       :user => node[:apache][:user],
       :group => node[:apache][:group]
   )
-  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
-    notifies :reload, resources(:service => "apache2")
-  end
+  notifies :reload, resources(:service => "apache2")
 end
 
 file "/etc/apache2/conf.d/openstack-dashboard.conf" do
