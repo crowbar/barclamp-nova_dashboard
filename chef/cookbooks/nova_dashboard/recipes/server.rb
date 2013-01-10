@@ -56,17 +56,15 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   source "nova-dashboard.conf.erb"
   mode 0644
   variables :horizon_dir => "/usr/share/openstack-dashboard"
-  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf")
-    notifies :reload, resources(:service => "apache2")
-  end
+  notifies :reload, resources(:service => "apache2")
 end
 
 file "/etc/apache2/conf.d/openstack-dashboard.conf" do
+  notifies :reload, resources(:service => "apache2")
   action :delete
 end
 
 apache_site "nova-dashboard.conf" do
-  notifies :reload, resources(:service => "apache2")
   enable true
 end
 
