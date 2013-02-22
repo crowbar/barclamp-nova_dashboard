@@ -8,7 +8,7 @@
       "mysql_instance": "none",
       "gitrepo": "http://github.com/openstack/horizon.git",
       "git_instance": "",
-      "git_refspec": "stable/folsom",
+      "git_refspec": "grizzly-1",
       "use_gitbarclamp": true,
       "use_pip_cache": true,
       "pfs_deps": [
