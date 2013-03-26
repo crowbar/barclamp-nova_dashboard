@@ -1,6 +1,10 @@
 <VirtualHost *:80>
+    WSGIDaemonProcess horizon user=www-data group=www-data processes=3 threads=10 home=<%= @horizon_dir %> 
+<% if @venv -%>
+    WSGIScriptAlias / <%= @horizon_dir %>/openstack_dashboard/wsgi/django_venv.wsgi
+<% else -%>
     WSGIScriptAlias / <%= @horizon_dir %>/openstack_dashboard/wsgi/django.wsgi
-    WSGIDaemonProcess horizon user=www-data group=www-data processes=3 threads=10 home=<%= @horizon_dir%>
+<% end -%>
     SetEnv APACHE_RUN_USER www-data
     SetEnv APACHE_RUN_GROUP www-data
     WSGIProcessGroup horizon
