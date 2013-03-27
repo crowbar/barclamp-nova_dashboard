@@ -11,6 +11,7 @@
       "git_refspec": "grizzly-1",
       "use_gitbarclamp": true,
       "use_pip_cache": true,
+      "use_virtualenv": true,
       "pfs_deps": [
         "nodejs",
         "apache2",
