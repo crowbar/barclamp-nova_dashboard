@@ -8,6 +8,9 @@
       "mysql_instance": "none"
     }
   },
+    "roles": {
+        "nova-dashboard-server": { "jig": "chef" }
+    },
   "deployment": {
     "nova_dashboard": {
       "crowbar-revision": 0,
