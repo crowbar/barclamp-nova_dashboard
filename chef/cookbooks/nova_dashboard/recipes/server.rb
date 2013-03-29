@@ -20,6 +20,8 @@ include_recipe "apache2::mod_rewrite"
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 dashboard_path = "/usr/share/openstack-dashboard"
+venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" : nil
+venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
 
 unless node[:nova_dashboard][:use_gitrepo]
   # Explicitly added client dependencies for now.
@@ -39,6 +41,7 @@ unless node[:nova_dashboard][:use_gitrepo]
 else
   pfs_and_install_deps "nova_dashboard" do
     path dashboard_path
+    virtualenv venv_path
   end
   execute "chown_www-data" do
     command "chown -R www-data:www-data #{dashboard_path}"
@@ -67,9 +70,23 @@ end
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   source "nova-dashboard.conf.erb"
   mode 0644
-  variables :horizon_dir => dashboard_path 
+  variables(
+    :horizon_dir => dashboard_path,
+    :venv => node[:nova_dashboard][:use_virtualenv],
+    :venv_path => venv_path
+  )
   if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf")
     notifies :reload, resources(:service => "apache2")
+  end
+end
+
+if node[:nova_dashboard][:use_virtualenv]
+  template "/usr/share/openstack-dashboard/openstack_dashboard/wsgi/django_venv.wsgi" do
+    source "django_venv.wsgi.erb"
+    mode 0644
+    variables(
+      :venv_path => venv_path
+    )
   end
 end
 
@@ -169,7 +186,7 @@ Chef::Log.info("Keystone server found at #{keystone_address}")
 execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
-  command "python manage.py syncdb --noinput"
+  command "#{venv_prefix} python manage.py syncdb --noinput"
   user "www-data"
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
