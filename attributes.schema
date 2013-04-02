@@ -1,0 +1,15 @@
+{
+    "type": "map",
+    "required": true,
+    "mapping": {
+        "nova_dashboard": {
+            "type": "map",
+            "required": true,
+            "mapping": {
+                "keystone_instance": { "type": "str", "required": true },
+                "mysql_instance": { "type": "str", "required": true },
+                "sql_engine": { "type": "str", "required": true }
+            }
+        }
+    }
+}
