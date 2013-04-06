@@ -82,4 +82,4 @@ locale_additions:
           deployment: Deployment
 
 git_repo:
-  - nova_dashboard https://github.com/openstack/horizon.git grizzly-1
+  - nova_dashboard https://github.com/openstack/horizon.git stable/grizzly
