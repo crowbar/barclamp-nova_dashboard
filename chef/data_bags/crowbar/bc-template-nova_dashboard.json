@@ -29,7 +29,7 @@
         "pip://python-quantumclient>=2.0",
         "pip://pytz"
       ],
-      "use_gitrepo": true
+      "use_gitrepo": false
     }
   },
   "deployment": {
