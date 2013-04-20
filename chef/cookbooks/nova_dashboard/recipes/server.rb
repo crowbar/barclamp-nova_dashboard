@@ -25,7 +25,7 @@ venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activ
 
 unless node[:nova_dashboard][:use_gitrepo]
   # Explicitly added client dependencies for now.
-  packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
+  packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
   packages.each do |pkg|
     package pkg do
       action :install
