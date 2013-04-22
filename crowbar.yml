@@ -59,6 +59,7 @@ debs:
     - libapache2-mod-wsgi
     - nodejs
     - python-netaddr
+    - node-less
 rpms:
   pkgs:
     # put your rpms here
