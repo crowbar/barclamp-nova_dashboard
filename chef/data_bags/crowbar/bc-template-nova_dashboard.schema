@@ -12,6 +12,7 @@
           "type": "map",
           "required": true,
           "mapping": {
+            "nova_instance": { "type": "str", "required": true },
             "keystone_instance": { "type": "str", "required": true },
             "mysql_instance": { "type": "str", "required": true },
             "gitrepo": { "type": "str", "required": true },

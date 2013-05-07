@@ -23,6 +23,7 @@ barclamp:
   version: 0
   requires:
     - keystone
+    - nova
   member:
     - openstack
 
@@ -80,6 +81,7 @@ locale_additions:
           sql_engine: SQL Engine
           mysql_instance: MySQL Instance
           keystone_instance: Keystone Instance
+          nova_instance: Nova Instance
         edit_deployment: 
           deployment: Deployment
 
