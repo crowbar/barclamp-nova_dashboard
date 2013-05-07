@@ -4,6 +4,7 @@
   "attributes": {
     "nova_dashboard": {
       "sql_engine": "mysql",
+      "nova_instance": "none",
       "keystone_instance": "none",
       "mysql_instance": "none",
       "gitrepo": "http://github.com/openstack/horizon.git",
