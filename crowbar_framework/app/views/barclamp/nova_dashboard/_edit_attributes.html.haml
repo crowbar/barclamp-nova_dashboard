@@ -11,4 +11,7 @@
     %p
       %label{ :for => :keystone_instance }= t('.keystone_instance')
       = instance_selector("keystone", :keystone_instance, "keystone_instance", @proposal)
+    %p
+      %label{ :for => :nova_instance }= t('.nova_instance')
+      = instance_selector("nova", :nova_instance, "nova_instance", @proposal)
 
