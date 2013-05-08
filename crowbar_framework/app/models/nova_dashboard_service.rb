@@ -33,6 +33,7 @@ class NovaDashboardService < ServiceObject
       answer << { "barclamp" => "git", "inst" => role.default_attributes[@bc_name]["git_instance"] }
     end
     answer << { "barclamp" => "keystone", "inst" => role.default_attributes["nova_dashboard"]["keystone_instance"] }
+    answer << { "barclamp" => "nova", "inst" => role.default_attributes["nova_dashboard"]["nova_instance"] }
     answer
   end
 
@@ -91,6 +92,19 @@ class NovaDashboardService < ServiceObject
       base["attributes"]["nova_dashboard"]["keystone_instance"] = keystones[0] unless keystones.empty?
     rescue
       @logger.info("Nova dashboard create_proposal: no keystone found")
+    end
+
+    base["attributes"]["nova_dashboard"]["nova_instance"] = ""
+    begin
+      novaService = NovaService.new(@logger)
+      novas = novaService.list_active[1]
+      if novas.empty?
+        # No actives, look for proposals
+        novas = novaService.proposals[1]
+      end
+      base["attributes"]["nova_dashboard"]["nova_instance"] = novas[0] unless novas.empty?
+    rescue
+      @logger.info("Nova dashboard create_proposal: no nova found")
     end
 
     @logger.debug("Nova_dashboard create_proposal: exiting")
