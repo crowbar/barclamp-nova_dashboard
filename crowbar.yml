@@ -29,9 +29,9 @@ barclamp:
 
 crowbar:
   layout: 1
-  order: 90
-  run_order: 90
-  chef_order: 90
+  order: 96
+  run_order: 96
+  chef_order: 96
 
 debs:
   ubuntu-10.10:
