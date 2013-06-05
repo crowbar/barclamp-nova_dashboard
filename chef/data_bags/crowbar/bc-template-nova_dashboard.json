@@ -3,10 +3,10 @@
   "description": "User Interface for OpenStack projects (code name Horizon)",
   "attributes": {
     "nova_dashboard": {
-      "sql_engine": "mysql",
+      "database_engine": "database",
       "nova_instance": "none",
       "keystone_instance": "none",
-      "mysql_instance": "none",
+      "database_instance": "none",
       "gitrepo": "http://github.com/openstack/horizon.git",
       "git_instance": "",
       "git_refspec": "stable/grizzly",

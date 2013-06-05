@@ -18,7 +18,8 @@
 barclamp:
   name: nova_dashboard
   display: Nova Dashboard
-  description: User Interface for OpenStack projects (aka code name Horizon)
+#  description: User Interface for OpenStack projects (aka code name Horizon)
+  description: 'OpenStack Dashboard: graphical interface to access, provision and automate cloud-based resources'
   version: 0
   requires:
     - keystone
@@ -28,9 +29,9 @@ barclamp:
 
 crowbar:
   layout: 1
-  order: 90
-  run_order: 90
-  chef_order: 90
+  order: 96
+  run_order: 96
+  chef_order: 96
 
 debs:
   ubuntu-10.10:
@@ -77,8 +78,8 @@ locale_additions:
       nova_dashboard:
         edit_attributes: 
           attributes: Attributes
-          sql_engine: SQL Engine
-          mysql_instance: MySQL Instance
+          database_engine: Database Engine
+          database_instance: Database Instance
           keystone_instance: Keystone Instance
           nova_instance: Nova Instance
         edit_deployment: 
