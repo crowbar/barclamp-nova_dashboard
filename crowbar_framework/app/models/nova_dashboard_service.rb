@@ -26,8 +26,8 @@ class NovaDashboardService < ServiceObject
 
   def proposal_dependencies(role)
     answer = []
-    if role.default_attributes["nova_dashboard"]["sql_engine"] == "mysql"
-      answer << { "barclamp" => "mysql", "inst" => role.default_attributes["nova_dashboard"]["mysql_instance"] }
+    if role.default_attributes["nova_dashboard"]["database_engine"] == "database"
+      answer << { "barclamp" => "database", "inst" => role.default_attributes["nova_dashboard"]["database_instance"] }
     end
     if role.default_attributes[@bc_name]["use_gitrepo"]
       answer << { "barclamp" => "git", "inst" => role.default_attributes[@bc_name]["git_instance"] }
@@ -49,36 +49,31 @@ class NovaDashboardService < ServiceObject
       }
     end
 
-    base["attributes"][@bc_name]["git_instance"] = ""
+    base["attributes"]["nova_dashboard"]["database_instance"] = ""
     begin
-      gitService = GitService.new(@logger)
-      gits = gitService.list_active[1]
-      if gits.empty?
+      databaseService = DatabaseService.new(@logger)
+      # Look for active roles
+      dbs = databaseService.list_active[1]
+      if dbs.empty?
         # No actives, look for proposals
-        gits = gitService.proposals[1]
+        dbs = databaseService.proposals[1]
       end
-      unless gits.empty?
-        base["attributes"][@bc_name]["git_instance"] = gits[0]
+      if dbs.empty?
+        @logger.info("Dashboard create_proposal: no database proposal found")
+        base["attributes"]["nova_dashboard"]["database_engine"] = ""
+      else
+        base["attributes"]["nova_dashboard"]["database_instance"] = dbs[0]
+        base["attributes"]["nova_dashboard"]["database_engine"] = "database"
       end
     rescue
-      @logger.info("#{@bc_name} create_proposal: no git found")
+      @logger.info("Nova dashboard create_proposal: no database found")
+      base["attributes"]["nova_dashboard"]["database_engine"] = ""
     end
 
-    base["attributes"]["nova_dashboard"]["mysql_instance"] = ""
-    begin
-      mysqlService = MysqlService.new(@logger)
-      mysqls = mysqlService.list_active[1]
-      if mysqls.empty?
-        # No actives, look for proposals
-        mysqls = mysqlService.proposals[1]
-      end
-      unless mysqls.empty?
-        base["attributes"]["nova_dashboard"]["mysql_instance"] = mysqls[0]
-      end
-      base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
-    rescue
-      @logger.info("Nova dashboard create_proposal: no mysql found")
-      base["attributes"]["nova_dashboard"]["sql_engine"] = "mysql"
+    # SQLite is not a fallback solution
+    # base["attributes"]["nova_dashboard"]["database_engine"] = "sqlite" if base["attributes"]["nova_dashboard"]["database_engine"] == ""
+    if base["attributes"]["nova_dashboard"]["database_engine"] == ""
+      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "database"))
     end
 
     base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
@@ -94,6 +89,10 @@ class NovaDashboardService < ServiceObject
       @logger.info("Nova dashboard create_proposal: no keystone found")
     end
 
+    if base["attributes"]["nova_dashboard"]["keystone_instance"] == ""
+      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "keystone"))
+    end
+
     base["attributes"]["nova_dashboard"]["nova_instance"] = ""
     begin
       novaService = NovaService.new(@logger)
@@ -105,6 +104,25 @@ class NovaDashboardService < ServiceObject
       base["attributes"]["nova_dashboard"]["nova_instance"] = novas[0] unless novas.empty?
     rescue
       @logger.info("Nova dashboard create_proposal: no nova found")
+    end
+
+    if base["attributes"]["nova_dashboard"]["nova_instance"] == ""
+      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "nova"))
+    end
+
+    base["attributes"][@bc_name]["git_instance"] = ""
+    begin
+      gitService = GitService.new(@logger)
+      gits = gitService.list_active[1]
+      if gits.empty?
+        # No actives, look for proposals
+        gits = gitService.proposals[1]
+      end
+      unless gits.empty?
+        base["attributes"][@bc_name]["git_instance"] = gits[0]
+      end
+    rescue
+      @logger.info("#{@bc_name} create_proposal: no git found")
     end
 
     @logger.debug("Nova_dashboard create_proposal: exiting")

@@ -78,8 +78,8 @@ locale_additions:
       nova_dashboard:
         edit_attributes: 
           attributes: Attributes
-          sql_engine: SQL Engine
-          mysql_instance: MySQL Instance
+          database_engine: Database Engine
+          database_instance: Database Instance
           keystone_instance: Keystone Instance
           nova_instance: Nova Instance
         edit_deployment: 
