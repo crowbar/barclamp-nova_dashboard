@@ -142,6 +142,13 @@ class NovaDashboardService < ServiceObject
       node.crowbar["crowbar"]["links"]["Nova Dashboard"] = "http://#{server_ip}/"
       node.save
     end
+
+    #enable public iface on horizon node
+    all_nodes.each do |n|
+      net_svc.allocate_ip "default", "public", "host", n
+    end
+
+
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: leaving")
   end
 
