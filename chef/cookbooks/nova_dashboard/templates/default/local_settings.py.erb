@@ -64,8 +64,10 @@ OPENSTACK_KEYSTONE_BACKEND = {
 API_PAGINATE_LIMIT = 1000
 SWIFT_PAGINATE_LIMIT = 1000
 
+<% if node.platform == "suse" -%>
 from horizon.utils import secret_key
 SECRET_KEY = secret_key.generate_or_read_from_file(os.path.join(LOCAL_PATH, '.secret_key_store'))
+<% end -%>
 
 # If you have external monitoring links
 # EXTERNAL_MONITORING = [
