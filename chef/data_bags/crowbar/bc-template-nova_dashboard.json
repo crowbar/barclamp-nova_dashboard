@@ -28,7 +28,8 @@
         "pip://python-keystoneclient",
         "pip://python-novaclient",
         "pip://python-quantumclient>=2.0",
-        "pip://pytz"
+        "pip://pytz",
+        "pip://python-swiftclient"
       ],
       "use_gitrepo": false
     }

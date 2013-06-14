@@ -13,6 +13,8 @@
 # limitations under the License.
 #
 
+require 'securerandom'
+
 include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
@@ -219,6 +221,8 @@ execute "python manage.py syncdb" do
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
+node.set[:nova_dashboard][:secret_key] = SecureRandom.hex(32) unless node[:nova_dashboard][:secret_key]
+
 # Need to template the "EXTERNAL_MONITORING" array
 template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
@@ -228,7 +232,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   variables(
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
-    :db_settings => db_settings
+    :db_settings => db_settings,
+    :secret_key => node[:nova_dashboard][:secret_key]
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create

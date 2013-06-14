@@ -35,10 +35,12 @@ MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 # EMAIL_HOST_PASSWORD = 'top-secret!'
 
 HORIZON_CONFIG = {
-    'dashboards': ('nova', 'syspanel', 'settings',),
+    'dashboards': ('project', 'admin', 'settings',),
     'default_dashboard': 'nova',
     'user_home': 'openstack_dashboard.views.user_home',
 }
+
+SECRET_KEY = '<%= @secret_key %>'
 
 OPENSTACK_HOST = "<%= @keystone_address %>"
 OPENSTACK_KEYSTONE_URL = "http://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
