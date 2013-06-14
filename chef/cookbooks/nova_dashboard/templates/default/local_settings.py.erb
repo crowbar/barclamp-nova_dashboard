@@ -40,6 +40,8 @@ HORIZON_CONFIG = {
     'user_home': 'openstack_dashboard.views.user_home',
 }
 
+COMPRESS_OFFLINE = <%= @compress_offline ? "True" : "False" %>
+
 OPENSTACK_HOST = "<%= @keystone_address %>"
 OPENSTACK_KEYSTONE_URL = "http://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
