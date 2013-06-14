@@ -24,58 +24,84 @@ venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" :
 venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
 
 unless node[:nova_dashboard][:use_gitrepo]
-  # Explicitly added client dependencies for now.
-  packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
-  packages.each do |pkg|
-    package pkg do
-      action :install
+  if node.platform != "suse"
+    # Explicitly added client dependencies for now.
+    packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
+    packages.each do |pkg|
+      package pkg do
+        action :install
+      end
     end
-  end
-  
-  rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
-  rm_pkgs.each do |pkg|
-    package pkg do
-      action :purge
+
+    rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
+    rm_pkgs.each do |pkg|
+      package pkg do
+        action :purge
+      end
     end
+  else
+    # On SUSE, the package has the correct list of dependencies
+    package "openstack-dashboard"
   end
 else
   pfs_and_install_deps "nova_dashboard" do
     path dashboard_path
     virtualenv venv_path
   end
-  execute "chown_www-data" do
-    command "chown -R www-data:www-data #{dashboard_path}"
+  execute "chown_#{node[:apache][:user]}" do
+    command "chown -R #{node[:apache][:user]}:#{node[:apache][:group]} #{dashboard_path}"
   end
 end
 
 
-directory "#{dashboard_path}/.blackhole" do
-  owner "www-data"
-  group "www-data"
-  mode "0755"
-  action :create
-end
+if node.platform != "suse"
+  directory "#{dashboard_path}/.blackhole" do
+    owner node[:apache][:user]
+    group node[:apache][:group]
+    mode "0755"
+    action :create
+  end
   
-directory "/var/www" do
-  owner "www-data"
-  group "www-data"
-  mode "0755"
-  action :create
-end
-  
-apache_site "000-default" do
-  enable false
+  directory "/var/www" do
+    owner node[:apache][:user]
+    group node[:apache][:group]
+    mode "0755"
+    action :create
+  end
+
+  apache_site "000-default" do
+    enable false
+  end
+
+  file "/etc/apache2/conf.d/openstack-dashboard.conf" do
+    action :delete
+  end
+else
+  # Get rid of unwanted vhost config files:
+  ["#{node[:apache][:dir]}/vhosts.d/default-redirect.conf",
+   "#{node[:apache][:dir]}/vhosts.d/nova-dashboard.conf"].each do |f|
+    file f do
+      action :delete
+    end
+  end
 end
 
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
-  source "nova-dashboard.conf.erb"
+  if node.platform == "suse"
+    path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
+    source "nova-dashboard.conf.suse.erb"
+  else
+    source "nova-dashboard.conf.erb"
+  end
   mode 0644
   variables(
     :horizon_dir => dashboard_path,
+    :user => node[:apache][:user],
+    :group => node[:apache][:group],
     :venv => node[:nova_dashboard][:use_virtualenv],
     :venv_path => venv_path
   )
-  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf")
+  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
     notifies :reload, resources(:service => "apache2")
   end
 end
@@ -90,8 +116,13 @@ if node[:nova_dashboard][:use_virtualenv]
   end
 end
 
-file "/etc/apache2/conf.d/openstack-dashboard.conf" do
-  action :delete
+if node.platform == "suse"
+  template "/etc/logrotate.d/openstack-dashboard" do
+    source "nova-dashboard.logrotate.erb"
+    mode 0644
+    owner "root"
+    group "root"
+  end
 end
 
 apache_site "nova-dashboard.conf" do
@@ -181,8 +212,8 @@ elsif node[:nova_dashboard][:database_engine] == "sqlite"
 
     file "/etc/openstack-dashboard/dashboard_openstack.sqlite3" do
         action :touch
-        user "www-data"
-        group "www-data"
+        user node[:apache][:user]
+        group node[:apache][:group]
     end
 else
     Chef::Log.error("Unknown database engine #{database_engine}")
@@ -214,7 +245,7 @@ execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
   command "#{venv_prefix} python manage.py syncdb --noinput"
-  user "www-data"
+  user node[:apache][:user]
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
 end
@@ -222,13 +253,14 @@ end
 # Need to template the "EXTERNAL_MONITORING" array
 template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
-  owner "root"
+  owner node[:apache][:user]
   group "root"
-  mode "0644"
+  mode "0640"
   variables(
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
-    :db_settings => db_settings
+    :db_settings => db_settings,
+    :compress_offline => node.platform == "suse"
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create

@@ -1,0 +1,29 @@
+<VirtualHost *:80>
+    WSGIScriptAlias / <%= @horizon_dir %>/openstack_dashboard/wsgi/django.wsgi
+    WSGIDaemonProcess horizon user=<%= @user %> group=<%= @group %> processes=3 threads=10
+    SetEnv APACHE_RUN_USER  <%= @user %>
+    SetEnv APACHE_RUN_GROUP <%= @group %>
+    WSGIProcessGroup horizon
+
+    DocumentRoot <%= @horizon_dir %>
+    Alias /static/horizon <%= @horizon_dir %>/static/horizon
+    Alias /static <%= @horizon_dir %>/static
+
+    <Directory />
+        Options None
+        AllowOverride None
+        Order deny,allow
+        Deny from all
+    </Directory>
+
+    <Directory <%= @horizon_dir %>/>
+        Options FollowSymLinks MultiViews
+        AllowOverride None
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    ErrorLog /var/log/apache2/openstack-dashboard-error_log
+    LogLevel warn
+    CustomLog /var/log/apache2/openstack-dashboard-access_log combined
+</VirtualHost>
