@@ -5,13 +5,6 @@
   = link_to t('raw'), proposal_barclamp_path(:id => @proposal.name, :controller => @proposal.barclamp, :dep_raw => @dep_raw, :attr_raw => true), :style => "float: right;"
   %div.container
     = render 'barclamp/git/pfsdeps.html.haml'
-    %p
-      %label{ :for => :database_instance }= t('.database_instance')
-      = instance_selector(@proposal.raw_data['attributes'][@proposal.barclamp]["database_engine"], :database_instance, "database_instance", @proposal)
-    %p
-      %label{ :for => :keystone_instance }= t('.keystone_instance')
-      = instance_selector("keystone", :keystone_instance, "keystone_instance", @proposal)
-    %p
-      %label{ :for => :nova_instance }= t('.nova_instance')
-      = instance_selector("nova", :nova_instance, "nova_instance", @proposal)
-
+    = render_instance_selector("database", :database_instance, t('.database_instance'), "database_instance", @proposal)
+    = render_instance_selector("keystone", :keystone_instance, t('.keystone_instance'), "keystone_instance", @proposal)
+    = render_instance_selector("nova", :nova_instance, t('.nova_instance'), "nova_instance", @proposal)
