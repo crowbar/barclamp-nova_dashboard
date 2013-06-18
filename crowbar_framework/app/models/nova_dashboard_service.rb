@@ -20,8 +20,9 @@ class NovaDashboardService < ServiceObject
     @logger = thelogger
   end
 
+# Turn off multi proposal support till it really works and people ask for it.
   def self.allow_multiple_proposals?
-    true
+    false
   end
 
   def proposal_dependencies(role)
@@ -133,10 +134,15 @@ class NovaDashboardService < ServiceObject
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: entering #{all_nodes.inspect}")
     return if all_nodes.empty?
 
+    net_svc = NetworkService.new @logger
+    all_nodes.each do |n|
+      net_svc.allocate_ip "default", "public", "host", n
+    end
+
     # Make sure the nodes have a link to the dashboard on them.
     all_nodes.each do |n|
       node = NodeObject.find_node_by_name(n)
-      server_ip = node.get_network_by_type("admin")["address"]
+      server_ip = node.get_network_by_type("public")["address"]
       node.crowbar["crowbar"] = {} if node.crowbar["crowbar"].nil?
       node.crowbar["crowbar"]["links"] = {} if node.crowbar["crowbar"]["links"].nil?
       node.crowbar["crowbar"]["links"]["Nova Dashboard"] = "http://#{server_ip}/"

@@ -2,7 +2,7 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 PROD = False
 USE_SSL = False
@@ -35,10 +35,23 @@ MAILER_EMAIL_BACKEND = EMAIL_BACKEND
 # EMAIL_HOST_PASSWORD = 'top-secret!'
 
 HORIZON_CONFIG = {
-    'dashboards': ('nova', 'syspanel', 'settings',),
-    'default_dashboard': 'nova',
-    'user_home': 'openstack_dashboard.views.user_home',
+    'dashboards': ('project', 'admin', 'settings',),
+    'default_dashboard': 'project',
+    'user_home': 'openstack_dashboard.views.get_user_home',
+    'password_validator': {
+        "regex": '.{8,}',
+        "help_text": "Your password must be at least 8 characters long."
+    },
+    'ajax_queue_limit': 10,
+    'auto_fade_alerts': {
+        'delay': 3000,
+        'fade_duration': 1500,
+        'types': ['alert-success', 'alert-info']
+    },
+    'help_url': "http://docs.openstack.org",
 }
+
+COMPRESS_OFFLINE = <%= @compress_offline ? "True" : "False" %>
 
 OPENSTACK_HOST = "<%= @keystone_address %>"
 OPENSTACK_KEYSTONE_URL = "http://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
@@ -50,6 +63,11 @@ OPENSTACK_KEYSTONE_BACKEND = {
 
 API_PAGINATE_LIMIT = 1000
 SWIFT_PAGINATE_LIMIT = 1000
+
+<% if node.platform == "suse" -%>
+from horizon.utils import secret_key
+SECRET_KEY = secret_key.generate_or_read_from_file(os.path.join(LOCAL_PATH, '.secret_key_store'))
+<% end -%>
 
 # If you have external monitoring links
 # EXTERNAL_MONITORING = [
