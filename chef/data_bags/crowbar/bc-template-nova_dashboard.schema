@@ -12,7 +12,6 @@
           "type": "map",
           "required": true,
           "mapping": {
-            "database_engine": { "type": "str", "required": true },
             "nova_instance": { "type": "str", "required": true },
             "keystone_instance": { "type": "str", "required": true },
             "database_instance": { "type": "str", "required": true },
