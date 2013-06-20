@@ -131,93 +131,73 @@ end
 
 node.set_unless['dashboard']['db']['password'] = secure_password
 
-database_engine = node[:nova_dashboard][:database_engine]
-
-if database_engine == "database"
-    Chef::Log.info("Configuring Horizion to use database backend")
-
-    env_filter = " AND database_config_environment:database-config-#{node[:nova_dashboard][:database_instance]}"
-    sqls = search(:node, "roles:database-server#{env_filter}") || []
-    if sqls.length > 0
-        sql = sqls[0]
-        sql = node if sql.name == node.name
-    else
-        sql = node
-    end
-    include_recipe "database::client"
-    backend_name = Chef::Recipe::Database::Util.get_backend_name(sql)
-    include_recipe "#{backend_name}::client"
-    include_recipe "#{backend_name}::python-client"
-
-    db_provider = Chef::Recipe::Database::Util.get_database_provider(sql)
-    db_user_provider = Chef::Recipe::Database::Util.get_user_provider(sql)
-    privs = Chef::Recipe::Database::Util.get_default_priviledges(sql)
-    case backend_name
-    when "mysql"
-        django_db_backend = "'django.db.backends.mysql'"
-    when "postgresql"
-        django_db_backend = "'django.db.backends.postgresql_psycopg2'"
-    end
-
-    database_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(sql, "admin").address if database_address.nil?
-    Chef::Log.info("Database server found at #{database_address}")
-    db_conn = { :host => database_address,
-                :username => "db_maker",
-                :password => sql[database_engine][:db_maker_password] }
-
-
-    # Create the Dashboard Database
-    database "create #{node[:dashboard][:db][:database]} database" do
-        connection db_conn
-        database_name node[:dashboard][:db][:database]
-        provider db_provider
-        action :create
-    end
-
-    database_user "create dashboard database user" do
-        connection db_conn
-        database_name node[:dashboard][:db][:database]
-        username node[:dashboard][:db][:user]
-        password node[:dashboard][:db][:password]
-        host '%'
-        provider db_user_provider
-        action :create
-    end
-
-    database_user "create dashboard database user" do
-        connection db_conn
-        database_name node[:dashboard][:db][:database]
-        username node[:dashboard][:db][:user]
-        password node[:dashboard][:db][:password]
-        host '%'
-        privileges privs
-        provider db_user_provider
-        action :grant
-    end
-
-    db_settings = {
-      'ENGINE' => django_db_backend,
-      'NAME' => "'#{node[:dashboard][:db][:database]}'",
-      'USER' => "'#{node[:dashboard][:db][:user]}'",
-      'PASSWORD' => "'#{node[:dashboard][:db][:password]}'",
-      'HOST' => "'#{database_address}'",
-      'default-character-set' => "'utf8'"
-    }
-elsif node[:nova_dashboard][:database_engine] == "sqlite"
-   Chef::Log.info("Configuring Horizion to use SQLite3 backend")
-    db_settings = {
-      'ENGINE' => "'django.db.backends.sqlite3'",
-      'NAME' => "os.path.join(LOCAL_PATH, 'dashboard_openstack.sqlite3')"
-    }
-
-    file "/etc/openstack-dashboard/dashboard_openstack.sqlite3" do
-        action :touch
-        user node[:apache][:user]
-        group node[:apache][:group]
-    end
+env_filter = " AND database_config_environment:database-config-#{node[:nova_dashboard][:database_instance]}"
+sqls = search(:node, "roles:database-server#{env_filter}") || []
+if sqls.length > 0
+    sql = sqls[0]
+    sql = node if sql.name == node.name
 else
-    Chef::Log.error("Unknown database engine #{database_engine}")
+    sql = node
 end
+include_recipe "database::client"
+backend_name = Chef::Recipe::Database::Util.get_backend_name(sql)
+include_recipe "#{backend_name}::client"
+include_recipe "#{backend_name}::python-client"
+
+db_provider = Chef::Recipe::Database::Util.get_database_provider(sql)
+db_user_provider = Chef::Recipe::Database::Util.get_user_provider(sql)
+privs = Chef::Recipe::Database::Util.get_default_priviledges(sql)
+case backend_name
+when "mysql"
+    django_db_backend = "'django.db.backends.mysql'"
+when "postgresql"
+    django_db_backend = "'django.db.backends.postgresql_psycopg2'"
+end
+
+database_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(sql, "admin").address if database_address.nil?
+Chef::Log.info("Database server found at #{database_address}")
+db_conn = { :host => database_address,
+            :username => "db_maker",
+            :password => sql["database"][:db_maker_password] }
+
+
+# Create the Dashboard Database
+database "create #{node[:dashboard][:db][:database]} database" do
+    connection db_conn
+    database_name node[:dashboard][:db][:database]
+    provider db_provider
+    action :create
+end
+
+database_user "create dashboard database user" do
+    connection db_conn
+    database_name node[:dashboard][:db][:database]
+    username node[:dashboard][:db][:user]
+    password node[:dashboard][:db][:password]
+    host '%'
+    provider db_user_provider
+    action :create
+end
+
+database_user "create dashboard database user" do
+    connection db_conn
+    database_name node[:dashboard][:db][:database]
+    username node[:dashboard][:db][:user]
+    password node[:dashboard][:db][:password]
+    host '%'
+    privileges privs
+    provider db_user_provider
+    action :grant
+end
+
+db_settings = {
+  'ENGINE' => django_db_backend,
+  'NAME' => "'#{node[:dashboard][:db][:database]}'",
+  'USER' => "'#{node[:dashboard][:db][:user]}'",
+  'PASSWORD' => "'#{node[:dashboard][:db][:password]}'",
+  'HOST' => "'#{database_address}'",
+  'default-character-set' => "'utf8'"
+}
 
 # Need to figure out environment filter
 env_filter = " AND keystone_config_environment:keystone-config-#{node[:nova_dashboard][:keystone_instance]}"
@@ -238,6 +218,7 @@ end
 
 keystone_address = keystone["keystone"]["address"] rescue nil
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
+keystone_protocol = keystone["keystone"]["api"]["protocol"]
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
@@ -257,6 +238,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   group "root"
   mode "0640"
   variables(
+    :keystone_protocol => keystone_protocol,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
     :db_settings => db_settings,

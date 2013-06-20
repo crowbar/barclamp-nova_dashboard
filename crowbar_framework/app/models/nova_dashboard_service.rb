@@ -27,9 +27,7 @@ class NovaDashboardService < ServiceObject
 
   def proposal_dependencies(role)
     answer = []
-    if role.default_attributes["nova_dashboard"]["database_engine"] == "database"
-      answer << { "barclamp" => "database", "inst" => role.default_attributes["nova_dashboard"]["database_instance"] }
-    end
+    answer << { "barclamp" => "database", "inst" => role.default_attributes["nova_dashboard"]["database_instance"] }
     if role.default_attributes[@bc_name]["use_gitrepo"]
       answer << { "barclamp" => "git", "inst" => role.default_attributes[@bc_name]["git_instance"] }
     end
@@ -61,19 +59,14 @@ class NovaDashboardService < ServiceObject
       end
       if dbs.empty?
         @logger.info("Dashboard create_proposal: no database proposal found")
-        base["attributes"]["nova_dashboard"]["database_engine"] = ""
       else
         base["attributes"]["nova_dashboard"]["database_instance"] = dbs[0]
-        base["attributes"]["nova_dashboard"]["database_engine"] = "database"
       end
     rescue
       @logger.info("Nova dashboard create_proposal: no database found")
-      base["attributes"]["nova_dashboard"]["database_engine"] = ""
     end
 
-    # SQLite is not a fallback solution
-    # base["attributes"]["nova_dashboard"]["database_engine"] = "sqlite" if base["attributes"]["nova_dashboard"]["database_engine"] == ""
-    if base["attributes"]["nova_dashboard"]["database_engine"] == ""
+    if base["attributes"]["nova_dashboard"]["database_instance"] == ""
       raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "database"))
     end
 

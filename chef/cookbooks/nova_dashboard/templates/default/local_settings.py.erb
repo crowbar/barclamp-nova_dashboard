@@ -54,7 +54,7 @@ HORIZON_CONFIG = {
 COMPRESS_OFFLINE = <%= @compress_offline ? "True" : "False" %>
 
 OPENSTACK_HOST = "<%= @keystone_address %>"
-OPENSTACK_KEYSTONE_URL = "http://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
+OPENSTACK_KEYSTONE_URL = "<%= @keystone_protocol %>://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 OPENSTACK_KEYSTONE_BACKEND = {
     'name': 'native',
@@ -64,7 +64,7 @@ OPENSTACK_KEYSTONE_BACKEND = {
 API_PAGINATE_LIMIT = 1000
 SWIFT_PAGINATE_LIMIT = 1000
 
-<% if node.platform == "suse" -%>
+<% if (node.platform == "suse") or (node.platform == "ubuntu" and node[:nova_dashboard][:use_gitrepo]) -%>
 from horizon.utils import secret_key
 SECRET_KEY = secret_key.generate_or_read_from_file(os.path.join(LOCAL_PATH, '.secret_key_store'))
 <% end -%>

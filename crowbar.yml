@@ -78,7 +78,6 @@ locale_additions:
       nova_dashboard:
         edit_attributes: 
           attributes: Attributes
-          database_engine: Database Engine
           database_instance: Database Instance
           keystone_instance: Keystone Instance
           nova_instance: Nova Instance

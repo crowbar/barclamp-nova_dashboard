@@ -3,7 +3,6 @@
   "description": "User Interface for OpenStack projects (code name Horizon)",
   "attributes": {
     "nova_dashboard": {
-      "database_engine": "database",
       "nova_instance": "none",
       "keystone_instance": "none",
       "database_instance": "none",
@@ -28,7 +27,8 @@
         "pip://python-keystoneclient",
         "pip://python-novaclient",
         "pip://python-quantumclient>=2.0",
-        "pip://pytz"
+        "pip://pytz",
+        "pip://python-swiftclient"
       ],
       "use_gitrepo": false
     }
