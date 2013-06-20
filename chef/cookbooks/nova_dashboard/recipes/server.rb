@@ -179,7 +179,7 @@ database_user "create dashboard database user" do
     action :create
 end
 
-database_user "create dashboard database user" do
+database_user "grant database access for dashboard database user" do
     connection db_conn
     database_name node[:dashboard][:db][:database]
     username node[:dashboard][:db][:user]
