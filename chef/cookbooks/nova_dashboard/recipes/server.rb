@@ -238,6 +238,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   group "root"
   mode "0640"
   variables(
+    :debug => node[:nova_dashboard][:debug],
     :keystone_protocol => keystone_protocol,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
