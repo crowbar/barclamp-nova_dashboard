@@ -60,6 +60,7 @@ OPENSTACK_KEYSTONE_BACKEND = {
     'name': 'native',
     'can_edit_user': True
 }
+OPENSTACK_SSL_NO_VERIFY = <%= @insecure ? "True" : "False" %>
 
 API_PAGINATE_LIMIT = 1000
 SWIFT_PAGINATE_LIMIT = 1000

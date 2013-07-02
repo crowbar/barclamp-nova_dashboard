@@ -220,6 +220,7 @@ keystone_address = keystone["keystone"]["address"] rescue nil
 keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
 keystone_protocol = keystone["keystone"]["api"]["protocol"]
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
+keystone_insecure = keystone_protocol == 'https' && keystone[:keystone][:ssl][:insecure]
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
 execute "python manage.py syncdb" do
@@ -241,6 +242,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_protocol => keystone_protocol,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
+    :insecure => keystone_insecure,
     :db_settings => db_settings,
     :compress_offline => node.platform == "suse"
   )
