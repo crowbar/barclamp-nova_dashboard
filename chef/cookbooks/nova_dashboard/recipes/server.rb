@@ -223,6 +223,14 @@ keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 keystone_insecure = keystone_protocol == 'https' && keystone[:keystone][:ssl][:insecure]
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
+quantums = search(:node, "roles:quantum-server") || []
+if quantums.length > 0
+  quantum = quantums[0]
+  quantum_insecure = quantum[:quantum][:api][:protocol] == 'https' && quantum[:quantum][:ssl][:insecure]
+else
+  quantum_insecure = false
+end
+
 execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
@@ -242,7 +250,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_protocol => keystone_protocol,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
-    :insecure => keystone_insecure,
+    :insecure => keystone_insecure || quantum_insecure,
     :db_settings => db_settings,
     :compress_offline => node.platform == "suse"
   )
