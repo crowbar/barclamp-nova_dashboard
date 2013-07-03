@@ -239,6 +239,15 @@ else
   quantum_insecure = false
 end
 
+env_filter = "AND nova_config_environment:nova-config-#{node[:nova_dashboard][:nova_instance]}"
+novas = search(:node, "roles:nova-multi-controller #{env_filter}") || []
+if novas.length > 0
+  nova = novas[0]
+  nova_insecure = nova[:nova][:ssl][:enabled] && nova[:nova][:ssl][:insecure]
+else
+  nova_insecure = false
+end
+
 execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
@@ -259,7 +268,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_protocol => keystone_protocol,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
-    :insecure => keystone_insecure || quantum_insecure,
+    :insecure => keystone_insecure || quantum_insecure || nova_insecure,
     :db_settings => db_settings,
     :compress_offline => node.platform == "suse",
     :use_ssl => node[:nova_dashboard][:apache][:ssl]
