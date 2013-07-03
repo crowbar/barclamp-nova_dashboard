@@ -17,6 +17,10 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
+if node[:nova_dashboard][:apache][:ssl]
+  include_recipe "apache2::mod_ssl"
+end
+
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 dashboard_path = "/usr/share/openstack-dashboard"
@@ -98,6 +102,10 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
     :horizon_dir => dashboard_path,
     :user => node[:apache][:user],
     :group => node[:apache][:group],
+    :use_ssl => node[:nova_dashboard][:apache][:ssl],
+    :ssl_crt_file => node[:nova_dashboard][:apache][:ssl_crt_file],
+    :ssl_key_file => node[:nova_dashboard][:apache][:ssl_key_file],
+    :ssl_crt_chain_file => node[:nova_dashboard][:apache][:ssl_crt_chain_file],
     :venv => node[:nova_dashboard][:use_virtualenv],
     :venv_path => venv_path
   )
@@ -242,7 +250,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
     :db_settings => db_settings,
-    :compress_offline => node.platform == "suse"
+    :compress_offline => node.platform == "suse",
+    :use_ssl => node[:nova_dashboard][:apache][:ssl]
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
