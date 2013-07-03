@@ -5,7 +5,18 @@ from django.utils.translation import ugettext_lazy as _
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 PROD = False
-USE_SSL = False
+
+# Set SSL proxy settings:
+# For Django 1.4+ pass this header from the proxy after terminating the SSL,
+# and don't forget to strip it from the client's request.
+# For more information see:
+# https://docs.djangoproject.com/en/1.4/ref/settings/#secure-proxy-ssl-header
+<%= @use_ssl ? '' : '# ' %>SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+
+# If Horizon is being served through SSL, then uncomment the following two
+# settings to better secure the cookies from security exploits
+<%= @use_ssl ? '' : '# ' %>CSRF_COOKIE_SECURE = True
+<%= @use_ssl ? '' : '# ' %>SESSION_COOKIE_SECURE = True
 
 LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 
