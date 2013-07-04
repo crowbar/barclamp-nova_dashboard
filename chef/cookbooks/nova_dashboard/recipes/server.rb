@@ -231,6 +231,22 @@ keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 keystone_insecure = keystone_protocol == 'https' && keystone[:keystone][:ssl][:insecure]
 Chef::Log.info("Keystone server found at #{keystone_address}")
 
+glances = search(:node, "roles:glance-server") || []
+if glances.length > 0
+  glance = glances[0]
+  glance_insecure = glance[:glance][:api][:protocol] == 'https' && glance[:glance][:ssl][:insecure]
+else
+  glance_insecure = false
+end
+
+cinders = search(:node, "roles:cinder-controller") || []
+if cinders.length > 0
+  cinder = cinders[0]
+  cinder_insecure = cinder[:cinder][:api][:protocol] == 'https' && cinder[:cinder][:ssl][:insecure]
+else
+  cinder_insecure = false
+end
+
 quantums = search(:node, "roles:quantum-server") || []
 if quantums.length > 0
   quantum = quantums[0]
@@ -268,7 +284,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_protocol => keystone_protocol,
     :keystone_address => keystone_address,
     :keystone_service_port => keystone_service_port,
-    :insecure => keystone_insecure || quantum_insecure || nova_insecure,
+    :insecure => keystone_insecure || glance_insecure || cinder_insecure || quantum_insecure || nova_insecure,
     :db_settings => db_settings,
     :compress_offline => node.platform == "suse",
     :use_ssl => node[:nova_dashboard][:apache][:ssl]
