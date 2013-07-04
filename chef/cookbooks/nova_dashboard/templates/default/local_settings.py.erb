@@ -64,7 +64,7 @@ HORIZON_CONFIG = {
 
 COMPRESS_OFFLINE = <%= @compress_offline ? "True" : "False" %>
 
-OPENSTACK_HOST = "<%= @keystone_address %>"
+OPENSTACK_HOST = "<%= @keystone_host %>"
 OPENSTACK_KEYSTONE_URL = "<%= @keystone_protocol %>://%s:<%= @keystone_service_port %>/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 OPENSTACK_KEYSTONE_BACKEND = {
