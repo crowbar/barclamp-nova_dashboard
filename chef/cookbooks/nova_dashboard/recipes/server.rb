@@ -224,12 +224,11 @@ if node[:nova_dashboard][:use_gitrepo]
   end
 end
 
-keystone_address = keystone["keystone"]["address"] rescue nil
-keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
+keystone_host = keystone[:fqdn]
 keystone_protocol = keystone["keystone"]["api"]["protocol"]
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
 keystone_insecure = keystone_protocol == 'https' && keystone[:keystone][:ssl][:insecure]
-Chef::Log.info("Keystone server found at #{keystone_address}")
+Chef::Log.info("Keystone server found at #{keystone_host}")
 
 glances = search(:node, "roles:glance-server") || []
 if glances.length > 0
@@ -282,7 +281,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   variables(
     :debug => node[:nova_dashboard][:debug],
     :keystone_protocol => keystone_protocol,
-    :keystone_address => keystone_address,
+    :keystone_host => keystone_host,
     :keystone_service_port => keystone_service_port,
     :insecure => keystone_insecure || glance_insecure || cinder_insecure || quantum_insecure || nova_insecure,
     :db_settings => db_settings,
