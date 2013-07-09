@@ -286,6 +286,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :insecure => keystone_insecure || glance_insecure || cinder_insecure || quantum_insecure || nova_insecure,
     :db_settings => db_settings,
     :compress_offline => node.platform == "suse",
+    :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
     :use_ssl => node[:nova_dashboard][:apache][:ssl]
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
