@@ -18,7 +18,6 @@ default[:dashboard][:db][:user] = "dash"
 default[:dashboard][:db][:password] = "" # Set by Recipe
 
 default[:nova_dashboard][:debug] = false
-override[:nova_dashboard][:user]="nova_dashboard"
 default[:nova_dashboard][:site_branding] = "OpenStack Dashboard"
 
 default[:nova_dashboard][:apache][:ssl] = false
