@@ -19,7 +19,7 @@ default[:dashboard][:db][:password] = "" # Set by Recipe
 
 default[:nova_dashboard][:debug] = false
 override[:nova_dashboard][:user]="nova_dashboard"
-default[:nova_dashboard][:site_branding] = "Openstack Nova Dashboard"
+default[:nova_dashboard][:site_branding] = "OpenStack Dashboard"
 
 default[:nova_dashboard][:apache][:ssl] = false
 default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/openstack-dashboard-server.crt'

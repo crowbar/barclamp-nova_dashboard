@@ -287,7 +287,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :db_settings => db_settings,
     :compress_offline => node.platform == "suse",
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
-    :use_ssl => node[:nova_dashboard][:apache][:ssl]
+    :use_ssl => node[:nova_dashboard][:apache][:ssl],
+    :site_branding => node[:nova_dashboard][:site_branding]
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
