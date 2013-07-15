@@ -16,6 +16,7 @@
             "nova_instance": { "type": "str", "required": true },
             "keystone_instance": { "type": "str", "required": true },
             "database_instance": { "type": "str", "required": true },
+            "site_branding": { "type": "str", "required": true },
             "apache" : {
               "type" : "map",
               "required" : true,
