@@ -272,6 +272,16 @@ execute "python manage.py syncdb" do
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
+
+# We're going to use memcached as a cache backend for Django
+memcached_instance "nova-dashboard"
+case node[:platform]
+when "suse"
+  package "python-python-memcached"
+when "debian", "ubuntu"
+  package "python-memcache"
+end
+
 # Need to template the "EXTERNAL_MONITORING" array
 template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
