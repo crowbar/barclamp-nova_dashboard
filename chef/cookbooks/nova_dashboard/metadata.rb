@@ -5,6 +5,7 @@ description      "Installs/Configures Nova Dashboard"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.me'))
 version          "0.0"
 
+depends "apache2"
 depends "openssl"
 depends "database"
 depends "nagios"
