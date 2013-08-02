@@ -17,8 +17,13 @@ default[:dashboard][:db][:database] = "dash"
 default[:dashboard][:db][:user] = "dash"
 default[:dashboard][:db][:password] = "" # Set by Recipe
 
-override[:nova_dashboard][:user]="nova_dashboard"
-default[:nova_dashboard][:site_branding] = "Openstack Nova Dashboard"
+default[:nova_dashboard][:debug] = false
+default[:nova_dashboard][:site_branding] = "OpenStack Dashboard"
+
+default[:nova_dashboard][:apache][:ssl] = false
+default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/openstack-dashboard-server.crt'
+default[:nova_dashboard][:apache][:ssl_key_file] = '/etc/apache2/ssl.key/openstack-dashboard-server.key'
+default[:nova_dashboard][:apache][:ssl_crt_chain_file] = ''
 
 # declare what needs to be monitored
 node[:nova_dashboard][:monitor]={}

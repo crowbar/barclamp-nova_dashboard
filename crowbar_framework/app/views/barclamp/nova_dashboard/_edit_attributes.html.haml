@@ -8,3 +8,35 @@
     = render_instance_selector("database", :database_instance, t('.database_instance'), "database_instance", @proposal)
     = render_instance_selector("keystone", :keystone_instance, t('.keystone_instance'), "keystone_instance", @proposal)
     = render_instance_selector("nova", :nova_instance, t('.nova_instance'), "nova_instance", @proposal)
+
+  %label.h3{ :for => :ssl }= t('.ssl')
+  %div.container{ :id => :ssl }
+    %p.h3
+      %label{ :for => :protocol }= t('.protocol')
+      = select_tag :protocol, options_for_select([['HTTP','false'], ['HTTPS', 'true']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl"].to_s), :onchange => "update_value('apache/ssl', 'protocol', 'boolean')"
+
+    %div{ :id => :ssl_div }
+      %p
+        %label{ :for => :ssl_crt_file }= t('.ssl_crt_file')
+        = text_field_tag :ssl_crt_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_crt_file"], :size => 80, :onchange => "update_value('apache/ssl_crt_file', 'ssl_crt_file', 'string')"
+
+      %p
+        %label{ :for => :ssl_key_file }= t('.ssl_key_file')
+        = text_field_tag :ssl_key_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_key_file"], :size => 80, :onchange => "update_value('apache/ssl_key_file', 'ssl_key_file', 'string')"
+
+      %p
+        %label{ :for => :ssl_crt_chain_file }= t('.ssl_crt_chain_file')
+        = text_field_tag :ssl_crt_chain_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_crt_chain_file"], :size => 80, :onchange => "update_value('apache/ssl_crt_chain_file', 'ssl_crt_chain_file', 'string')"
+
+
+:javascript
+  function toggle_protocol() {
+    if ($('#protocol option:selected').attr('value') == 'true') {
+      $('#ssl_div').show();
+    } else {
+      $('#ssl_div').hide();
+    }
+  };
+
+  $(document).ready(function () { toggle_protocol(); });
+  $('#protocol').change(toggle_protocol);

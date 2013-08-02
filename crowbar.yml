@@ -81,6 +81,11 @@ locale_additions:
           database_instance: Database Instance
           keystone_instance: Keystone Instance
           nova_instance: Nova Instance
+          ssl: SSL Support
+          protocol: Protocol
+          ssl_crt_file: SSL Certificate File
+          ssl_key_file: SSL (Private) Key File
+          ssl_crt_chain_file: SSL Certificate Chain File
         edit_deployment: 
           deployment: Deployment
 

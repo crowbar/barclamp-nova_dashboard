@@ -17,6 +17,10 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
+if node[:nova_dashboard][:apache][:ssl]
+  include_recipe "apache2::mod_ssl"
+end
+
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 dashboard_path = "/usr/share/openstack-dashboard"
@@ -98,6 +102,10 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
     :horizon_dir => dashboard_path,
     :user => node[:apache][:user],
     :group => node[:apache][:group],
+    :use_ssl => node[:nova_dashboard][:apache][:ssl],
+    :ssl_crt_file => node[:nova_dashboard][:apache][:ssl_crt_file],
+    :ssl_key_file => node[:nova_dashboard][:apache][:ssl_key_file],
+    :ssl_crt_chain_file => node[:nova_dashboard][:apache][:ssl_crt_chain_file],
     :venv => node[:nova_dashboard][:use_virtualenv],
     :venv_path => venv_path
   )
@@ -216,11 +224,44 @@ if node[:nova_dashboard][:use_gitrepo]
   end
 end
 
-keystone_address = keystone["keystone"]["address"] rescue nil
-keystone_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(keystone, "admin").address if keystone_address.nil?
+keystone_host = keystone[:fqdn]
 keystone_protocol = keystone["keystone"]["api"]["protocol"]
 keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
-Chef::Log.info("Keystone server found at #{keystone_address}")
+keystone_insecure = keystone_protocol == 'https' && keystone[:keystone][:ssl][:insecure]
+Chef::Log.info("Keystone server found at #{keystone_host}")
+
+glances = search(:node, "roles:glance-server") || []
+if glances.length > 0
+  glance = glances[0]
+  glance_insecure = glance[:glance][:api][:protocol] == 'https' && glance[:glance][:ssl][:insecure]
+else
+  glance_insecure = false
+end
+
+cinders = search(:node, "roles:cinder-controller") || []
+if cinders.length > 0
+  cinder = cinders[0]
+  cinder_insecure = cinder[:cinder][:api][:protocol] == 'https' && cinder[:cinder][:ssl][:insecure]
+else
+  cinder_insecure = false
+end
+
+quantums = search(:node, "roles:quantum-server") || []
+if quantums.length > 0
+  quantum = quantums[0]
+  quantum_insecure = quantum[:quantum][:api][:protocol] == 'https' && quantum[:quantum][:ssl][:insecure]
+else
+  quantum_insecure = false
+end
+
+env_filter = "AND nova_config_environment:nova-config-#{node[:nova_dashboard][:nova_instance]}"
+novas = search(:node, "roles:nova-multi-controller #{env_filter}") || []
+if novas.length > 0
+  nova = novas[0]
+  nova_insecure = nova[:nova][:ssl][:enabled] && nova[:nova][:ssl][:insecure]
+else
+  nova_insecure = false
+end
 
 execute "python manage.py syncdb" do
   cwd dashboard_path
@@ -231,6 +272,16 @@ execute "python manage.py syncdb" do
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
+
+# We're going to use memcached as a cache backend for Django
+memcached_instance "nova-dashboard"
+case node[:platform]
+when "suse"
+  package "python-python-memcached"
+when "debian", "ubuntu"
+  package "python-memcache"
+end
+
 # Need to template the "EXTERNAL_MONITORING" array
 template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   source "local_settings.py.erb"
@@ -238,11 +289,16 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   group "root"
   mode "0640"
   variables(
+    :debug => node[:nova_dashboard][:debug],
     :keystone_protocol => keystone_protocol,
-    :keystone_address => keystone_address,
+    :keystone_host => keystone_host,
     :keystone_service_port => keystone_service_port,
+    :insecure => keystone_insecure || glance_insecure || cinder_insecure || quantum_insecure || nova_insecure,
     :db_settings => db_settings,
-    :compress_offline => node.platform == "suse"
+    :compress_offline => node.platform == "suse",
+    :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
+    :use_ssl => node[:nova_dashboard][:apache][:ssl],
+    :site_branding => node[:nova_dashboard][:site_branding]
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create

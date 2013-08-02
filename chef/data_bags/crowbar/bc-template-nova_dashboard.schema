@@ -12,9 +12,21 @@
           "type": "map",
           "required": true,
           "mapping": {
+            "debug": { "type": "bool", "required": true },
             "nova_instance": { "type": "str", "required": true },
             "keystone_instance": { "type": "str", "required": true },
             "database_instance": { "type": "str", "required": true },
+            "site_branding": { "type": "str", "required": true },
+            "apache" : {
+              "type" : "map",
+              "required" : true,
+              "mapping": {
+                "ssl": { "type": "bool", "required": true },
+                "ssl_crt_file": { "type": "str" },
+                "ssl_key_file": { "type": "str" },
+                "ssl_crt_chain_file": { "type": "str" }
+              }
+            },
             "gitrepo": { "type": "str", "required": true },
             "git_instance": { "type": "str", "required": true },
             "git_refspec": { "type": "str", "required": true },

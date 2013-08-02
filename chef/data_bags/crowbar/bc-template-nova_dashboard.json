@@ -3,9 +3,17 @@
   "description": "User Interface for OpenStack projects (code name Horizon)",
   "attributes": {
     "nova_dashboard": {
+      "debug": false,
       "nova_instance": "none",
       "keystone_instance": "none",
       "database_instance": "none",
+      "site_branding": "OpenStack Dashboard",
+      "apache": {
+        "ssl": false,
+        "ssl_crt_file": "/etc/apache2/ssl.crt/openstack-dashboard-server.crt",
+        "ssl_key_file": "/etc/apache2/ssl.key/openstack-dashboard-server.key",
+        "ssl_crt_chain_file": ""
+      },
       "gitrepo": "http://github.com/openstack/horizon.git",
       "git_instance": "",
       "git_refspec": "stable/grizzly",

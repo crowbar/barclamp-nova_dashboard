@@ -1,4 +1,22 @@
+<% if @use_ssl %>
+<IfDefine SSL>
+<IfDefine !NOSSL>
+
+RewriteEngine On
+RewriteCond %{SERVER_PORT} ^80$
+RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
+
+<VirtualHost *:443>
+    SSLEngine On
+    SSLCertificateFile <%= @ssl_crt_file %>
+    SSLCertificateKeyFile <%= @ssl_key_file %>
+    <% unless @ssl_crt_chain_file.nil? or @ssl_crt_chain_file.empty? %>
+    SSLCertificateChainFile <%= @ssl_crt_chain_file %>
+    <% end %>
+
+<% else %>
 <VirtualHost *:80>
+<% end %>
     WSGIDaemonProcess horizon user=<%= @user %> group=<%= @group %> processes=3 threads=10 home=<%= @horizon_dir %> 
 <% if @venv -%>
     WSGIScriptAlias / <%= @horizon_dir %>/openstack_dashboard/wsgi/django_venv.wsgi
@@ -32,3 +50,8 @@
 </VirtualHost>
 
 WSGISocketPrefix /var/run/apache2
+
+<% if @use_ssl %>
+</IfDefine>
+</IfDefine>
+<% end %>
