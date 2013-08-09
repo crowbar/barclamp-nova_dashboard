@@ -17,9 +17,8 @@
 
 barclamp:
   name: nova_dashboard
-  display: Nova Dashboard
-#  description: User Interface for OpenStack projects (aka code name Horizon)
-  description: 'OpenStack Dashboard: graphical interface to access, provision and automate cloud-based resources'
+  display: Horizon
+  description: 'OpenStack Dashboard: Web User Interface to access, provision and automate Cloud-based resources'
   version: 0
   requires:
     - keystone
