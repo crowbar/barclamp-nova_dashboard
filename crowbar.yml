@@ -63,9 +63,22 @@ debs:
     - python-netaddr
     - node-less
 rpms:
+  centos-6.4:
+    repos:
+      - rpm http://rdo.fedorapeople.org/openstack/openstack-grizzly/rdo-release-grizzly.rpm
+      # rpm http://repos.fedorapeople.org/repos/openstack/openstack-grizzly/epel-6
+      # http://mirror.us.leaseweb.net/epel/6/x86_64
+      # http://rbel.frameos.org/stable/el6/x86_64
+  redhat-6.4:
+    repos:
+      - rpm http://rdo.fedorapeople.org/openstack/openstack-grizzly/rdo-release-grizzly.rpm
+      # rpm http://repos.fedorapeople.org/repos/openstack/openstack-grizzly/epel-6
   pkgs:
-    # put your rpms here
-    # - httpd
+    - openstack-dashboard
+    - httpd
+    - python-memcached
+    - python-swiftclient
+    - python-django-horizon
     
 gems:
   pkgs:
