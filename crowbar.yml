@@ -79,7 +79,9 @@ rpms:
     - python-memcached
     - python-swiftclient
     - python-django-horizon
-    
+    - nodejs
+    - nodejs-less
+
 gems:
   pkgs:
     # put your gems here.
