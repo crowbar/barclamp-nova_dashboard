@@ -9,9 +9,9 @@
     = render_instance_selector("keystone", :keystone_instance, t('.keystone_instance'), "keystone_instance", @proposal)
     = render_instance_selector("nova", :nova_instance, t('.nova_instance'), "nova_instance", @proposal)
 
-  %label.h3{ :for => :ssl }= t('.ssl')
-  %div.container{ :id => :ssl }
-    %p.h3
+  %label.section-header{ :for => :protocol_div }= t('.ssl')
+  %div.section{ :id => :protocol_div }
+    %p
       %label{ :for => :protocol }= t('.protocol')
       = select_tag :protocol, options_for_select([['HTTP','false'], ['HTTPS', 'true']], @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl"].to_s), :onchange => "update_value('apache/ssl', 'protocol', 'boolean')"
 
