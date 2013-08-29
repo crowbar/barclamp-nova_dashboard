@@ -81,6 +81,7 @@ rpms:
     - python-django-horizon
     - nodejs
     - nodejs-less
+    - memcached
 
 gems:
   pkgs:
