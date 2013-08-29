@@ -28,7 +28,7 @@ venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" :
 venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
 
 unless node[:nova_dashboard][:use_gitrepo]
-   if node.platform?(%w{debian ubuntu})
+   if %w(debian ubuntu).include?(node.platform)
     # Explicitly added client dependencies for now.
     packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
     packages.each do |pkg|
@@ -43,7 +43,7 @@ unless node[:nova_dashboard][:use_gitrepo]
         action :purge
       end
     end
-  elsif node.platform?(%w{centos redhat})
+  elsif %w(redhat centos).include?(node.platform)
     package "openstack-dashboard"
     package "nodejs"
     package "nodejs-less"
