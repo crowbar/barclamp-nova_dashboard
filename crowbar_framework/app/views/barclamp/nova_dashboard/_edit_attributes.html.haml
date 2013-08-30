@@ -18,15 +18,15 @@
     %div{ :id => :ssl_div }
       %p
         %label{ :for => :ssl_crt_file }= t('.ssl_crt_file')
-        = text_field_tag :ssl_crt_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_crt_file"], :size => 80, :onchange => "update_value('apache/ssl_crt_file', 'ssl_crt_file', 'string')"
+        = text_field_tag :ssl_crt_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_crt_file"], :class=> "input-xxlarge", :size => 80, :onchange => "update_value('apache/ssl_crt_file', 'ssl_crt_file', 'string')"
 
       %p
         %label{ :for => :ssl_key_file }= t('.ssl_key_file')
-        = text_field_tag :ssl_key_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_key_file"], :size => 80, :onchange => "update_value('apache/ssl_key_file', 'ssl_key_file', 'string')"
+        = text_field_tag :ssl_key_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_key_file"], :class=> "input-xxlarge", :size => 80, :onchange => "update_value('apache/ssl_key_file', 'ssl_key_file', 'string')"
 
       %p
         %label{ :for => :ssl_crt_chain_file }= t('.ssl_crt_chain_file')
-        = text_field_tag :ssl_crt_chain_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_crt_chain_file"], :size => 80, :onchange => "update_value('apache/ssl_crt_chain_file', 'ssl_crt_chain_file', 'string')"
+        = text_field_tag :ssl_crt_chain_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_crt_chain_file"], :class=> "input-xxlarge", :size => 80, :onchange => "update_value('apache/ssl_crt_chain_file', 'ssl_crt_chain_file', 'string')"
 
 
 :javascript
