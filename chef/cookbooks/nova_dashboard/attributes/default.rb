@@ -30,3 +30,6 @@ node[:nova_dashboard][:monitor]={}
 node[:nova_dashboard][:monitor][:svcs] = []
 node[:nova_dashboard][:monitor][:ports]={}
 
+# Use a non-default port for memcached to avoid collision with swift
+node[:nova_dashboard][:memcached] = {}
+node[:nova_dashboard][:memcached][:port] = 11212

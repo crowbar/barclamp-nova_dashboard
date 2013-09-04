@@ -78,7 +78,7 @@ SECRET_KEY = secret_key.generate_or_read_from_file(os.path.join(LOCAL_PATH, '.se
 CACHES = {
    'default': {
        'BACKEND' : 'django.core.cache.backends.memcached.MemcachedCache',
-       'LOCATION' : '<%= "127.0.0.1:#{node[:memcached][:port]}" %>',
+       'LOCATION' : '<%= "127.0.0.1:#{node[:nova_dashboard][:memcached][:port]}" %>',
    }
 }
 
