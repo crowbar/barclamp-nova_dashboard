@@ -274,7 +274,13 @@ end
 
 
 # We're going to use memcached as a cache backend for Django
-memcached_instance "nova-dashboard"
+#
+# Do not use the default port, since this will collide with swift
+# if it happens to be installed on the same node
+memcached_instance "nova-dashboard" do
+  port node[:nova_dashboard][:memcached][:port]
+end
+
 case node[:platform]
 when "suse"
   package "python-python-memcached"
