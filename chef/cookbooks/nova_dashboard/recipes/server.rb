@@ -28,7 +28,7 @@ venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" :
 venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
 
 unless node[:nova_dashboard][:use_gitrepo]
-   if %w(debian ubuntu).include?(node.platform)
+  if %w(debian ubuntu).include?(node.platform)
     # Explicitly added client dependencies for now.
     packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
     packages.each do |pkg|
