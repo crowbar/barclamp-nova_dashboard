@@ -28,7 +28,7 @@ venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" :
 venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
 
 unless node[:nova_dashboard][:use_gitrepo]
-  if node.platform != "suse"
+  if %w(debian ubuntu).include?(node.platform)
     # Explicitly added client dependencies for now.
     packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
     packages.each do |pkg|
@@ -42,6 +42,14 @@ unless node[:nova_dashboard][:use_gitrepo]
       package pkg do
         action :purge
       end
+    end
+  elsif %w(redhat centos).include?(node.platform)
+    package "openstack-dashboard"
+    package "nodejs"
+    package "nodejs-less"
+    package "python-memcached"
+    execute "chown_#{node[:apache][:user]}" do
+      command "chown -R #{node[:apache][:user]}:#{node[:apache][:group]} #{dashboard_path}"
     end
   else
     # On SUSE, the package has the correct list of dependencies
