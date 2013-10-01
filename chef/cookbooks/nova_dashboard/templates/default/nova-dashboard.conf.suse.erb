@@ -24,7 +24,6 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
     WSGIProcessGroup horizon
 
     DocumentRoot <%= @horizon_dir %>
-    Alias /static/horizon <%= @horizon_dir %>/static/horizon
     Alias /static <%= @horizon_dir %>/static
 
     <Directory />
