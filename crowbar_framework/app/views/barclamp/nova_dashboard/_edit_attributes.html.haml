@@ -4,7 +4,6 @@
   %label{:for => "proposal_attributes"}= t('.attributes')
   = link_to t('raw'), proposal_barclamp_path(:id => @proposal.name, :controller => @proposal.barclamp, :dep_raw => @dep_raw, :attr_raw => true), :style => "float: right;"
   %div.container
-    = render 'barclamp/git/pfsdeps.html.haml'
     = render_instance_selector("database", :database_instance, t('.database_instance'), "database_instance", @proposal)
     = render_instance_selector("keystone", :keystone_instance, t('.keystone_instance'), "keystone_instance", @proposal)
     = render_instance_selector("nova", :nova_instance, t('.nova_instance'), "nova_instance", @proposal)
@@ -27,7 +26,7 @@
       %p
         %label{ :for => :ssl_crt_chain_file }= t('.ssl_crt_chain_file')
         = text_field_tag :ssl_crt_chain_file, @proposal.raw_data['attributes'][@proposal.barclamp]["apache"]["ssl_crt_chain_file"], :class=> "input-xxlarge", :size => 80, :onchange => "update_value('apache/ssl_crt_chain_file', 'ssl_crt_chain_file', 'string')"
-
+  = render 'barclamp/git/pfsdeps.html.haml'
 
 :javascript
   function toggle_protocol() {
