@@ -23,9 +23,6 @@ end
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
-dashboard_path = "/usr/share/openstack-dashboard"
-venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" : nil
-venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
 
 unless node[:nova_dashboard][:use_gitrepo]
   if %w(debian ubuntu).include?(node.platform)
@@ -56,6 +53,10 @@ unless node[:nova_dashboard][:use_gitrepo]
     package "openstack-dashboard"
   end
 else
+  dashboard_path = "/usr/share/openstack-dashboard"
+  venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" : nil
+  venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
+
   pfs_and_install_deps "nova_dashboard" do
     path dashboard_path
     virtualenv venv_path
