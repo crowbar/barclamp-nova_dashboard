@@ -16,6 +16,7 @@
 include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
+dashboard_path = "/usr/share/openstack-dashboard"
 
 if node[:nova_dashboard][:apache][:ssl]
   include_recipe "apache2::mod_ssl"
@@ -53,7 +54,6 @@ unless node[:nova_dashboard][:use_gitrepo]
     package "openstack-dashboard"
   end
 else
-  dashboard_path = "/usr/share/openstack-dashboard"
   venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" : nil
   venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
 
