@@ -10,7 +10,9 @@
     WSGIProcessGroup horizon
 
     DocumentRoot <%= @horizon_dir %>/.blackhole/
-    Alias /media <%= @horizon_dir %>/openstack_dashboard/static
+    Alias /static/dashboard/js/ <%= @horizon_dir %>/static/dashboard/js/
+    Alias /static/dashboard/css/ <%= @horizon_dir %>/static/dashboard/css/
+    Alias /static <%= @horizon_dir %>/openstack_dashboard/static
 
     <Directory />
         Options FollowSymLinks
