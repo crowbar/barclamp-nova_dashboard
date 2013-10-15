@@ -123,6 +123,18 @@ class NovaDashboardService < ServiceObject
     base
   end
 
+  def validate_proposal_after_save proposal
+    super
+    if proposal["attributes"][@bc_name]["use_gitrepo"]
+      gitService = GitService.new(@logger)
+      gits = gitService.list_active[1].to_a
+      if not gits.include?proposal["attributes"][@bc_name]["git_instance"]
+        raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "git"))
+      end
+    end
+  end
+
+
   def apply_role_pre_chef_call(old_role, role, all_nodes)
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: entering #{all_nodes.inspect}")
     return if all_nodes.empty?
