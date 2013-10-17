@@ -34,7 +34,7 @@
         "pip://python-glanceclient<2",
         "pip://python-keystoneclient",
         "pip://python-novaclient",
-        "pip://python-quantumclient>=2.0",
+        "pip://python-neutronclient>=2.0",
         "pip://pytz",
         "pip://python-swiftclient"
       ],
