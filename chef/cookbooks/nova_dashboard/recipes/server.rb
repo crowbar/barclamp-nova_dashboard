@@ -264,6 +264,14 @@ else
   nova_insecure = false
 end
 
+directory "/var/lib/openstack-dashboard" do
+  owner node[:apache][:user]
+  group node[:apache][:group]
+  mode "0700"
+  action :create
+end
+
+
 execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
