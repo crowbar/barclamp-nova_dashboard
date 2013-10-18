@@ -107,5 +107,4 @@ locale_additions:
           deployment: Deployment
 
 git_repo:
-  - nova_dashboard https://github.com/openstack/nova_dashboard.git stable/havana
-  # - nova_dashboard https://github.com/openstack/horizon.git stable/havana
+  - nova_dashboard https://github.com/openstack/horizon.git stable/havana
