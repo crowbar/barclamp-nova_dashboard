@@ -16,7 +16,7 @@
       },
       "gitrepo": "http://github.com/openstack/horizon.git",
       "git_instance": "",
-      "git_refspec": "stable/grizzly",
+      "git_refspec": "stable/havana",
       "use_gitbarclamp": false,
       "use_pip_cache": false,
       "use_virtualenv": false,
