@@ -248,12 +248,12 @@ else
   cinder_insecure = false
 end
 
-quantums = search(:node, "roles:quantum-server") || []
-if quantums.length > 0
-  quantum = quantums[0]
-  quantum_insecure = quantum[:quantum][:api][:protocol] == 'https' && quantum[:quantum][:ssl][:insecure]
+neutrons = search(:node, "roles:neutron-server") || []
+if neutrons.length > 0
+  neutron = neutrons[0]
+  neutron_insecure = neutron[:neutron][:api][:protocol] == 'https' && neutron[:neutron][:ssl][:insecure]
 else
-  quantum_insecure = false
+  neutron_insecure = false
 end
 
 env_filter = "AND nova_config_environment:nova-config-#{node[:nova_dashboard][:nova_instance]}"
@@ -264,6 +264,14 @@ if novas.length > 0
 else
   nova_insecure = false
 end
+
+directory "/var/lib/openstack-dashboard" do
+  owner node[:apache][:user]
+  group node[:apache][:group]
+  mode "0700"
+  action :create
+end
+
 
 execute "python manage.py syncdb" do
   cwd dashboard_path
@@ -301,7 +309,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_protocol => keystone_protocol,
     :keystone_host => keystone_host,
     :keystone_service_port => keystone_service_port,
-    :insecure => keystone_insecure || glance_insecure || cinder_insecure || quantum_insecure || nova_insecure,
+    :insecure => keystone_insecure || glance_insecure || cinder_insecure || neutron_insecure || nova_insecure,
     :db_settings => db_settings,
     :compress_offline => node.platform == "suse",
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",

@@ -65,14 +65,15 @@ debs:
 rpms:
   centos-6.4:
     repos:
-      - rpm http://rdo.fedorapeople.org/openstack/openstack-grizzly/rdo-release-grizzly.rpm
-      # rpm http://repos.fedorapeople.org/repos/openstack/openstack-grizzly/epel-6
+      - rpm http://repos.fedorapeople.org/repos/openstack/openstack-havana/epel-6
+      #- rpm http://rdo.fedorapeople.org/openstack/openstack-havana/rdo-release-havana.rpm
+      # rpm http://repos.fedorapeople.org/repos/openstack/openstack-havana/epel-6
       # http://mirror.us.leaseweb.net/epel/6/x86_64
       # http://rbel.frameos.org/stable/el6/x86_64
   redhat-6.4:
     repos:
-      - rpm http://rdo.fedorapeople.org/openstack/openstack-grizzly/rdo-release-grizzly.rpm
-      # rpm http://repos.fedorapeople.org/repos/openstack/openstack-grizzly/epel-6
+      - rpm http://rdo.fedorapeople.org/openstack/openstack-havana/rdo-release-havana.rpm
+      # rpm http://repos.fedorapeople.org/repos/openstack/openstack-havana/epel-6
   pkgs:
     - openstack-dashboard
     - httpd
@@ -106,4 +107,4 @@ locale_additions:
           deployment: Deployment
 
 git_repo:
-  - nova_dashboard https://github.com/openstack/horizon.git stable/grizzly
+  - nova_dashboard https://github.com/openstack/horizon.git stable/havana
