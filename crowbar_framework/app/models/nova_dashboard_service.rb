@@ -147,10 +147,12 @@ class NovaDashboardService < ServiceObject
     # Make sure the nodes have a link to the dashboard on them.
     all_nodes.each do |n|
       node = NodeObject.find_node_by_name(n)
-      server_ip = node.get_network_by_type("public")["address"]
+      public_server_ip = node.get_network_by_type("public")["address"]
       node.crowbar["crowbar"] = {} if node.crowbar["crowbar"].nil?
       node.crowbar["crowbar"]["links"] = {} if node.crowbar["crowbar"]["links"].nil?
-      node.crowbar["crowbar"]["links"]["Nova Dashboard"] = "http://#{server_ip}/"
+      node.crowbar["crowbar"]["links"]["Nova Dashboard (public)"] = "http://#{public_server_ip}/"
+      admin_server_ip = node.get_network_by_type("admin")["address"]
+      node.crowbar["crowbar"]["links"]["Nova Dashboard (admin)"] = "http://#{admin_server_ip}/"
       node.save
     end
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: leaving")
