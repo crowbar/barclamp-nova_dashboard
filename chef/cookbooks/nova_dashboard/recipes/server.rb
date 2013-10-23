@@ -115,7 +115,7 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
     :ssl_crt_file => node[:nova_dashboard][:apache][:ssl_crt_file],
     :ssl_key_file => node[:nova_dashboard][:apache][:ssl_key_file],
     :ssl_crt_chain_file => node[:nova_dashboard][:apache][:ssl_crt_chain_file],
-    :venv => node[:nova_dashboard][:use_virtualenv],
+    :venv => node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo],
     :venv_path => venv_path
   )
   if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
@@ -123,7 +123,7 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   end
 end
 
-if node[:nova_dashboard][:use_virtualenv]
+if node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo]
   template "/usr/share/openstack-dashboard/openstack_dashboard/wsgi/django_venv.wsgi" do
     source "django_venv.wsgi.erb"
     mode 0644
