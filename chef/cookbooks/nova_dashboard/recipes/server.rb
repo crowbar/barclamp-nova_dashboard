@@ -314,7 +314,6 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_service_port => keystone_service_port,
     :insecure => keystone_insecure || glance_insecure || cinder_insecure || neutron_insecure || nova_insecure,
     :db_settings => db_settings,
-    :compress_offline => node.platform == "suse",
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
     :site_branding => node[:nova_dashboard][:site_branding]
