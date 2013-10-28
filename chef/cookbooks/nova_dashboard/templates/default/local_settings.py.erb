@@ -14,6 +14,8 @@ TEMPLATE_DEBUG = DEBUG
 # https://docs.djangoproject.com/en/1.4/ref/settings/#secure-proxy-ssl-header
 <%= @use_ssl ? '' : '# ' %>SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 
+ALLOWED_HOSTS = ['*']
+
 # If Horizon is being served through SSL, then uncomment the following two
 # settings to better secure the cookies from security exploits
 <%= @use_ssl ? '' : '# ' %>CSRF_COOKIE_SECURE = True
