@@ -28,7 +28,7 @@ end
 unless node[:nova_dashboard][:use_gitrepo]
   if %w(debian ubuntu).include?(node.platform)
     # Explicitly added client dependencies for now.
-    packages = [ "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
+    packages = [ "python-lesscpy", "python-ply", "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
     packages.each do |pkg|
       package pkg do
         action :install
@@ -46,9 +46,6 @@ unless node[:nova_dashboard][:use_gitrepo]
     package "nodejs"
     package "nodejs-less"
     package "python-memcached"
-    execute "chown_#{node[:apache][:user]}" do
-      command "chown -R #{node[:apache][:user]}:#{node[:apache][:group]} #{dashboard_path}"
-    end
   else
     # On SUSE, the package has the correct list of dependencies
     package "openstack-dashboard"
@@ -61,11 +58,11 @@ else
     path dashboard_path
     virtualenv venv_path
   end
-  execute "chown_#{node[:apache][:user]}" do
-    command "chown -R #{node[:apache][:user]}:#{node[:apache][:group]} #{dashboard_path}"
-  end
 end
 
+execute "chown_#{node[:apache][:user]}" do
+  command "chown -R #{node[:apache][:user]}:#{node[:apache][:group]} #{dashboard_path}"
+end
 
 if node.platform != "suse"
   directory "#{dashboard_path}/.blackhole" do
