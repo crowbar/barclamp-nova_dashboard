@@ -91,6 +91,11 @@ gems:
     # put your gems here.
     # - i18n
 
+pips:
+  - lesscpy
+  - ply
+  - python-memcached
+
 locale_additions:
   en:
     barclamp:
