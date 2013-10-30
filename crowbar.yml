@@ -80,6 +80,7 @@ rpms:
     - nodejs
     - nodejs-less
     - memcached
+    - python-lesscpy
 
 gems:
   pkgs:
