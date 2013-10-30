@@ -16,7 +16,7 @@
       },
       "gitrepo": "http://github.com/openstack/horizon.git",
       "git_instance": "",
-      "git_refspec": "stable/grizzly",
+      "git_refspec": "stable/havana",
       "use_gitbarclamp": true,
       "use_pip_cache": true,
       "use_virtualenv": true,
@@ -24,19 +24,10 @@
         "nodejs",
         "apache2",
         "libapache2-mod-wsgi",
-        "python-netaddr",
-        "python-lockfile",
-        "pip://warlock<2",
-        "pip://django>=1.4",
-        "pip://django_compressor",
-        "pip://django_openstack_auth",
-        "pip://python-cinderclient",
-        "pip://python-glanceclient<2",
-        "pip://python-keystoneclient",
-        "pip://python-novaclient",
-        "pip://python-neutronclient>=2.0",
-        "pip://pytz",
-        "pip://python-swiftclient"
+        "pip://python-memcached",
+        "pip://setuptools-git",
+        "pip://distribute>=0.6.28",
+        "pip://MySQL-python"
       ],
       "use_gitrepo": false
     }
