@@ -28,7 +28,7 @@ end
 unless node[:nova_dashboard][:use_gitrepo]
   if %w(debian ubuntu).include?(node.platform)
     # Explicitly added client dependencies for now.
-    packages = [ "python-lesscpy", "python-ply", "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose", "nodejs", "node-less" ]
+    packages = [ "python-lesscpy", "python-ply", "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
     packages.each do |pkg|
       package pkg do
         action :install
@@ -43,8 +43,6 @@ unless node[:nova_dashboard][:use_gitrepo]
     end
   elsif %w(redhat centos).include?(node.platform)
     package "openstack-dashboard"
-    package "nodejs"
-    package "nodejs-less"
     package "python-memcached"
   else
     # On SUSE, the package has the correct list of dependencies

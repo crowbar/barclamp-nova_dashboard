@@ -21,13 +21,14 @@
       "use_pip_cache": true,
       "use_virtualenv": true,
       "pfs_deps": [
-        "nodejs",
         "apache2",
         "libapache2-mod-wsgi",
-        "pip://python-memcached",
         "pip://setuptools-git",
         "pip://distribute>=0.6.28",
-        "pip://MySQL-python"
+        "pip://MySQL-python",
+        "pip://python-memcached",
+        "pip://ply",
+        "pip://lesscpy"
       ],
       "use_gitrepo": false
     }
