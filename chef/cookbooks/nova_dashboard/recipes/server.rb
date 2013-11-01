@@ -43,6 +43,7 @@ unless node[:nova_dashboard][:use_gitrepo]
     end
   elsif %w(redhat centos).include?(node.platform)
     package "openstack-dashboard"
+    package "python-lesscpy"
     package "python-memcached"
   else
     # On SUSE, the package has the correct list of dependencies
