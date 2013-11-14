@@ -31,7 +31,6 @@ class TestDashboardBasicOps(object):
       raise Exception("Unable to parse knife output " + out)
     if out['results'] != 1:
       raise Exception("There is " + out['results'] + "dashboard servers found")
-      exit(1)
     if out['rows'][0]['nova_dashboard.apache.ssl']:
       proto="https"
     else:
