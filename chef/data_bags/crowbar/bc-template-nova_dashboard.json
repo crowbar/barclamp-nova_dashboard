@@ -14,6 +14,7 @@
         "ssl_key_file": "/etc/apache2/ssl.key/openstack-dashboard-server.key",
         "ssl_crt_chain_file": ""
       },
+      "external_monitoring": {},
       "gitrepo": "http://github.com/openstack/horizon.git",
       "git_instance": "",
       "git_refspec": "stable/havana",
