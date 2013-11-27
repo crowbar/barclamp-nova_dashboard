@@ -254,8 +254,10 @@ neutrons = search(:node, "roles:neutron-server") || []
 if neutrons.length > 0
   neutron = neutrons[0]
   neutron_insecure = neutron[:neutron][:api][:protocol] == 'https' && neutron[:neutron][:ssl][:insecure]
+  neutron_networking_plugin = neutron[:neutron][:networking_plugin]
 else
   neutron_insecure = false
+  neutron_networking_plugin = ""
 end
 
 env_filter = "AND nova_config_environment:nova-config-#{node[:nova_dashboard][:nova_instance]}"
@@ -316,7 +318,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :db_settings => db_settings,
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
-    :site_branding => node[:nova_dashboard][:site_branding]
+    :site_branding => node[:nova_dashboard][:site_branding],
+    :neutron_networking_plugin = neutron_networking_plugin
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
