@@ -24,7 +24,9 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
     WSGIProcessGroup horizon
 
     DocumentRoot <%= @horizon_dir %>
-    Alias /static <%= @horizon_dir %>/static
+    Alias /static/dashboard/css /srv/www/openstack-dashboard/static/dashboard/css
+    Alias /static/dashboard/js /srv/www/openstack-dashboard/static/dashboard/js
+    Alias /static/dashboard <%= @horizon_dir %>/openstack_dashboard/static/dashboard/
 
     <Directory />
         Options None
@@ -32,6 +34,14 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
         Order deny,allow
         Deny from all
     </Directory>
+
+    <Directory /srv/www/openstack-dashboard/>
+        Options FollowSymLinks MultiViews
+        AllowOverride None
+        Order allow,deny
+        allow from all
+    </Directory>
+
 
     <Directory <%= @horizon_dir %>/>
         Options FollowSymLinks MultiViews
