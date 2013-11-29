@@ -6,6 +6,7 @@ en:
         keystone_instance: Keystone Instance
         nova_instance: Nova Instance
         ssl_header: SSL Support
+        session_timeout: Session Timeout (in minutes)
         apache:
           ssl: Protocol
           ssl_crt_file: SSL Certificate File
