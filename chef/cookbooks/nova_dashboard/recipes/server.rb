@@ -289,13 +289,10 @@ end
 
 
 # We're going to use memcached as a cache backend for Django
-#
-# Do not use the default port, since this will collide with swift
-# if it happens to be installed on the same node
-memcached_instance "nova-dashboard" do
-  port node[:nova_dashboard][:memcached][:port]
-end
+node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+node[:memcached][:listen] = node_admin_ip
 
+memcached_instance "nova-dashboard"
 case node[:platform]
 when "suse"
   package "python-python-memcached"
@@ -320,7 +317,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
     :site_branding => node[:nova_dashboard][:site_branding],
     :neutron_networking_plugin => neutron_networking_plugin,
-    :session_timeout => node[:nova_dashboard][:session_timeout]
+    :session_timeout => node[:nova_dashboard][:session_timeout],
+    :memcache_listen => node_admin_ip
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
