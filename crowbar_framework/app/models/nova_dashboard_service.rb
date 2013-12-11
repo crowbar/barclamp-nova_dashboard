@@ -43,8 +43,9 @@ class NovaDashboardService < ServiceObject
     nodes = NodeObject.all
     nodes.delete_if { |n| n.nil? or n.admin? }
     if nodes.size >= 1
+      controller = nodes.find { |n| n if n.intended_role == "controller" } || nodes.first[:fqdn]
       base["deployment"]["nova_dashboard"]["elements"] = {
-        "nova_dashboard-server" => [ nodes.first[:fqdn] ]
+        "nova_dashboard-server" => [ controller ]
       }
     end
 
