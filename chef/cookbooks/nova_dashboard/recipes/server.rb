@@ -69,7 +69,7 @@ if node.platform != "suse"
     mode "0755"
     action :create
   end
-  
+
   directory "/var/www" do
     owner node[:apache][:user]
     group node[:apache][:group]
@@ -97,10 +97,8 @@ end
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   if node.platform == "suse"
     path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
-    source "nova-dashboard.conf.suse.erb"
-  else
-    source "nova-dashboard.conf.erb"
   end
+  source "nova-dashboard.conf.erb"
   mode 0644
   variables(
     :horizon_dir => dashboard_path,
