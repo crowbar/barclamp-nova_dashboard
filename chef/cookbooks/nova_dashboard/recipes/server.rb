@@ -16,7 +16,12 @@
 include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
-dashboard_path = "/usr/share/openstack-dashboard"
+
+if %w(suse).include? node.platform
+  dashboard_path = "/srv/www/openstack-dashboard"
+else
+  dashboard_path = "/usr/share/openstack-dashboard"
+end
 
 if node[:nova_dashboard][:apache][:ssl]
   include_recipe "apache2::mod_ssl"
@@ -56,10 +61,10 @@ else
     path dashboard_path
     virtualenv venv_path
   end
-end
 
-execute "chown_#{node[:apache][:user]}" do
-  command "chown -R #{node[:apache][:user]}:#{node[:apache][:group]} #{dashboard_path}"
+  execute "chown_#{node[:apache][:user]}" do
+    command "chown -R #{node[:apache][:user]}:#{node[:apache][:group]} #{dashboard_path}"
+  end
 end
 
 if node.platform != "suse"
@@ -92,6 +97,18 @@ else
       action :delete
     end
   end
+
+  template "/etc/logrotate.d/openstack-dashboard" do
+    source "nova-dashboard.logrotate.erb"
+    mode 0644
+    owner "root"
+    group "root"
+  end
+
+  apache_module "deflate" do
+    conf false
+    enable true
+  end
 end
 
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
@@ -123,15 +140,6 @@ if node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo]
     variables(
       :venv_path => venv_path
     )
-  end
-end
-
-if node.platform == "suse"
-  template "/etc/logrotate.d/openstack-dashboard" do
-    source "nova-dashboard.logrotate.erb"
-    mode 0644
-    owner "root"
-    group "root"
   end
 end
 
@@ -271,6 +279,7 @@ execute "python manage.py syncdb" do
   environment ({'PYTHONPATH' => dashboard_path})
   command "#{venv_prefix} python manage.py syncdb --noinput"
   user node[:apache][:user]
+  group node[:apache][:group]
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
 end

@@ -24,9 +24,14 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
     WSGIProcessGroup horizon
 
     DocumentRoot <%= @horizon_dir %>
-    Alias /static/dashboard/css /srv/www/openstack-dashboard/static/dashboard/css
-    Alias /static/dashboard/js /srv/www/openstack-dashboard/static/dashboard/js
-    Alias /static/dashboard <%= @horizon_dir %>/openstack_dashboard/static/dashboard/
+    Alias /media <%= @horizon_dir %>/openstack_dashboard/media
+    Alias /static <%= @horizon_dir %>/openstack_dashboard/static
+
+    <Location /static>
+        SetOutputFilter DEFLATE
+        ExpiresActive on
+        ExpiresDefault "access plus 1 month"
+    </Location>
 
     <Directory />
         Options None
@@ -34,14 +39,6 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
         Order deny,allow
         Deny from all
     </Directory>
-
-    <Directory /srv/www/openstack-dashboard/>
-        Options FollowSymLinks MultiViews
-        AllowOverride None
-        Order allow,deny
-        allow from all
-    </Directory>
-
 
     <Directory <%= @horizon_dir %>/>
         Options FollowSymLinks MultiViews
