@@ -64,6 +64,7 @@ debs:
     - nodejs
     - python-netaddr
     - node-less
+
 rpms:
   centos-6.4:
     repos:
@@ -95,23 +96,6 @@ pips:
   - lesscpy
   - ply
   - python-memcached
-
-locale_additions:
-  en:
-    barclamp:
-      nova_dashboard:
-        edit_attributes: 
-          attributes: Attributes
-          database_instance: Database Instance
-          keystone_instance: Keystone Instance
-          nova_instance: Nova Instance
-          ssl: SSL Support
-          protocol: Protocol
-          ssl_crt_file: SSL Certificate File
-          ssl_key_file: SSL (Private) Key File
-          ssl_crt_chain_file: SSL Certificate Chain File
-        edit_deployment: 
-          deployment: Deployment
 
 git_repo:
   - nova_dashboard https://github.com/openstack/horizon.git stable/havana
