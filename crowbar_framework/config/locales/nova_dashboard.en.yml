@@ -2,14 +2,12 @@ en:
   barclamp:
     nova_dashboard:
       edit_attributes:
-        attributes: Attributes
         database_instance: Database Instance
         keystone_instance: Keystone Instance
         nova_instance: Nova Instance
-        ssl: SSL Support
-        protocol: Protocol
-        ssl_crt_file: SSL Certificate File
-        ssl_key_file: SSL (Private) Key File
-        ssl_crt_chain_file: SSL Certificate Chain File
-      edit_deployment:
-        deployment: Deployment
+        ssl_header: SSL Support
+        apache:
+          ssl: Protocol
+          ssl_crt_file: SSL Certificate File
+          ssl_key_file: SSL (Private) Key File
+          ssl_crt_chain_file: SSL Certificate Chain File
