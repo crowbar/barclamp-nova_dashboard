@@ -17,8 +17,8 @@
 
 barclamp:
   name: nova_dashboard
-  display: Nova Dashboard
-  description: User Interface for OpenStack projects (aka code name Horizon)
+  display: Horizon
+  description: 'OpenStack Dashboard: Web User Interface to access, provision and automate Cloud-based resources'
   version: 0
   license: "apache2"
   copyright: "Dell, Inc 2013"
@@ -27,16 +27,18 @@ barclamp:
   allow_multiple_proposals: true
   requires:
     - keystone
+    - nova
   member:
     - openstack
   os_support:
     - ubuntu-12.04
 
 crowbar:
-  layout: 1.9
-  order: 90
-  run_order: 90
-  chef_order: 90
+  layout: 1
+  order: 96
+  run_order: 96
+  chef_order: 96
+  proposal_schema_version: 2
 
 debs:
   ubuntu-12.04:
@@ -55,5 +57,61 @@ debs:
     - python-glance
     - python-novaclient
     - python-swift
+    - apache2
+    - python-lesscpy
+    - python-ply
+    - libapache2-mod-wsgi
+    - nodejs
+    - python-netaddr
     - node-less
+rpms:
+  centos-6.4:
+    repos:
+      - rpm http://repos.fedorapeople.org/repos/openstack/openstack-havana/epel-6
+      #- rpm http://rdo.fedorapeople.org/openstack/openstack-havana/rdo-release-havana.rpm
+      # rpm http://repos.fedorapeople.org/repos/openstack/openstack-havana/epel-6
+      # http://mirror.us.leaseweb.net/epel/6/x86_64
+      # http://rbel.frameos.org/stable/el6/x86_64
+  redhat-6.4:
+    repos:
+      - rpm http://rdo.fedorapeople.org/openstack/openstack-havana/rdo-release-havana.rpm
+      # rpm http://repos.fedorapeople.org/repos/openstack/openstack-havana/epel-6
+  pkgs:
+    - openstack-dashboard
+    - httpd
+    - python-memcached
+    - python-swiftclient
+    - python-django-horizon
+    - nodejs
+    - nodejs-less
+    - memcached
 
+gems:
+  pkgs:
+    # put your gems here.
+    # - i18n
+
+pips:
+  - lesscpy
+  - ply
+  - python-memcached
+
+locale_additions:
+  en:
+    barclamp:
+      nova_dashboard:
+        edit_attributes: 
+          attributes: Attributes
+          database_instance: Database Instance
+          keystone_instance: Keystone Instance
+          nova_instance: Nova Instance
+          ssl: SSL Support
+          protocol: Protocol
+          ssl_crt_file: SSL Certificate File
+          ssl_key_file: SSL (Private) Key File
+          ssl_crt_chain_file: SSL Certificate Chain File
+        edit_deployment: 
+          deployment: Deployment
+
+git_repo:
+  - nova_dashboard https://github.com/openstack/horizon.git stable/havana
