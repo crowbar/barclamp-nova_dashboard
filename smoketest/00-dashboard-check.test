@@ -2,6 +2,8 @@
 import os
 if os.path.isfile("/etc/redhat-release"):
   os.system("sudo yum --assumeyes install python-lxml")
+elif os.path.isfile("/etc/SuSE-release"):
+  os.system("sudo zypper -n install python-lxml")
 else:
   os.system("sudo apt-get install -y python-lxml")
 
