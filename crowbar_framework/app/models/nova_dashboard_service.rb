@@ -16,8 +16,8 @@
 class NovaDashboardService < ServiceObject
 
   def initialize(thelogger)
+    super(thelogger)
     @bc_name = "nova_dashboard"
-    @logger = thelogger
   end
 
 # Turn off multi proposal support till it really works and people ask for it.
@@ -49,90 +49,23 @@ class NovaDashboardService < ServiceObject
       }
     end
 
-    base["attributes"]["nova_dashboard"]["database_instance"] = ""
-    begin
-      databaseService = DatabaseService.new(@logger)
-      # Look for active roles
-      dbs = databaseService.list_active[1]
-      if dbs.empty?
-        # No actives, look for proposals
-        dbs = databaseService.proposals[1]
-      end
-      if dbs.empty?
-        @logger.info("Dashboard create_proposal: no database proposal found")
-      else
-        base["attributes"]["nova_dashboard"]["database_instance"] = dbs[0]
-      end
-    rescue
-      @logger.info("Nova dashboard create_proposal: no database found")
-    end
-
-    if base["attributes"]["nova_dashboard"]["database_instance"] == ""
-      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "database"))
-    end
-
-    base["attributes"]["nova_dashboard"]["keystone_instance"] = ""
-    begin
-      keystoneService = KeystoneService.new(@logger)
-      keystones = keystoneService.list_active[1]
-      if keystones.empty?
-        # No actives, look for proposals
-        keystones = keystoneService.proposals[1]
-      end
-      base["attributes"]["nova_dashboard"]["keystone_instance"] = keystones[0] unless keystones.empty?
-    rescue
-      @logger.info("Nova dashboard create_proposal: no keystone found")
-    end
-
-    if base["attributes"]["nova_dashboard"]["keystone_instance"] == ""
-      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "keystone"))
-    end
-
-    base["attributes"]["nova_dashboard"]["nova_instance"] = ""
-    begin
-      novaService = NovaService.new(@logger)
-      novas = novaService.list_active[1]
-      if novas.empty?
-        # No actives, look for proposals
-        novas = novaService.proposals[1]
-      end
-      base["attributes"]["nova_dashboard"]["nova_instance"] = novas[0] unless novas.empty?
-    rescue
-      @logger.info("Nova dashboard create_proposal: no nova found")
-    end
-
-    if base["attributes"]["nova_dashboard"]["nova_instance"] == ""
-      raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "nova"))
-    end
-
-    base["attributes"][@bc_name]["git_instance"] = ""
-    begin
-      gitService = GitService.new(@logger)
-      gits = gitService.list_active[1]
-      if gits.empty?
-        # No actives, look for proposals
-        gits = gitService.proposals[1]
-      end
-      unless gits.empty?
-        base["attributes"][@bc_name]["git_instance"] = gits[0]
-      end
-    rescue
-      @logger.info("#{@bc_name} create_proposal: no git found")
-    end
+    base["attributes"][@bc_name]["git_instance"] = find_dep_proposal("git", true)
+    base["attributes"][@bc_name]["database_instance"] = find_dep_proposal("database")
+    base["attributes"][@bc_name]["keystone_instance"] = find_dep_proposal("keystone")
+    base["attributes"][@bc_name]["nova_instance"] = find_dep_proposal("nova")
 
     @logger.debug("Nova_dashboard create_proposal: exiting")
     base
   end
 
   def validate_proposal_after_save proposal
-    super
+    validate_one_for_role proposal, "nova_dashboard-server"
+
     if proposal["attributes"][@bc_name]["use_gitrepo"]
-      gitService = GitService.new(@logger)
-      gits = gitService.list_active[1].to_a
-      if not gits.include?proposal["attributes"][@bc_name]["git_instance"]
-        raise(I18n.t('model.service.dependency_missing', :name => @bc_name, :dependson => "git"))
-      end
+      validate_dep_proposal_is_active "git", proposal["attributes"][@bc_name]["git_instance"]
     end
+
+    super
   end
 
 
