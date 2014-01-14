@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import os
 if os.path.isfile("/etc/redhat-release"):
-  os.system("yum --assumeyes install python-lxml")
+  os.system("sudo yum --assumeyes install python-lxml")
+elif os.path.isfile("/etc/SuSE-release"):
+  os.system("sudo zypper -n install python-lxml")
 else:
-  os.system("apt-get install -y python-lxml")
+  os.system("sudo apt-get install -y python-lxml")
 
 import urllib
 import urllib2
@@ -16,26 +18,25 @@ from lxml import html
 class TestDashboardBasicOps(object):
   @classmethod
   def __init__(self, user, passwd):
-    self.user=user
-    self.passwd=passwd
-    cmd="knife search node roles:nova_dashboard-server -F json -a nova_dashboard.apache.ssl"
-    cmd=cmd.split(" ")
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    self.user = user
+    self.passwd = passwd
+    cmd = "knife search node roles:nova_dashboard-server -F json -a nova_dashboard.apache.ssl"
+    p = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE)
     out = p.communicate()[0]
     err = p.returncode
     if err != 0:
       raise Exception("nova_dashboard-server not found")
     try:
-      out=json.loads(out)
+      out = json.loads(out)
     except:
       raise Exception("Unable to parse knife output " + out)
     if out['results'] != 1:
       raise Exception("There is " + out['results'] + "dashboard servers found")
     if out['rows'][0]['nova_dashboard.apache.ssl']:
-      proto="https"
+      proto = "https"
     else:
-      proto="http"
-    self.url=proto+"://"+out['rows'][0]['id']
+      proto = "http"
+    self.url = proto+"://"+out['rows'][0]['id']
 
 
   def check_login_page(self):
@@ -102,21 +103,21 @@ print "Checking js"
 if not admintest.check_link('//script[@type="text/javascript"]/@src'):
   raise Exception("admin js test failed")
 
-behavior_admin={}
-behavior_admin['Instances']="Instances - OpenStack Dashboard"
-behavior_admin['Volumes']="Volumes - OpenStack Dashboard"
-behavior_admin['Networks']="Networks - OpenStack Dashboard"
-behavior_admin['Routers']="Routers - OpenStack Dashboard"
-behavior_admin['Hypervisors']="Hypervisors - OpenStack Dashboard"
-behavior_admin['Flavors']="Flavors - OpenStack Dashboard"
-behavior_admin['Images']="Images - OpenStack Dashboard"
-behavior_admin['Defaults']="Defaults - OpenStack Dashboard"
-behavior_admin['System Info']="System Info - OpenStack Dashboard"
-behavior_admin['Domains']="Domains - OpenStack Dashboard"
-behavior_admin['Projects']="Projects - OpenStack Dashboard"
-behavior_admin['Users']="Users - OpenStack Dashboard"
-behavior_admin['Groups']="Groups - OpenStack Dashboard"
-behavior_admin['Roles']="Roles - OpenStack Dashboard"
+behavior_admin = {}
+behavior_admin['Instances'] = "Instances - OpenStack Dashboard"
+behavior_admin['Volumes'] = "Volumes - OpenStack Dashboard"
+behavior_admin['Networks'] = "Networks - OpenStack Dashboard"
+behavior_admin['Routers'] = "Routers - OpenStack Dashboard"
+behavior_admin['Hypervisors'] = "Hypervisors - OpenStack Dashboard"
+behavior_admin['Flavors'] = "Flavors - OpenStack Dashboard"
+behavior_admin['Images'] = "Images - OpenStack Dashboard"
+behavior_admin['Defaults'] = "Defaults - OpenStack Dashboard"
+behavior_admin['System Info'] = "System Info - OpenStack Dashboard"
+behavior_admin['Domains'] = "Domains - OpenStack Dashboard"
+behavior_admin['Projects'] = "Projects - OpenStack Dashboard"
+behavior_admin['Users'] = "Users - OpenStack Dashboard"
+behavior_admin['Groups'] = "Groups - OpenStack Dashboard"
+behavior_admin['Roles'] = "Roles - OpenStack Dashboard"
 for key in behavior_admin.keys():
   print "Checking", key, "dashboard"
   if not admintest.check_link('//a[text()="' + key + '"]/@href', behavior_admin[key]):
@@ -140,15 +141,15 @@ print "Checking js"
 if not usertest.check_link('//script[@type="text/javascript"]/@src'):
   raise Exception("user js test failed")
 
-behavior_user={}
-behavior_user['Overview']="Instance Overview - OpenStack Dashboard"
-behavior_user['Access & Security']="Access.*Security - OpenStack Dashboard"
-behavior_user['Images & Snapshots']="Images.*Snapshots - OpenStack Dashboard<"
-behavior_user['Network Topology']="Network Topology - OpenStack Dashboard"
-behavior_user['Instances']="Instances - OpenStack Dashboard"
-behavior_user['Volumes']="Volumes - OpenStack Dashboard"
-behavior_user['Networks']="Networks - OpenStack Dashboard"
-behavior_user['Routers']="Routers - OpenStack Dashboard"
+behavior_user = {}
+behavior_user['Overview'] = "Instance Overview - OpenStack Dashboard"
+behavior_user['Access & Security'] = "Access.*Security - OpenStack Dashboard"
+behavior_user['Images & Snapshots'] = "Images.*Snapshots - OpenStack Dashboard<"
+behavior_user['Network Topology'] = "Network Topology - OpenStack Dashboard"
+behavior_user['Instances'] = "Instances - OpenStack Dashboard"
+behavior_user['Volumes'] = "Volumes - OpenStack Dashboard"
+behavior_user['Networks'] = "Networks - OpenStack Dashboard"
+behavior_user['Routers'] = "Routers - OpenStack Dashboard"
 
 for key in behavior_user.keys():
   print "Checking", key, "dashboard"
