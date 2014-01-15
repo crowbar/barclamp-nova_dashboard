@@ -8,6 +8,7 @@
       "keystone_instance": "none",
       "database_instance": "none",
       "site_branding": "OpenStack Dashboard",
+      "session_timeout": 1440,
       "apache": {
         "ssl": false,
         "ssl_crt_file": "/etc/apache2/ssl.crt/openstack-dashboard-server.crt",
@@ -37,6 +38,7 @@
   "deployment": {
     "nova_dashboard": {
       "crowbar-revision": 0,
+      "schema-revision": 2,
       "element_states": {
         "nova_dashboard-server": [ "readying", "ready", "applying" ]
       },

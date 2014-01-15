@@ -319,7 +319,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
     :site_branding => node[:nova_dashboard][:site_branding],
-    :neutron_networking_plugin = neutron_networking_plugin
+    :neutron_networking_plugin = neutron_networking_plugin,
+    :session_timeout => node[:nova_dashboard][:session_timeout]
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
