@@ -9,6 +9,10 @@
       "database_instance": "none",
       "site_branding": "OpenStack Dashboard",
       "session_timeout": 1440,
+      "password_validator": {
+        "regex": ".{8,}",
+        "help_text": "Your password must be at least 8 characters long."
+      },
       "apache": {
         "ssl": false,
         "ssl_crt_file": "/etc/apache2/ssl.crt/openstack-dashboard-server.crt",
@@ -38,7 +42,7 @@
   "deployment": {
     "nova_dashboard": {
       "crowbar-revision": 0,
-      "schema-revision": 2,
+      "schema-revision": 3,
       "element_states": {
         "nova_dashboard-server": [ "readying", "ready", "applying" ]
       },

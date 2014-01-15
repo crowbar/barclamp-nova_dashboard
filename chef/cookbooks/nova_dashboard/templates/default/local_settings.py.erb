@@ -66,10 +66,10 @@ HORIZON_CONFIG = {
 }
 
 # Specify a regular expression to validate user passwords.
-# HORIZON_CONFIG["password_validator"] = {
-#     "regex": '.*',
-#     "help_text": _("Your password does not meet the requirements.")
-# }
+HORIZON_CONFIG["password_validator"] = {
+    "regex": '<%= @password_validator_regex != "" ? @password_validator_regex : ".*" %>',
+    "help_text": <%= @password_validator_help_text != "" ? "'#{@password_validator_help_text}'" : '_("Your password does not meet the requirements.")' %>
+}
 
 # Disable simplified floating IP address management for deployments with
 # multiple floating IP pools or complex network requirements.
