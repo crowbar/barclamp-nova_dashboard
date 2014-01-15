@@ -27,6 +27,11 @@
                 "ssl_crt_chain_file": { "type": "str" }
               }
             },
+            "external_monitoring": { "type": "map", "required": false,
+              "mapping": {
+                =: { "type": "str",  "required": false }
+              }
+            },
             "gitrepo": { "type": "str", "required": true },
             "git_instance": { "type": "str", "required": true },
             "git_refspec": { "type": "str", "required": true },
