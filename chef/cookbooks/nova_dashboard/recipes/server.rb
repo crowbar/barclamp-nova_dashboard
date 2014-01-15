@@ -315,6 +315,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :db_settings => db_settings,
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
+    :password_validator_regex => node[:nova_dashboard][:password_validator][:regex],
+    :password_validator_help_text => node[:nova_dashboard][:password_validator][:help_text],
     :site_branding => node[:nova_dashboard][:site_branding],
     :neutron_networking_plugin => neutron_networking_plugin,
     :session_timeout => node[:nova_dashboard][:session_timeout],

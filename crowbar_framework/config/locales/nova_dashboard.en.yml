@@ -5,6 +5,10 @@ en:
         database_instance: Database Instance
         keystone_instance: Keystone Instance
         nova_instance: Nova Instance
+        password_validator_header: User Password Validation
+        password_validator:
+          regex: Regular expression used for password validation
+          help_text: Text to display if the password does not pass validation
         ssl_header: SSL Support
         session_timeout: Session Timeout (in minutes)
         apache:
