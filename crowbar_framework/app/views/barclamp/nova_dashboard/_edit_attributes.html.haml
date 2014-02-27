@@ -20,7 +20,7 @@
       %legend
         = t(".ssl_header")
 
-      = boolean_field %w(apache ssl), :collection => :ssl_protocols_for_nova_dashbaord, "data-sslprefix" => "apache", "data-sslcert" => "", "data-sslkey" => ""
+      = boolean_field %w(apache ssl), collection: :ssl_protocols_for_nova_dashbaord, data: { sslprefix: "apache", sslcert: "", sslkey: "" }
 
       #apache_container
         = string_field %w(apache ssl_crt_file)
