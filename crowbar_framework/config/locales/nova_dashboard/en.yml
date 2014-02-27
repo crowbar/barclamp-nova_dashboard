@@ -1,0 +1,35 @@
+#
+# Copyright 2011-2013, Dell
+# Copyright 2013-2014, SUSE LINUX Products GmbH
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+en:
+  barclamp:
+    nova_dashboard:
+      edit_attributes:
+        database_instance: 'Database Instance'
+        keystone_instance: 'Keystone Instance'
+        nova_instance: 'Nova Instance'
+        password_validator_header: 'User Password Validation'
+        password_validator:
+          regex: 'Regular expression used for password validation'
+          help_text: 'Text to display if the password does not pass validation'
+        ssl_header: 'SSL Support'
+        session_timeout: 'Session Timeout (in minutes)'
+        apache:
+          ssl: 'Protocol'
+          ssl_crt_file: 'SSL Certificate File'
+          ssl_key_file: 'SSL (Private) Key File'
+          ssl_crt_chain_file: 'SSL Certificate Chain File'
