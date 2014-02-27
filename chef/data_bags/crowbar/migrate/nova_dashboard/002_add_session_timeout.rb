@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 def upgrade ta, td, a, d
   a['session_timeout'] = ta['session_timeout']
   return a, d
