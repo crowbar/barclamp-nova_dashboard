@@ -255,9 +255,11 @@ if neutrons.length > 0
   neutron = neutrons[0]
   neutron_insecure = neutron[:neutron][:api][:protocol] == 'https' && neutron[:neutron][:ssl][:insecure]
   neutron_networking_plugin = neutron[:neutron][:networking_plugin]
+  neutron_use_ml2 = neutron[:neutron][:use_ml2]
 else
   neutron_insecure = false
   neutron_networking_plugin = ""
+  neutron_use_ml2 = false
 end
 
 env_filter = "AND nova_config_environment:nova-config-#{node[:nova_dashboard][:nova_instance]}"
@@ -319,6 +321,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :password_validator_help_text => node[:nova_dashboard][:password_validator][:help_text],
     :site_branding => node[:nova_dashboard][:site_branding],
     :neutron_networking_plugin => neutron_networking_plugin,
+    :neutron_use_ml2 => neutron_use_ml2,
     :session_timeout => node[:nova_dashboard][:session_timeout],
     :memcache_listen => node_admin_ip
   )
