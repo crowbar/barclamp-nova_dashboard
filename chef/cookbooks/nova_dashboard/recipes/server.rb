@@ -178,14 +178,7 @@ apache_site "nova-dashboard.conf" do
   enable true
 end
 
-env_filter = " AND database_config_environment:database-config-#{node[:nova_dashboard][:database_instance]}"
-sqls = search(:node, "roles:database-server#{env_filter}") || []
-if sqls.length > 0
-    sql = sqls[0]
-    sql = node if sql.name == node.name
-else
-    sql = node
-end
+sql = get_instance('roles:database-server')
 include_recipe "database::client"
 backend_name = Chef::Recipe::Database::Util.get_backend_name(sql)
 include_recipe "#{backend_name}::client"
@@ -276,14 +269,8 @@ else
   neutron_networking_plugin = ""
 end
 
-env_filter = "AND nova_config_environment:nova-config-#{node[:nova_dashboard][:nova_instance]}"
-novas = search(:node, "roles:nova-multi-controller #{env_filter}") || []
-if novas.length > 0
-  nova = novas[0]
-  nova_insecure = nova[:nova][:ssl][:enabled] && nova[:nova][:ssl][:insecure]
-else
-  nova_insecure = false
-end
+nova = get_instance('roles:nova-multi-controller')
+nova_insecure = (nova[:nova][:ssl][:enabled] && nova[:nova][:ssl][:insecure]) rescue false
 
 directory "/var/lib/openstack-dashboard" do
   owner node[:apache][:user]
