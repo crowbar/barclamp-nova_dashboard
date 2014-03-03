@@ -246,21 +246,9 @@ db_settings = {
   'default-character-set' => "'utf8'"
 }
 
-# Need to figure out environment filter
-env_filter = " AND keystone_config_environment:keystone-config-#{node[:nova_dashboard][:keystone_instance]}"
-keystones = search(:node, "recipes:keystone\\:\\:server#{env_filter}") || []
-if keystones.length > 0
-  keystone = keystones[0]
-  keystone = node if keystone.name == node.name
-else
-  keystone = node
-end
-
-keystone_host = keystone[:fqdn]
-keystone_protocol = keystone["keystone"]["api"]["protocol"]
-keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
-keystone_insecure = keystone_protocol == 'https' && keystone[:keystone][:ssl][:insecure]
-Chef::Log.info("Keystone server found at #{keystone_host}")
+keystone = get_instance('roles:keystone-server')
+keystone_settings = KeystoneHelper.keystone_settings(keystone)
+Chef::Log.info("Keystone server found at #{keystone_settings['internal_url_host']}")
 
 glances = search(:node, "roles:glance-server") || []
 if glances.length > 0
@@ -345,10 +333,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   mode "0640"
   variables(
     :debug => node[:nova_dashboard][:debug],
-    :keystone_protocol => keystone_protocol,
-    :keystone_host => keystone_host,
-    :keystone_service_port => keystone_service_port,
-    :insecure => keystone_insecure || glance_insecure || cinder_insecure || neutron_insecure || nova_insecure,
+    :keystone_settings => keystone_settings,
+    :insecure => keystone_settings['insecure'] || glance_insecure || cinder_insecure || neutron_insecure || nova_insecure,
     :db_settings => db_settings,
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
