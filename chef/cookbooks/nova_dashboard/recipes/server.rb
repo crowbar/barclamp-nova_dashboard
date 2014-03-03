@@ -129,6 +129,16 @@ else
   bind_port_ssl = 443
 end
 
+if node[:nova_dashboard][:apache][:ssl]
+  node.default[:apache][:listen_ports] = [bind_port, bind_port_ssl]
+else
+  node.default[:apache][:listen_ports] = [bind_port]
+end
+
+# Override what the apache2 cookbook does since it enforces the ports
+resource = resources(:template => "#{node[:apache][:dir]}/ports.conf")
+resource.variables({:apache_listen_ports => node[:apache][:listen_ports]})
+
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   if node.platform == "suse"
     path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
