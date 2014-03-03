@@ -112,6 +112,23 @@ else
   end
 end
 
+ha_enabled = node[:nova_dashboard][:ha][:enabled]
+
+if ha_enabled
+  log "HA support for horizon is enabled"
+  admin_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+  bind_host = admin_address
+  bind_port = node[:nova_dashboard][:ha][:ports][:plain]
+  bind_port_ssl = node[:nova_dashboard][:ha][:ports][:ssl]
+
+  include_recipe "nova_dashboard::ha"
+else
+  log "HA support for horizon is disabled"
+  bind_host = "*"
+  bind_port = 80
+  bind_port_ssl = 443
+end
+
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   if node.platform == "suse"
     path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
@@ -119,6 +136,9 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   source "nova-dashboard.conf.erb"
   mode 0644
   variables(
+    :bind_host => bind_host,
+    :bind_port => bind_port,
+    :bind_port_ssl => bind_port_ssl,
     :horizon_dir => dashboard_path,
     :user => node[:apache][:user],
     :group => node[:apache][:group],

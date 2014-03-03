@@ -21,6 +21,8 @@ barclamp:
   description: 'OpenStack Dashboard: Web User Interface to access, provision and automate Cloud-based resources'
   version: 0
   requires:
+    - pacemaker
+    - database
     - keystone
     - nova
   member:

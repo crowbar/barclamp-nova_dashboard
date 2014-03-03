@@ -25,8 +25,12 @@ default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/opensta
 default[:nova_dashboard][:apache][:ssl_key_file] = '/etc/apache2/ssl.key/openstack-dashboard-server.key'
 default[:nova_dashboard][:apache][:ssl_crt_chain_file] = ''
 
+default[:nova_dashboard][:ha][:enabled] = false
+# Ports to bind to when haproxy is used for the real ports
+default[:nova_dashboard][:ha][:ports][:plain] = 5580
+default[:nova_dashboard][:ha][:ports][:ssl] = 5581
+
 # declare what needs to be monitored
 node[:nova_dashboard][:monitor]={}
 node[:nova_dashboard][:monitor][:svcs] = []
 node[:nova_dashboard][:monitor][:ports]={}
-
