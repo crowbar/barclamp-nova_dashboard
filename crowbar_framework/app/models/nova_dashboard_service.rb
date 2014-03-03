@@ -65,6 +65,8 @@ class NovaDashboardService < ServiceObject
     base["attributes"][@bc_name]["keystone_instance"] = find_dep_proposal("keystone")
     base["attributes"][@bc_name]["nova_instance"] = find_dep_proposal("nova")
 
+    base["attributes"][@bc_name][:db][:password] = random_password
+
     @logger.debug("Nova_dashboard create_proposal: exiting")
     base
   end

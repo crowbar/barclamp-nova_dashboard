@@ -13,9 +13,9 @@
 # limitations under the License.
 #
 
-default[:dashboard][:db][:database] = "dash"
-default[:dashboard][:db][:user] = "dash"
-default[:dashboard][:db][:password] = "" # Set by Recipe
+default[:nova_dashboard][:db][:database] = "horizon"
+default[:nova_dashboard][:db][:user] = "horizon"
+default[:nova_dashboard][:db][:password] = nil # must be set by wrapper
 
 default[:nova_dashboard][:debug] = false
 default[:nova_dashboard][:site_branding] = "OpenStack Dashboard"

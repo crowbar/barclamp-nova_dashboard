@@ -148,8 +148,6 @@ apache_site "nova-dashboard.conf" do
   enable true
 end
 
-node.set_unless['dashboard']['db']['password'] = secure_password
-
 env_filter = " AND database_config_environment:database-config-#{node[:nova_dashboard][:database_instance]}"
 sqls = search(:node, "roles:database-server#{env_filter}") || []
 if sqls.length > 0
@@ -181,18 +179,18 @@ db_conn = { :host => database_address,
 
 
 # Create the Dashboard Database
-database "create #{node[:dashboard][:db][:database]} database" do
+database "create #{node[:nova_dashboard][:db][:database]} database" do
     connection db_conn
-    database_name node[:dashboard][:db][:database]
+    database_name node[:nova_dashboard][:db][:database]
     provider db_provider
     action :create
 end
 
 database_user "create dashboard database user" do
     connection db_conn
-    database_name node[:dashboard][:db][:database]
-    username node[:dashboard][:db][:user]
-    password node[:dashboard][:db][:password]
+    database_name node[:nova_dashboard][:db][:database]
+    username node[:nova_dashboard][:db][:user]
+    password node[:nova_dashboard][:db][:password]
     host '%'
     provider db_user_provider
     action :create
@@ -200,9 +198,9 @@ end
 
 database_user "grant database access for dashboard database user" do
     connection db_conn
-    database_name node[:dashboard][:db][:database]
-    username node[:dashboard][:db][:user]
-    password node[:dashboard][:db][:password]
+    database_name node[:nova_dashboard][:db][:database]
+    username node[:nova_dashboard][:db][:user]
+    password node[:nova_dashboard][:db][:password]
     host '%'
     privileges privs
     provider db_user_provider
@@ -211,9 +209,9 @@ end
 
 db_settings = {
   'ENGINE' => django_db_backend,
-  'NAME' => "'#{node[:dashboard][:db][:database]}'",
-  'USER' => "'#{node[:dashboard][:db][:user]}'",
-  'PASSWORD' => "'#{node[:dashboard][:db][:password]}'",
+  'NAME' => "'#{node[:nova_dashboard][:db][:database]}'",
+  'USER' => "'#{node[:nova_dashboard][:db][:user]}'",
+  'PASSWORD' => "'#{node[:nova_dashboard][:db][:password]}'",
   'HOST' => "'#{database_address}'",
   'default-character-set' => "'utf8'"
 }
