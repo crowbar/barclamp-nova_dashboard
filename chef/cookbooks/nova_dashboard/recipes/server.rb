@@ -317,8 +317,17 @@ end
 
 
 # We're going to use memcached as a cache backend for Django
-node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
-node[:memcached][:listen] = node_admin_ip
+if ha_enabled
+  memcached_nodes = CrowbarPacemakerHelper.cluster_nodes(node, "nova_dashboard-server")
+  memcached_locations = memcached_nodes.map do |n|
+    node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(n, "admin").address
+    "#{node_admin_ip}:#{n[:memcached][:port] rescue node[:memcached][:port]}"
+  end
+else
+  node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+  node[:memcached][:listen] = node_admin_ip
+  memcached_locations = [ "#{node_admin_ip}:#{node[:memcached][:port]}" ]
+end
 
 memcached_instance "nova-dashboard"
 case node[:platform]
@@ -348,7 +357,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :site_branding => node[:nova_dashboard][:site_branding],
     :neutron_networking_plugin => neutron_networking_plugin,
     :session_timeout => node[:nova_dashboard][:session_timeout],
-    :memcache_listen => node_admin_ip
+    :memcached_locations => memcached_locations
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
