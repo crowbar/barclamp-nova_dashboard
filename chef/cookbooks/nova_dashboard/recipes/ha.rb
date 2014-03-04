@@ -17,23 +17,30 @@ haproxy_servers, haproxy_servers_nodes  = PacemakerHelper.haproxy_servers(node, 
 haproxy_servers.each do |haproxy_server|
   haproxy_server_node = haproxy_servers_nodes[haproxy_server['name']]
   haproxy_server['address'] = Chef::Recipe::Barclamp::Inventory.get_network_by_type(haproxy_server_node, "admin").address
-  if node[:nova_dashboard][:apache][:ssl]
-    haproxy_server['port'] = haproxy_server_node[:nova_dashboard][:ha][:ports][:ssl]
-  else
-    haproxy_server['port'] = haproxy_server_node[:nova_dashboard][:ha][:ports][:plain]
-  end
+  haproxy_server['port'] = haproxy_server_node[:nova_dashboard][:ha][:ports][:plain]
 end
 
-if node[:nova_dashboard][:apache][:ssl]
-  listen_port = 443
-else
-  listen_port = 80
-end
-
-haproxy_loadbalancer "nova_dashboard-service" do
+haproxy_loadbalancer "horizon" do
   address "0.0.0.0"
-  port listen_port
-  use_ssl node[:nova_dashboard][:apache][:ssl]
+  port 80
+  use_ssl false
   servers haproxy_servers
   action :nothing
 end.run_action(:create)
+
+if node[:nova_dashboard][:apache][:ssl]
+  haproxy_ssl_servers = haproxy_servers.map{|s| s.clone}
+  haproxy_ssl_servers.each do |haproxy_server|
+    haproxy_server_node = haproxy_servers_nodes[haproxy_server['name']]
+    # No need to set address, as we cloned the previous list with the right address
+    haproxy_server['port'] = haproxy_server_node[:nova_dashboard][:ha][:ports][:ssl]
+  end
+
+  haproxy_loadbalancer "horizon-ssl" do
+    address "0.0.0.0"
+    port 443
+    use_ssl true
+    servers haproxy_ssl_servers
+    action :nothing
+  end.run_action(:create)
+end
