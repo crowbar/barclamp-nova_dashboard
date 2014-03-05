@@ -25,6 +25,19 @@ class NovaDashboardService < ServiceObject
     false
   end
 
+  class << self
+    def role_constraints
+      @role_constraints ||= begin
+        {
+          "nova_dashboard-server" => {
+            "unique" => false,
+            "count" => 1
+          }
+        }
+      end
+    end
+  end
+
   def proposal_dependencies(role)
     answer = []
     answer << { "barclamp" => "database", "inst" => role.default_attributes["nova_dashboard"]["database_instance"] }
