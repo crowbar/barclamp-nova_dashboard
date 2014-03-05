@@ -27,9 +27,6 @@ if node[:nova_dashboard][:apache][:ssl]
   include_recipe "apache2::mod_ssl"
 end
 
-::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
-
-
 unless node[:nova_dashboard][:use_gitrepo]
   if %w(debian ubuntu).include?(node.platform)
     # Explicitly added client dependencies for now.
