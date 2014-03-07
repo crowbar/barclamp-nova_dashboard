@@ -18,15 +18,6 @@
 #
 
 module NovaDashboardBarclampHelper
-  def nova_dashboard_role_contraints
-    {
-      "nova_dashboard-server" => {
-        "unique" => false,
-        "count" => 1
-      }
-    }
-  end
-
   def ssl_protocols_for_nova_dashbaord(selected)
     options_for_select(
       [
