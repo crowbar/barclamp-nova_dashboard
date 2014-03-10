@@ -27,14 +27,12 @@ class NovaDashboardService < ServiceObject
 
   class << self
     def role_constraints
-      @role_constraints ||= begin
-        {
-          "nova_dashboard-server" => {
-            "unique" => false,
-            "count" => 1
-          }
+      {
+        "nova_dashboard-server" => {
+          "unique" => false,
+          "count" => 1
         }
-      end
+      }
     end
   end
 
