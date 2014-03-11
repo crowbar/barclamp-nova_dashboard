@@ -13,34 +13,20 @@
 # limitations under the License.
 #
 
-haproxy_servers, haproxy_servers_nodes  = PacemakerHelper.haproxy_servers(node, "nova_dashboard-server")
-haproxy_servers.each do |haproxy_server|
-  haproxy_server_node = haproxy_servers_nodes[haproxy_server['name']]
-  haproxy_server['address'] = Chef::Recipe::Barclamp::Inventory.get_network_by_type(haproxy_server_node, "admin").address
-  haproxy_server['port'] = haproxy_server_node[:nova_dashboard][:ha][:ports][:plain]
-end
-
 haproxy_loadbalancer "horizon" do
   address "0.0.0.0"
   port 80
   use_ssl false
-  servers haproxy_servers
+  servers CrowbarPacemakerHelper.haproxy_servers_for_service(node, "nova_dashboard", "nova_dashboard-server", "plain")
   action :nothing
 end.run_action(:create)
 
 if node[:nova_dashboard][:apache][:ssl]
-  haproxy_ssl_servers = haproxy_servers.map{|s| s.clone}
-  haproxy_ssl_servers.each do |haproxy_server|
-    haproxy_server_node = haproxy_servers_nodes[haproxy_server['name']]
-    # No need to set address, as we cloned the previous list with the right address
-    haproxy_server['port'] = haproxy_server_node[:nova_dashboard][:ha][:ports][:ssl]
-  end
-
   haproxy_loadbalancer "horizon-ssl" do
     address "0.0.0.0"
     port 443
     use_ssl true
-    servers haproxy_ssl_servers
+    servers CrowbarPacemakerHelper.haproxy_servers_for_service(node, "nova_dashboard", "nova_dashboard-server", "ssl")
     action :nothing
   end.run_action(:create)
 end
