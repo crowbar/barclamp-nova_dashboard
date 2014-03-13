@@ -9,6 +9,11 @@
       "database_instance": "none",
       "site_branding": "OpenStack Dashboard",
       "session_timeout": 1440,
+      "db": {
+        "database": "horizon",
+        "user": "horizon",
+        "password": ""
+      },
       "password_validator": {
         "regex": ".{8,}",
         "help_text": "Your password must be at least 8 characters long."
@@ -42,7 +47,7 @@
   "deployment": {
     "nova_dashboard": {
       "crowbar-revision": 0,
-      "schema-revision": 3,
+      "schema-revision": 4,
       "element_states": {
         "nova_dashboard-server": [ "readying", "ready", "applying" ]
       },

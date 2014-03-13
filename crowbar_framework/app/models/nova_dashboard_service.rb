@@ -13,7 +13,7 @@
 # limitations under the License. 
 # 
 
-class NovaDashboardService < ServiceObject
+class NovaDashboardService < PacemakerServiceObject
 
   def initialize(thelogger)
     super(thelogger)
@@ -30,7 +30,8 @@ class NovaDashboardService < ServiceObject
       {
         "nova_dashboard-server" => {
           "unique" => false,
-          "count" => 1
+          "count" => 1,
+          "cluster" => true
         }
       }
     end
@@ -65,6 +66,8 @@ class NovaDashboardService < ServiceObject
     base["attributes"][@bc_name]["keystone_instance"] = find_dep_proposal("keystone")
     base["attributes"][@bc_name]["nova_instance"] = find_dep_proposal("nova")
 
+    base["attributes"][@bc_name][:db][:password] = random_password
+
     @logger.debug("Nova_dashboard create_proposal: exiting")
     base
   end
@@ -84,22 +87,72 @@ class NovaDashboardService < ServiceObject
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: entering #{all_nodes.inspect}")
     return if all_nodes.empty?
 
+    server_elements, server_nodes, ha_enabled = role_expand_elements(role, "nova_dashboard-server")
+
+    vip_networks = ["admin", "public"]
+
+    dirty = false
+    dirty = prepare_role_for_ha_with_haproxy(role, ["nova_dashboard", "ha", "enabled"], ha_enabled, vip_networks)
+    role.save if dirty
+
     net_svc = NetworkService.new @logger
-    all_nodes.each do |n|
+    # All nodes must have a public IP, even if part of a cluster; otherwise
+    # the VIP can't be moved to the nodes
+    server_nodes.each do |n|
       net_svc.allocate_ip "default", "public", "host", n
     end
 
+    # No specific need to call sync dns here, as the cookbook doesn't require
+    # the VIP of the cluster to be setup
+    allocate_virtual_ips_for_any_cluster_in_networks(server_elements, vip_networks)
+
     # Make sure the nodes have a link to the dashboard on them.
-    all_nodes.each do |n|
+    if role.default_attributes["nova_dashboard"]["apache"]["ssl"]
+      protocol = "https"
+    else
+      protocol = "http"
+    end
+
+    if ha_enabled
+      # This assumes that there can only be one cluster assigned to the
+      # nova_dashboard-server role (otherwise, we'd need to check to which
+      # cluster each node belongs to create the link).
+      # Good news, the assumption is correct :-)
+      public_db = ProposalObject.find_data_bag_item "crowbar/public_network"
+      admin_db = ProposalObject.find_data_bag_item "crowbar/admin_network"
+
+      domain = NodeObject.find_node_by_name(server_nodes[0])[:domain]
+      hostname = "cluster-default.#{domain}"
+      server_elements.each do |element|
+        if is_cluster? element
+          hostname = "cluster-#{cluster_name(element)}.#{domain}"
+          break
+        end
+      end
+
+      public_server_ip = public_db["allocated_by_name"]["#{hostname}"]["address"]
+      admin_server_ip = admin_db["allocated_by_name"]["#{hostname}"]["address"]
+    end
+
+    server_nodes.each do |n|
       node = NodeObject.find_node_by_name(n)
-      public_server_ip = node.get_network_by_type("public")["address"]
-      node.crowbar["crowbar"] = {} if node.crowbar["crowbar"].nil?
-      node.crowbar["crowbar"]["links"] = {} if node.crowbar["crowbar"]["links"].nil?
-      node.crowbar["crowbar"]["links"]["Nova Dashboard (public)"] = "http://#{public_server_ip}/"
-      admin_server_ip = node.get_network_by_type("admin")["address"]
-      node.crowbar["crowbar"]["links"]["Nova Dashboard (admin)"] = "http://#{admin_server_ip}/"
+      node.crowbar["crowbar"] ||= {}
+      node.crowbar["crowbar"]["links"] ||= {}
+
+      unless ha_enabled
+        public_server_ip = node.get_network_by_type("public")["address"]
+        admin_server_ip = node.get_network_by_type("admin")["address"]
+      end
+
+      node.crowbar["crowbar"]["links"].delete("Nova Dashboard (public)")
+      node.crowbar["crowbar"]["links"]["OpenStack Dashboard (public)"] = "#{protocol}://#{public_server_ip}/"
+
+      node.crowbar["crowbar"]["links"].delete("Nova Dashboard (admin)")
+      node.crowbar["crowbar"]["links"]["OpenStack Dashboard (admin)"] = "#{protocol}://#{admin_server_ip}/"
+
       node.save
     end
+
     @logger.debug("Nova_dashboard apply_role_pre_chef_call: leaving")
   end
 

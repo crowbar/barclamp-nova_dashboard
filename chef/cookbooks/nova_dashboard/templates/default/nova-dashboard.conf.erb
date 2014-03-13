@@ -3,10 +3,10 @@
 <IfDefine !NOSSL>
 
 RewriteEngine On
-RewriteCond %{SERVER_PORT} ^80$
+RewriteCond %{SERVER_PORT} ^<%= @bind_port %>$
 RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
 
-<VirtualHost *:443>
+<VirtualHost <%= @bind_host %>:<%= @bind_port_ssl %>>
     SSLEngine On
     SSLCertificateFile <%= @ssl_crt_file %>
     SSLCertificateKeyFile <%= @ssl_key_file %>
@@ -15,7 +15,7 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
     <% end %>
 
 <% else %>
-<VirtualHost *:80>
+<VirtualHost <%= @bind_host %>:<%= @bind_port %>>
 <% end %>
     WSGIDaemonProcess horizon user=<%= @user %> group=<%= @group %> processes=3 threads=10 home=<%= @horizon_dir %> 
 <% if @venv -%>

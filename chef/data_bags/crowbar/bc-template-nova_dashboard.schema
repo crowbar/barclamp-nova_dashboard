@@ -18,6 +18,15 @@
             "database_instance": { "type": "str", "required": true },
             "site_branding": { "type": "str", "required": true },
             "session_timeout": { "type": "int", "required": true },
+            "db" : {
+              "type" : "map",
+              "required" : true,
+              "mapping": {
+                "database": { "type": "str", "required": true },
+                "user": { "type": "str", "required": true },
+                "password": { "type": "str", "required": true }
+              }
+            },
             "password_validator" : {
               "type" : "map",
               "required" : true,
