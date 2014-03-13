@@ -27,9 +27,6 @@ if node[:nova_dashboard][:apache][:ssl]
   include_recipe "apache2::mod_ssl"
 end
 
-::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
-
-
 unless node[:nova_dashboard][:use_gitrepo]
   if %w(debian ubuntu).include?(node.platform)
     # Explicitly added client dependencies for now.
@@ -112,6 +109,33 @@ else
   end
 end
 
+ha_enabled = node[:nova_dashboard][:ha][:enabled]
+
+if ha_enabled
+  log "HA support for horizon is enabled"
+  admin_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+  bind_host = admin_address
+  bind_port = node[:nova_dashboard][:ha][:ports][:plain]
+  bind_port_ssl = node[:nova_dashboard][:ha][:ports][:ssl]
+
+  include_recipe "nova_dashboard::ha"
+else
+  log "HA support for horizon is disabled"
+  bind_host = "*"
+  bind_port = 80
+  bind_port_ssl = 443
+end
+
+if node[:nova_dashboard][:apache][:ssl]
+  node.default[:apache][:listen_ports] = [bind_port, bind_port_ssl]
+else
+  node.default[:apache][:listen_ports] = [bind_port]
+end
+
+# Override what the apache2 cookbook does since it enforces the ports
+resource = resources(:template => "#{node[:apache][:dir]}/ports.conf")
+resource.variables({:apache_listen_ports => node[:apache][:listen_ports]})
+
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   if node.platform == "suse"
     path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
@@ -119,6 +143,9 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   source "nova-dashboard.conf.erb"
   mode 0644
   variables(
+    :bind_host => bind_host,
+    :bind_port => bind_port,
+    :bind_port_ssl => bind_port_ssl,
     :horizon_dir => dashboard_path,
     :user => node[:apache][:user],
     :group => node[:apache][:group],
@@ -148,16 +175,7 @@ apache_site "nova-dashboard.conf" do
   enable true
 end
 
-node.set_unless['dashboard']['db']['password'] = secure_password
-
-env_filter = " AND database_config_environment:database-config-#{node[:nova_dashboard][:database_instance]}"
-sqls = search(:node, "roles:database-server#{env_filter}") || []
-if sqls.length > 0
-    sql = sqls[0]
-    sql = node if sql.name == node.name
-else
-    sql = node
-end
+sql = get_instance('roles:database-server')
 include_recipe "database::client"
 backend_name = Chef::Recipe::Database::Util.get_backend_name(sql)
 include_recipe "#{backend_name}::client"
@@ -181,18 +199,18 @@ db_conn = { :host => database_address,
 
 
 # Create the Dashboard Database
-database "create #{node[:dashboard][:db][:database]} database" do
+database "create #{node[:nova_dashboard][:db][:database]} database" do
     connection db_conn
-    database_name node[:dashboard][:db][:database]
+    database_name node[:nova_dashboard][:db][:database]
     provider db_provider
     action :create
 end
 
 database_user "create dashboard database user" do
     connection db_conn
-    database_name node[:dashboard][:db][:database]
-    username node[:dashboard][:db][:user]
-    password node[:dashboard][:db][:password]
+    database_name node[:nova_dashboard][:db][:database]
+    username node[:nova_dashboard][:db][:user]
+    password node[:nova_dashboard][:db][:password]
     host '%'
     provider db_user_provider
     action :create
@@ -200,9 +218,9 @@ end
 
 database_user "grant database access for dashboard database user" do
     connection db_conn
-    database_name node[:dashboard][:db][:database]
-    username node[:dashboard][:db][:user]
-    password node[:dashboard][:db][:password]
+    database_name node[:nova_dashboard][:db][:database]
+    username node[:nova_dashboard][:db][:user]
+    password node[:nova_dashboard][:db][:password]
     host '%'
     privileges privs
     provider db_user_provider
@@ -211,28 +229,16 @@ end
 
 db_settings = {
   'ENGINE' => django_db_backend,
-  'NAME' => "'#{node[:dashboard][:db][:database]}'",
-  'USER' => "'#{node[:dashboard][:db][:user]}'",
-  'PASSWORD' => "'#{node[:dashboard][:db][:password]}'",
+  'NAME' => "'#{node[:nova_dashboard][:db][:database]}'",
+  'USER' => "'#{node[:nova_dashboard][:db][:user]}'",
+  'PASSWORD' => "'#{node[:nova_dashboard][:db][:password]}'",
   'HOST' => "'#{database_address}'",
   'default-character-set' => "'utf8'"
 }
 
-# Need to figure out environment filter
-env_filter = " AND keystone_config_environment:keystone-config-#{node[:nova_dashboard][:keystone_instance]}"
-keystones = search(:node, "recipes:keystone\\:\\:server#{env_filter}") || []
-if keystones.length > 0
-  keystone = keystones[0]
-  keystone = node if keystone.name == node.name
-else
-  keystone = node
-end
-
-keystone_host = keystone[:fqdn]
-keystone_protocol = keystone["keystone"]["api"]["protocol"]
-keystone_service_port = keystone["keystone"]["api"]["service_port"] rescue nil
-keystone_insecure = keystone_protocol == 'https' && keystone[:keystone][:ssl][:insecure]
-Chef::Log.info("Keystone server found at #{keystone_host}")
+keystone = get_instance('roles:keystone-server')
+keystone_settings = KeystoneHelper.keystone_settings(keystone)
+Chef::Log.info("Keystone server found at #{keystone_settings['internal_url_host']}")
 
 glances = search(:node, "roles:glance-server") || []
 if glances.length > 0
@@ -260,14 +266,8 @@ else
   neutron_networking_plugin = ""
 end
 
-env_filter = "AND nova_config_environment:nova-config-#{node[:nova_dashboard][:nova_instance]}"
-novas = search(:node, "roles:nova-multi-controller #{env_filter}") || []
-if novas.length > 0
-  nova = novas[0]
-  nova_insecure = nova[:nova][:ssl][:enabled] && nova[:nova][:ssl][:insecure]
-else
-  nova_insecure = false
-end
+nova = get_instance('roles:nova-multi-controller')
+nova_insecure = (nova[:nova][:ssl][:enabled] && nova[:nova][:ssl][:insecure]) rescue false
 
 directory "/var/lib/openstack-dashboard" do
   owner node[:apache][:user]
@@ -289,8 +289,17 @@ end
 
 
 # We're going to use memcached as a cache backend for Django
-node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
-node[:memcached][:listen] = node_admin_ip
+if ha_enabled
+  memcached_nodes = CrowbarPacemakerHelper.cluster_nodes(node, "nova_dashboard-server")
+  memcached_locations = memcached_nodes.map do |n|
+    node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(n, "admin").address
+    "#{node_admin_ip}:#{n[:memcached][:port] rescue node[:memcached][:port]}"
+  end
+else
+  node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+  node[:memcached][:listen] = node_admin_ip
+  memcached_locations = [ "#{node_admin_ip}:#{node[:memcached][:port]}" ]
+end
 
 memcached_instance "nova-dashboard"
 case node[:platform]
@@ -308,10 +317,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
   mode "0640"
   variables(
     :debug => node[:nova_dashboard][:debug],
-    :keystone_protocol => keystone_protocol,
-    :keystone_host => keystone_host,
-    :keystone_service_port => keystone_service_port,
-    :insecure => keystone_insecure || glance_insecure || cinder_insecure || neutron_insecure || nova_insecure,
+    :keystone_settings => keystone_settings,
+    :insecure => keystone_settings['insecure'] || glance_insecure || cinder_insecure || neutron_insecure || nova_insecure,
     :db_settings => db_settings,
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
@@ -320,7 +327,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :site_branding => node[:nova_dashboard][:site_branding],
     :neutron_networking_plugin => neutron_networking_plugin,
     :session_timeout => node[:nova_dashboard][:session_timeout],
-    :memcache_listen => node_admin_ip
+    :memcached_locations => memcached_locations
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create

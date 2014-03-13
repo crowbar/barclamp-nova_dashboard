@@ -13,9 +13,9 @@
 # limitations under the License.
 #
 
-default[:dashboard][:db][:database] = "dash"
-default[:dashboard][:db][:user] = "dash"
-default[:dashboard][:db][:password] = "" # Set by Recipe
+default[:nova_dashboard][:db][:database] = "horizon"
+default[:nova_dashboard][:db][:user] = "horizon"
+default[:nova_dashboard][:db][:password] = nil # must be set by wrapper
 
 default[:nova_dashboard][:debug] = false
 default[:nova_dashboard][:site_branding] = "OpenStack Dashboard"
@@ -25,8 +25,12 @@ default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/opensta
 default[:nova_dashboard][:apache][:ssl_key_file] = '/etc/apache2/ssl.key/openstack-dashboard-server.key'
 default[:nova_dashboard][:apache][:ssl_crt_chain_file] = ''
 
+default[:nova_dashboard][:ha][:enabled] = false
+# Ports to bind to when haproxy is used for the real ports
+default[:nova_dashboard][:ha][:ports][:plain] = 5580
+default[:nova_dashboard][:ha][:ports][:ssl] = 5581
+
 # declare what needs to be monitored
 node[:nova_dashboard][:monitor]={}
 node[:nova_dashboard][:monitor][:svcs] = []
 node[:nova_dashboard][:monitor][:ports]={}
-
