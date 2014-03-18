@@ -191,7 +191,7 @@ when "postgresql"
     django_db_backend = "'django.db.backends.postgresql_psycopg2'"
 end
 
-database_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(sql, "admin").address if database_address.nil?
+database_address = CrowbarDatabaseHelper.get_listen_address(sql)
 Chef::Log.info("Database server found at #{database_address}")
 db_conn = { :host => database_address,
             :username => "db_maker",
