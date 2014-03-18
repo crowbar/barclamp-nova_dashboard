@@ -112,6 +112,9 @@ CACHES = {
           '<%= memcached_location %>',
 <% end -%>
         ]
+        'OPTIONS': {
+          'KEY_PREFIX': '<%= node[:nova_dashboard][:config][:environment] %>'
+        }
     }
 }
 
