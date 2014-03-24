@@ -197,6 +197,7 @@ db_conn = { :host => database_address,
             :username => "db_maker",
             :password => sql["database"][:db_maker_password] }
 
+crowbar_pacemaker_sync_mark "wait-nova_dashboard_database"
 
 # Create the Dashboard Database
 database "create #{node[:nova_dashboard][:db][:database]} database" do
@@ -226,6 +227,8 @@ database_user "grant database access for dashboard database user" do
     provider db_user_provider
     action :grant
 end
+
+crowbar_pacemaker_sync_mark "create-nova_dashboard_database"
 
 db_settings = {
   'ENGINE' => django_db_backend,
@@ -277,6 +280,9 @@ directory "/var/lib/openstack-dashboard" do
 end
 
 
+# We should protect this with crowbar_pacemaker_sync_mark, but because we run
+# this in a notification, we can't; we had a sync mark earlier on, though, so
+# the founder is very likely to do the db sync first and make this a non-issue.
 execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
