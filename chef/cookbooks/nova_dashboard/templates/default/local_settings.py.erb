@@ -111,7 +111,7 @@ CACHES = {
 <% @memcached_locations.each do |memcached_location| -%>
           '<%= memcached_location %>',
 <% end -%>
-        ]
+        ],
         'OPTIONS': {
           'KEY_PREFIX': '<%= node[:nova_dashboard][:config][:environment] %>'
         }
