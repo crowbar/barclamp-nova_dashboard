@@ -16,6 +16,8 @@
 include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
+# This is required for the OCF resource agent
+include_recipe "apache2::mod_status"
 
 if %w(suse).include? node.platform
   dashboard_path = "/srv/www/openstack-dashboard"

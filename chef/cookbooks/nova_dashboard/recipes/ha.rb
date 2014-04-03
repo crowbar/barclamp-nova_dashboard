@@ -30,3 +30,49 @@ if node[:nova_dashboard][:apache][:ssl]
     action :nothing
   end.run_action(:create)
 end
+
+# Wait for all nodes to reach this point so we know that all nodes will have
+# all the required packages installed before we create the pacemaker
+# resources
+crowbar_pacemaker_sync_mark "sync-nova_dashboard_before_ha"
+
+# Avoid races when creating pacemaker resources
+crowbar_pacemaker_sync_mark "wait-nova_dashboard_ha_resources"
+
+agent_name = "ocf:heartbeat:apache"
+apache_op = {}
+apache_op["monitor"] = {}
+apache_op["monitor"]["interval"] = "10s"
+
+admin_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+if node[:nova_dashboard][:apache][:ssl]
+  testurl = "https://#{admin_address}:#{node[:nova_dashboard][:ha][:ports][:ssl]}"
+else
+  testurl = "http://#{admin_address}:#{node[:nova_dashboard][:ha][:ports][:plain]}"
+end
+
+service_name = "apache2-service"
+
+pacemaker_primitive service_name do
+  agent agent_name
+  params ({
+    "statusurl" => "http://127.0.0.1:#{node[:nova_dashboard][:ha][:ports][:plain]}/server-status",
+    "testurl" => testurl,
+    "testregex10" => ".*<h3>Log In</h3>.*",
+    # do not fail because of wrong certificates
+    "client" => "curl --insecure"
+  })
+  op    apache_op
+  action :create
+end
+
+pacemaker_clone "clone-#{service_name}" do
+  rsc service_name
+  action [ :create, :start ]
+end
+
+crowbar_pacemaker_sync_mark "create-nova_dashboard_ha_resources"
+
+# Override service provider for apache2 resource defined in apache2 cookbook
+resource = resources(:service => "apache2")
+resource.provider(Chef::Provider::CrowbarPacemakerService)
