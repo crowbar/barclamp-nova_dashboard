@@ -337,6 +337,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :password_validator_regex => node[:nova_dashboard][:password_validator][:regex],
     :password_validator_help_text => node[:nova_dashboard][:password_validator][:help_text],
     :site_branding => node[:nova_dashboard][:site_branding],
+    :site_branding_link => node[:nova_dashboard][:site_branding_link],
     :neutron_networking_plugin => neutron_networking_plugin,
     :neutron_use_ml2 => neutron_use_ml2,
     :session_timeout => node[:nova_dashboard][:session_timeout],
