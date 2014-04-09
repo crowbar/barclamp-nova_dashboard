@@ -51,7 +51,7 @@ else
   testurl = "http://#{admin_address}:#{node[:nova_dashboard][:ha][:ports][:plain]}"
 end
 
-service_name = "apache2-service"
+service_name = "apache"
 
 pacemaker_primitive service_name do
   agent agent_name
@@ -66,7 +66,7 @@ pacemaker_primitive service_name do
   action :create
 end
 
-pacemaker_clone "clone-#{service_name}" do
+pacemaker_clone "cl-#{service_name}" do
   rsc service_name
   action [ :create, :start ]
 end
