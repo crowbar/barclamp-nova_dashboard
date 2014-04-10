@@ -16,6 +16,8 @@
 include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
+# This is required for the OCF resource agent
+include_recipe "apache2::mod_status"
 
 if %w(suse).include? node.platform
   dashboard_path = "/srv/www/openstack-dashboard"
@@ -191,12 +193,13 @@ when "postgresql"
     django_db_backend = "'django.db.backends.postgresql_psycopg2'"
 end
 
-database_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(sql, "admin").address if database_address.nil?
+database_address = CrowbarDatabaseHelper.get_listen_address(sql)
 Chef::Log.info("Database server found at #{database_address}")
 db_conn = { :host => database_address,
             :username => "db_maker",
             :password => sql["database"][:db_maker_password] }
 
+crowbar_pacemaker_sync_mark "wait-nova_dashboard_database"
 
 # Create the Dashboard Database
 database "create #{node[:nova_dashboard][:db][:database]} database" do
@@ -226,6 +229,8 @@ database_user "grant database access for dashboard database user" do
     provider db_user_provider
     action :grant
 end
+
+crowbar_pacemaker_sync_mark "create-nova_dashboard_database"
 
 db_settings = {
   'ENGINE' => django_db_backend,
@@ -261,9 +266,11 @@ if neutrons.length > 0
   neutron = neutrons[0]
   neutron_insecure = neutron[:neutron][:api][:protocol] == 'https' && neutron[:neutron][:ssl][:insecure]
   neutron_networking_plugin = neutron[:neutron][:networking_plugin]
+  neutron_use_ml2 = neutron[:neutron][:use_ml2]
 else
   neutron_insecure = false
   neutron_networking_plugin = ""
+  neutron_use_ml2 = false
 end
 
 nova = get_instance('roles:nova-multi-controller')
@@ -277,6 +284,9 @@ directory "/var/lib/openstack-dashboard" do
 end
 
 
+# We should protect this with crowbar_pacemaker_sync_mark, but because we run
+# this in a notification, we can't; we had a sync mark earlier on, though, so
+# the founder is very likely to do the db sync first and make this a non-issue.
 execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
@@ -289,6 +299,11 @@ end
 
 
 # We're going to use memcached as a cache backend for Django
+
+# make sure our memcache only listens on the admin IP address
+node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+node[:memcached][:listen] = node_admin_ip
+
 if ha_enabled
   memcached_nodes = CrowbarPacemakerHelper.cluster_nodes(node, "nova_dashboard-server")
   memcached_locations = memcached_nodes.map do |n|
@@ -296,10 +311,9 @@ if ha_enabled
     "#{node_admin_ip}:#{n[:memcached][:port] rescue node[:memcached][:port]}"
   end
 else
-  node_admin_ip = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
-  node[:memcached][:listen] = node_admin_ip
   memcached_locations = [ "#{node_admin_ip}:#{node[:memcached][:port]}" ]
 end
+memcached_locations.sort!
 
 memcached_instance "nova-dashboard"
 case node[:platform]
@@ -326,6 +340,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :password_validator_help_text => node[:nova_dashboard][:password_validator][:help_text],
     :site_branding => node[:nova_dashboard][:site_branding],
     :neutron_networking_plugin => neutron_networking_plugin,
+    :neutron_use_ml2 => neutron_use_ml2,
     :session_timeout => node[:nova_dashboard][:session_timeout],
     :memcached_locations => memcached_locations
   )
