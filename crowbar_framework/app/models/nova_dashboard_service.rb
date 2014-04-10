@@ -121,14 +121,15 @@ class NovaDashboardService < PacemakerServiceObject
       public_db = ProposalObject.find_data_bag_item "crowbar/public_network"
       admin_db = ProposalObject.find_data_bag_item "crowbar/admin_network"
 
-      domain = NodeObject.find_node_by_name(server_nodes[0])[:domain]
-      hostname = "cluster-default.#{domain}"
+      hostname = nil
       server_elements.each do |element|
         if is_cluster? element
-          hostname = "cluster-#{cluster_name(element)}.#{domain}"
+          hostname = PacemakerServiceObject.cluster_vhostname_from_element(element)
           break
         end
       end
+
+      raise "Cannot find hostname for VIP of cluster" if hostname.nil?
 
       public_server_ip = public_db["allocated_by_name"]["#{hostname}"]["address"]
       admin_server_ip = admin_db["allocated_by_name"]["#{hostname}"]["address"]
