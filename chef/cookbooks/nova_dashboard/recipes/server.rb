@@ -313,6 +313,7 @@ if ha_enabled
 else
   memcached_locations = [ "#{node_admin_ip}:#{node[:memcached][:port]}" ]
 end
+memcached_locations.sort!
 
 memcached_instance "nova-dashboard"
 case node[:platform]
