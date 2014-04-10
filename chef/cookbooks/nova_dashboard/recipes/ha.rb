@@ -44,23 +44,12 @@ apache_op = {}
 apache_op["monitor"] = {}
 apache_op["monitor"]["interval"] = "10s"
 
-admin_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
-if node[:nova_dashboard][:apache][:ssl]
-  testurl = "https://#{admin_address}:#{node[:nova_dashboard][:ha][:ports][:ssl]}"
-else
-  testurl = "http://#{admin_address}:#{node[:nova_dashboard][:ha][:ports][:plain]}"
-end
-
 service_name = "apache"
 
 pacemaker_primitive service_name do
   agent agent_name
   params ({
-    "statusurl" => "http://127.0.0.1:#{node[:nova_dashboard][:ha][:ports][:plain]}/server-status",
-    "testurl" => testurl,
-    "testregex10" => ".*<h3>Log In</h3>.*",
-    # do not fail because of wrong certificates
-    "client" => "curl --insecure"
+    "statusurl" => "http://127.0.0.1:#{node[:nova_dashboard][:ha][:ports][:plain]}/server-status"
   })
   op    apache_op
   action :create
