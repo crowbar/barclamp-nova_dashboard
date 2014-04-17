@@ -70,10 +70,10 @@ debs:
 rpms:
   centos-6.4:
     repos:
-      - bare openstack havana http://repos.fedorapeople.org/repos/openstack/openstack-havana/epel-6/
+      - bare openstack icehouse http://repos.fedorapeople.org/repos/openstack/openstack-icehouse/epel-6/
   redhat-6.4:
     repos:
-      - bare openstack havana http://repos.fedorapeople.org/repos/openstack/openstack-havana/epel-6/
+      - bare openstack icehouse http://repos.fedorapeople.org/repos/openstack/openstack-icehouse/epel-6/
   pkgs:
     - openstack-dashboard
     - httpd
@@ -96,4 +96,4 @@ pips:
   - python-memcached
 
 git_repo:
-  - nova_dashboard https://github.com/openstack/horizon.git stable/havana
+  - nova_dashboard https://github.com/openstack/horizon.git stable/icehouse

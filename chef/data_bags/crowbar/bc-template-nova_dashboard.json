@@ -27,7 +27,7 @@
       "external_monitoring": {},
       "gitrepo": "http://github.com/openstack/horizon.git",
       "git_instance": "",
-      "git_refspec": "stable/havana",
+      "git_refspec": "stable/icehouse",
       "use_gitbarclamp": true,
       "use_pip_cache": true,
       "use_virtualenv": true,
