@@ -23,4 +23,8 @@ class NovaDashboardController < BarclampController
   def initialize_service
     @service_object = NovaDashboardService.new logger
   end
+
+  def permitted_params
+    params.require(:nove_dashboard)
+  end
 end
