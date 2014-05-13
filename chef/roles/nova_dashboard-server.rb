@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 name "nova_dashboard-server"
 description "Nova Dashboard Server Role"
 run_list(
