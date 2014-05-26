@@ -1,5 +1,6 @@
+#
 # Copyright 2011-2013, Dell
-# Copyright 2013, SUSE LINUX Products GmbH
+# Copyright 2013-2014, SUSE LINUX Products GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,18 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Author: Dell Crowbar Team
-# Author: SUSE LINUX Products GmbH
-#
 
-module NovaDashboardBarclampHelper
-  def ssl_protocols_for_nova_dashbaord(selected)
-    options_for_select(
-      [
-        ["HTTP", "false"],
-        ["HTTPS", "true"]
-      ],
-      selected.to_s
-    )
+module Barclamp
+  module NovaDashboardHelper
+    def ssl_protocols_for_nova_dashbaord(selected)
+      options_for_select(
+        [
+          ["HTTP", "false"],
+          ["HTTPS", "true"]
+        ],
+        selected.to_s
+      )
+    end
   end
 end
