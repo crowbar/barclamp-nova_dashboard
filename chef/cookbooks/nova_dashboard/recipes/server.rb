@@ -241,9 +241,7 @@ db_settings = {
   'default-character-set' => "'utf8'"
 }
 
-keystone = get_instance('roles:keystone-server')
-keystone_settings = KeystoneHelper.keystone_settings(keystone)
-Chef::Log.info("Keystone server found at #{keystone_settings['internal_url_host']}")
+keystone_settings = KeystoneHelper.keystone_settings(node, @cookbook_name)
 
 glances = search(:node, "roles:glance-server") || []
 if glances.length > 0
