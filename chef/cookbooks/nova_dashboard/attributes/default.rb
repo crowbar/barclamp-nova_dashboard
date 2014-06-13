@@ -19,6 +19,7 @@ default[:nova_dashboard][:db][:password] = nil # must be set by wrapper
 
 default[:nova_dashboard][:debug] = false
 default[:nova_dashboard][:site_branding] = "OpenStack Dashboard"
+default[:nova_dashboard][:site_branding_link] = "http://docs.openstack.org/"
 
 default[:nova_dashboard][:apache][:ssl] = false
 default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/openstack-dashboard-server.crt'
