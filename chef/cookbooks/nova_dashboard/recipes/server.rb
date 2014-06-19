@@ -297,6 +297,14 @@ execute "python manage.py syncdb" do
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
+execute "python manage.py compress" do
+  cwd dashboard_path
+  environment ({'PYTHONPATH' => dashboard_path})
+  command "#{venv_prefix} python manage.py compress -f"
+  notifies :restart, resources(:service => "apache2"), :immediately
+  only_if { node[:platform] =="ubuntu" }
+end
+
 
 # We're going to use memcached as a cache backend for Django
 
