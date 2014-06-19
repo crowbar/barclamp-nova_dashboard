@@ -48,6 +48,7 @@
   "deployment": {
     "nova_dashboard": {
       "crowbar-revision": 0,
+      "crowbar-applied": false,
       "schema-revision": 10,
       "element_states": {
         "nova_dashboard-server": [ "readying", "ready", "applying" ]

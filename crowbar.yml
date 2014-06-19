@@ -33,7 +33,7 @@ crowbar:
   order: 96
   run_order: 96
   chef_order: 96
-  proposal_schema_version: 2
+  proposal_schema_version: 3
 
 debs:
   ubuntu-10.10:
