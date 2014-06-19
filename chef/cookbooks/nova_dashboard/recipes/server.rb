@@ -283,6 +283,11 @@ directory "/var/lib/openstack-dashboard" do
   action :create
 end
 
+execute "set_permission_for_secret_key" do
+  command "chown -R www-data:www-data /var/lib/openstack-dashboard"
+  only_if { node[:platform] == "ubuntu" }
+end
+
 
 # We should protect this with crowbar_pacemaker_sync_mark, but because we run
 # this in a notification, we can't; we had a sync mark earlier on, though, so
