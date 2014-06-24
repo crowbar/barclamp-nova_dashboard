@@ -35,6 +35,7 @@
                 "help_text": { "type": "str", "required": true }
               }
             },
+            "can_set_password": { "type": "bool", "required": false },
             "apache" : {
               "type" : "map",
               "required" : true,

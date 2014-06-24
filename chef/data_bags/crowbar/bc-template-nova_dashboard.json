@@ -18,6 +18,7 @@
         "regex": ".{8,}",
         "help_text": "Your password must be at least 8 characters long."
       },
+      "can_set_password": false,
       "apache": {
         "ssl": false,
         "ssl_crt_file": "/etc/apache2/ssl.crt/openstack-dashboard-server.crt",
