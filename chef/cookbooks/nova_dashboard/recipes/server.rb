@@ -265,10 +265,14 @@ if neutrons.length > 0
   neutron_insecure = neutron[:neutron][:api][:protocol] == 'https' && neutron[:neutron][:ssl][:insecure]
   neutron_networking_plugin = neutron[:neutron][:networking_plugin]
   neutron_use_ml2 = neutron[:neutron][:use_ml2]
+  neutron_use_lbaas = neutron[:neutron][:use_lbaas]
+  neutron_use_vpnaas = neutron[:neutron][:use_vpnaas]
 else
   neutron_insecure = false
   neutron_networking_plugin = ""
   neutron_use_ml2 = false
+  neutron_use_lbaas = false
+  neutron_use_vpnaas = false
 end
 
 nova = get_instance('roles:nova-multi-controller')
@@ -332,6 +336,8 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :keystone_settings => keystone_settings,
     :insecure => keystone_settings['insecure'] || glance_insecure || cinder_insecure || neutron_insecure || nova_insecure,
     :db_settings => db_settings,
+    :enable_lb => neutron_use_lbaas,
+    :enable_vpn => neutron_use_vpnaas,
     :timezone => (node[:provisioner][:timezone] rescue "UTC") || "UTC",
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
     :password_validator_regex => node[:nova_dashboard][:password_validator][:regex],
