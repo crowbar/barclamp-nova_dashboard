@@ -283,6 +283,11 @@ directory "/var/lib/openstack-dashboard" do
   action :create
 end
 
+execute "set_permission_for_secret_key" do
+  command "chown -R www-data:www-data /var/lib/openstack-dashboard"
+  only_if { node[:platform] == "ubuntu" }
+end
+
 
 # We should protect this with crowbar_pacemaker_sync_mark, but because we run
 # this in a notification, we can't; we had a sync mark earlier on, though, so
@@ -295,6 +300,14 @@ execute "python manage.py syncdb" do
   group node[:apache][:group]
   action :nothing
   notifies :restart, resources(:service => "apache2"), :immediately
+end
+
+execute "python manage.py compress" do
+  cwd dashboard_path
+  environment ({'PYTHONPATH' => dashboard_path})
+  command "#{venv_prefix} python manage.py compress -f"
+  notifies :restart, resources(:service => "apache2"), :immediately
+  only_if { node[:platform] =="ubuntu" }
 end
 
 
