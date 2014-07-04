@@ -35,3 +35,6 @@ default[:nova_dashboard][:ha][:ports][:ssl] = 5581
 node[:nova_dashboard][:monitor]={}
 node[:nova_dashboard][:monitor][:svcs] = []
 node[:nova_dashboard][:monitor][:ports]={}
+
+# Display password fields for Nova password injection
+default["nova_dashboard"]["can_set_password"] = false
