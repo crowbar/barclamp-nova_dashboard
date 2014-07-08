@@ -19,6 +19,7 @@
         "regex": ".{8,}",
         "help_text": "Your password must be at least 8 characters long."
       },
+      "can_set_mount_point": false,
       "can_set_password": false,
       "apache": {
         "ssl": false,

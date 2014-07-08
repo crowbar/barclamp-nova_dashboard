@@ -348,6 +348,7 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :neutron_use_ml2 => neutron_use_ml2,
     :session_timeout => node[:nova_dashboard][:session_timeout],
     :memcached_locations => memcached_locations,
+    :can_set_mount_point => node["nova_dashboard"]["can_set_mount_point"],
     :can_set_password => node["nova_dashboard"]["can_set_password"]
   )
   notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
