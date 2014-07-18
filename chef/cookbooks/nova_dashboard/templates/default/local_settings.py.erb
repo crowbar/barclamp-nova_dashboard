@@ -169,7 +169,7 @@ OPENSTACK_KEYSTONE_BACKEND = {
 # can_set_mount_point to True will add the option to set the mount point
 # from the UI.
 OPENSTACK_HYPERVISOR_FEATURES = {
-    'can_set_mount_point': True,
+    'can_set_mount_point': <%= @can_set_mount_point ? "True" : "False"  %>,
     'can_set_password': <%= @can_set_password ? "True" : "False"  %>
 }
 
