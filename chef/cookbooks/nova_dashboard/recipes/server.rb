@@ -131,9 +131,9 @@ end
 node.normal[:apache][:listen_ports_crowbar] ||= {}
 
 if node[:nova_dashboard][:apache][:ssl]
-  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = [bind_port, bind_port_ssl]
+  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = [String(bind_port), String(bind_port_ssl)]
 else
-  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = [bind_port]
+  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = [String(bind_port)]
 end
 
 # Override what the apache2 cookbook does since it enforces the ports
