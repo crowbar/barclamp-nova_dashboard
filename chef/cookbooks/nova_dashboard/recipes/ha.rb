@@ -39,29 +39,6 @@ crowbar_pacemaker_sync_mark "sync-nova_dashboard_before_ha"
 # Avoid races when creating pacemaker resources
 crowbar_pacemaker_sync_mark "wait-nova_dashboard_ha_resources"
 
-agent_name = "ocf:heartbeat:apache"
-apache_op = {}
-apache_op["monitor"] = {}
-apache_op["monitor"]["interval"] = "10s"
-
-service_name = "apache"
-
-pacemaker_primitive service_name do
-  agent agent_name
-  params ({
-    "statusurl" => "http://127.0.0.1:#{node[:nova_dashboard][:ha][:ports][:plain]}/server-status"
-  })
-  op    apache_op
-  action :create
-end
-
-pacemaker_clone "cl-#{service_name}" do
-  rsc service_name
-  action [ :create, :start ]
-end
+include_recipe "crowbar-pacemaker::apache"
 
 crowbar_pacemaker_sync_mark "create-nova_dashboard_ha_resources"
-
-# Override service provider for apache2 resource defined in apache2 cookbook
-resource = resources(:service => "apache2")
-resource.provider(Chef::Provider::CrowbarPacemakerService)

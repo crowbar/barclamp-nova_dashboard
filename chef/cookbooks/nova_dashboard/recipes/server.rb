@@ -16,8 +16,6 @@
 include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
-# This is required for the OCF resource agent
-include_recipe "apache2::mod_status"
 
 if %w(suse).include? node.platform
   dashboard_path = "/srv/www/openstack-dashboard"
@@ -131,14 +129,14 @@ end
 node.normal[:apache][:listen_ports_crowbar] ||= {}
 
 if node[:nova_dashboard][:apache][:ssl]
-  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = [bind_port, bind_port_ssl]
+  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = { :plain => [bind_port], :ssl => [bind_port_ssl] }
 else
-  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = [bind_port]
+  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = { :plain => [bind_port] }
 end
 
 # Override what the apache2 cookbook does since it enforces the ports
 resource = resources(:template => "#{node[:apache][:dir]}/ports.conf")
-resource.variables({:apache_listen_ports => node.normal[:apache][:listen_ports_crowbar].values.flatten.uniq.sort})
+resource.variables({:apache_listen_ports => node.normal[:apache][:listen_ports_crowbar].values.map{ |p| p.values }.flatten.uniq.sort})
 
 template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   if node.platform == "suse"
