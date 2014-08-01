@@ -111,72 +111,6 @@ else
   end
 end
 
-ha_enabled = node[:nova_dashboard][:ha][:enabled]
-
-if ha_enabled
-  log "HA support for horizon is enabled"
-  admin_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
-  bind_host = admin_address
-  bind_port = node[:nova_dashboard][:ha][:ports][:plain]
-  bind_port_ssl = node[:nova_dashboard][:ha][:ports][:ssl]
-
-  include_recipe "nova_dashboard::ha"
-else
-  log "HA support for horizon is disabled"
-  bind_host = "*"
-  bind_port = 80
-  bind_port_ssl = 443
-end
-
-if node[:nova_dashboard][:apache][:ssl]
-  node.default[:apache][:listen_ports] = [bind_port, bind_port_ssl]
-else
-  node.default[:apache][:listen_ports] = [bind_port]
-end
-
-# Override what the apache2 cookbook does since it enforces the ports
-resource = resources(:template => "#{node[:apache][:dir]}/ports.conf")
-resource.variables({:apache_listen_ports => node[:apache][:listen_ports]})
-
-template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
-  if node.platform == "suse"
-    path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
-  end
-  source "nova-dashboard.conf.erb"
-  mode 0644
-  variables(
-    :bind_host => bind_host,
-    :bind_port => bind_port,
-    :bind_port_ssl => bind_port_ssl,
-    :horizon_dir => dashboard_path,
-    :user => node[:apache][:user],
-    :group => node[:apache][:group],
-    :use_ssl => node[:nova_dashboard][:apache][:ssl],
-    :ssl_crt_file => node[:nova_dashboard][:apache][:ssl_crt_file],
-    :ssl_key_file => node[:nova_dashboard][:apache][:ssl_key_file],
-    :ssl_crt_chain_file => node[:nova_dashboard][:apache][:ssl_crt_chain_file],
-    :venv => node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo],
-    :venv_path => venv_path
-  )
-  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
-    notifies :reload, resources(:service => "apache2")
-  end
-end
-
-if node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo]
-  template "/usr/share/openstack-dashboard/openstack_dashboard/wsgi/django_venv.wsgi" do
-    source "django_venv.wsgi.erb"
-    mode 0644
-    variables(
-      :venv_path => venv_path
-    )
-  end
-end
-
-apache_site "nova-dashboard.conf" do
-  enable true
-end
-
 sql = get_instance('roles:database-server')
 include_recipe "database::client"
 backend_name = Chef::Recipe::Database::Util.get_backend_name(sql)
@@ -283,6 +217,7 @@ directory "/var/lib/openstack-dashboard" do
   action :create
 end
 
+ha_enabled = node[:nova_dashboard][:ha][:enabled]
 
 # We're going to use memcached as a cache backend for Django
 
@@ -353,6 +288,72 @@ template local_settings do
 end
 
 crowbar_pacemaker_sync_mark "create-nova_dashboard_config"
+
+if ha_enabled
+  log "HA support for horizon is enabled"
+  admin_address = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
+  bind_host = admin_address
+  bind_port = node[:nova_dashboard][:ha][:ports][:plain]
+  bind_port_ssl = node[:nova_dashboard][:ha][:ports][:ssl]
+
+  include_recipe "nova_dashboard::ha"
+else
+  log "HA support for horizon is disabled"
+  bind_host = "*"
+  bind_port = 80
+  bind_port_ssl = 443
+end
+
+node.normal[:apache][:listen_ports_crowbar] ||= {}
+
+if node[:nova_dashboard][:apache][:ssl]
+  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = { :plain => [bind_port], :ssl => [bind_port_ssl] }
+else
+  node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = { :plain => [bind_port] }
+end
+
+# Override what the apache2 cookbook does since it enforces the ports
+resource = resources(:template => "#{node[:apache][:dir]}/ports.conf")
+resource.variables({:apache_listen_ports => node.normal[:apache][:listen_ports_crowbar].values.map{ |p| p.values }.flatten.uniq.sort})
+
+template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
+  if node.platform == "suse"
+    path "#{node[:apache][:dir]}/vhosts.d/openstack-dashboard.conf"
+  end
+  source "nova-dashboard.conf.erb"
+  mode 0644
+  variables(
+    :bind_host => bind_host,
+    :bind_port => bind_port,
+    :bind_port_ssl => bind_port_ssl,
+    :horizon_dir => dashboard_path,
+    :user => node[:apache][:user],
+    :group => node[:apache][:group],
+    :use_ssl => node[:nova_dashboard][:apache][:ssl],
+    :ssl_crt_file => node[:nova_dashboard][:apache][:ssl_crt_file],
+    :ssl_key_file => node[:nova_dashboard][:apache][:ssl_key_file],
+    :ssl_crt_chain_file => node[:nova_dashboard][:apache][:ssl_crt_chain_file],
+    :venv => node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo],
+    :venv_path => venv_path
+  )
+  if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
+    notifies :reload, resources(:service => "apache2")
+  end
+end
+
+if node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo]
+  template "/usr/share/openstack-dashboard/openstack_dashboard/wsgi/django_venv.wsgi" do
+    source "django_venv.wsgi.erb"
+    mode 0644
+    variables(
+      :venv_path => venv_path
+    )
+  end
+end
+
+apache_site "nova-dashboard.conf" do
+  enable true
+end
 
 node[:nova_dashboard][:monitor][:svcs] <<["nova_dashboard-server"]
 node.save
