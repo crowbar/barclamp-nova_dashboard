@@ -286,20 +286,6 @@ directory "/var/lib/openstack-dashboard" do
 end
 
 
-# We should protect this with crowbar_pacemaker_sync_mark, but because we run
-# this in a notification, we can't; we had a sync mark earlier on, though, so
-# the founder is very likely to do the db sync first and make this a non-issue.
-execute "python manage.py syncdb" do
-  cwd dashboard_path
-  environment ({'PYTHONPATH' => dashboard_path})
-  command "#{venv_prefix} python manage.py syncdb --noinput"
-  user node[:apache][:user]
-  group node[:apache][:group]
-  action :nothing
-  notifies :restart, resources(:service => "apache2"), :immediately
-end
-
-
 # We're going to use memcached as a cache backend for Django
 
 # make sure our memcache only listens on the admin IP address
@@ -325,8 +311,26 @@ when "debian", "ubuntu"
   package "python-memcache"
 end
 
+crowbar_pacemaker_sync_mark "wait-nova_dashboard_config"
+
+local_settings = "#{dashboard_path}/openstack_dashboard/local/local_settings.py"
+
+# We need to protect syncdb with crowbar_pacemaker_sync_mark. Since it's run in
+# an immmediate notification of the creation of the config file, we put the two
+# between the crowbar_pacemaker_sync_mark calls.
+execute "python manage.py syncdb" do
+  cwd dashboard_path
+  environment ({'PYTHONPATH' => dashboard_path})
+  command "#{venv_prefix} python manage.py syncdb --noinput"
+  user node[:apache][:user]
+  group node[:apache][:group]
+  action :nothing
+  subscribes :run, "template[#{local_settings}]", :immediately
+  notifies :restart, resources(:service => "apache2"), :immediately
+end
+
 # Need to template the "EXTERNAL_MONITORING" array
-template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
+template local_settings do
   source "local_settings.py.erb"
   owner node[:apache][:user]
   group "root"
@@ -351,9 +355,10 @@ template "#{dashboard_path}/openstack_dashboard/local/local_settings.py" do
     :can_set_mount_point => node["nova_dashboard"]["can_set_mount_point"],
     :can_set_password => node["nova_dashboard"]["can_set_password"]
   )
-  notifies :run, resources(:execute => "python manage.py syncdb"), :immediately
   action :create
 end
+
+crowbar_pacemaker_sync_mark "create-nova_dashboard_config"
 
 node[:nova_dashboard][:monitor][:svcs] <<["nova_dashboard-server"]
 node.save
