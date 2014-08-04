@@ -299,8 +299,6 @@ if ha_enabled
   bind_host = admin_address
   bind_port = node[:nova_dashboard][:ha][:ports][:plain]
   bind_port_ssl = node[:nova_dashboard][:ha][:ports][:ssl]
-
-  include_recipe "nova_dashboard::ha"
 else
   log "HA support for horizon is disabled"
   bind_host = "*"
@@ -315,6 +313,9 @@ if node[:nova_dashboard][:apache][:ssl]
 else
   node.normal[:apache][:listen_ports_crowbar][:nova_dashboard] = { :plain => [bind_port] }
 end
+
+# we can only include the recipe after having defined the listen_ports_crowbar attribute
+include_recipe "nova_dashboard::ha" if ha_enabled
 
 # Override what the apache2 cookbook does since it enforces the ports
 resource = resources(:template => "#{node[:apache][:dir]}/ports.conf")
