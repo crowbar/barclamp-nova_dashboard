@@ -109,56 +109,46 @@ else
   end
 end
 
-sql = get_instance('roles:database-server')
+db_settings = fetch_database_settings
 include_recipe "database::client"
-backend_name = Chef::Recipe::Database::Util.get_backend_name(sql)
-include_recipe "#{backend_name}::client"
-include_recipe "#{backend_name}::python-client"
+include_recipe "#{db_settings[:backend_name]}::client"
+include_recipe "#{db_settings[:backend_name]}::python-client"
 
-db_provider = Chef::Recipe::Database::Util.get_database_provider(sql)
-db_user_provider = Chef::Recipe::Database::Util.get_user_provider(sql)
-privs = Chef::Recipe::Database::Util.get_default_priviledges(sql)
-case backend_name
+case db_settings[:backend_name]
 when "mysql"
     django_db_backend = "'django.db.backends.mysql'"
 when "postgresql"
     django_db_backend = "'django.db.backends.postgresql_psycopg2'"
 end
 
-database_address = CrowbarDatabaseHelper.get_listen_address(sql)
-Chef::Log.info("Database server found at #{database_address}")
-db_conn = { :host => database_address,
-            :username => "db_maker",
-            :password => sql["database"][:db_maker_password] }
-
 crowbar_pacemaker_sync_mark "wait-nova_dashboard_database"
 
 # Create the Dashboard Database
 database "create #{node[:nova_dashboard][:db][:database]} database" do
-    connection db_conn
+    connection db_settings[:connection]
     database_name node[:nova_dashboard][:db][:database]
-    provider db_provider
+    provider db_settings[:provider]
     action :create
 end
 
 database_user "create dashboard database user" do
-    connection db_conn
+    connection db_settings[:connection]
     database_name node[:nova_dashboard][:db][:database]
     username node[:nova_dashboard][:db][:user]
     password node[:nova_dashboard][:db][:password]
     host '%'
-    provider db_user_provider
+    provider db_settings[:user_provider]
     action :create
 end
 
 database_user "grant database access for dashboard database user" do
-    connection db_conn
+    connection db_settings[:connection]
     database_name node[:nova_dashboard][:db][:database]
     username node[:nova_dashboard][:db][:user]
     password node[:nova_dashboard][:db][:password]
     host '%'
-    privileges privs
-    provider db_user_provider
+    privileges db_settings[:privs]
+    provider db_settings[:user_provider]
     action :grant
 end
 
@@ -169,7 +159,7 @@ db_settings = {
   'NAME' => "'#{node[:nova_dashboard][:db][:database]}'",
   'USER' => "'#{node[:nova_dashboard][:db][:user]}'",
   'PASSWORD' => "'#{node[:nova_dashboard][:db][:password]}'",
-  'HOST' => "'#{database_address}'",
+  'HOST' => "'#{db_settings[:address]}'",
   'default-character-set' => "'utf8'"
 }
 
