@@ -4,7 +4,10 @@
 
 RewriteEngine On
 RewriteCond %{SERVER_PORT} ^<%= @bind_port %>$
-RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
+RewriteCond %{REQUEST_URI} !^/server-status
+# Remove port from HTTP_HOST
+RewriteCond %{HTTP_HOST} ^([^:]+)(:[0-9]+)?$
+RewriteRule / https://%1:<%= @bind_port_ssl %>%{REQUEST_URI} [L,R]
 
 <VirtualHost <%= @bind_host %>:<%= @bind_port_ssl %>>
     SSLEngine On

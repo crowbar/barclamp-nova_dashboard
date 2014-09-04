@@ -46,11 +46,16 @@ apache_op["monitor"]["interval"] = "10s"
 
 service_name = "apache"
 
+apache_params = {}
+apache_params["statusurl"] = "http://127.0.0.1:#{node[:nova_dashboard][:ha][:ports][:plain]}/server-status"
+
+if node[:nova_dashboard][:apache][:ssl]
+  apache_params["options"] = "-DSSL"
+end
+
 pacemaker_primitive service_name do
   agent agent_name
-  params ({
-    "statusurl" => "http://127.0.0.1:#{node[:nova_dashboard][:ha][:ports][:plain]}/server-status"
-  })
+  params apache_params
   op    apache_op
   action :create
 end
