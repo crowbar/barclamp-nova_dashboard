@@ -118,6 +118,10 @@ CACHES = {
     }
 }
 
+# Make sure that django_compressor uses a host specific cache key
+# as we do not use a shared filesystem for the static assets
+COMPRESS_CACHE_KEY_FUNCTION='compressor.cache.socket_cachekey'
+
 # Send email to the console by default
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Or send them to /dev/null
