@@ -94,6 +94,15 @@ from horizon.utils import secret_key
 SECRET_KEY = secret_key.generate_or_read_from_file(os.path.join(LOCAL_PATH, '.secret_key_store'))
 <% end -%>
 
+<% if (node.platform == "suse") -%>
+# Possibly add some extra documentation to static files
+STATICFILES_DIRS = (
+    ("dashboard/help/html/", "/usr/share/doc/manual/susecloud-manuals_en/"),
+    ("dashboard/help", "/usr/share/doc/manual/susecloud-admin_en-pdf/"),
+    ("dashboard/help", "/usr/share/doc/manual/susecloud-user_en-pdf/"),
+)
+<% end -%>
+
 # We recommend you use memcached for development; otherwise after every reload
 # of the django development server, you will have to login again. To use
 # memcached set CACHES to something like
