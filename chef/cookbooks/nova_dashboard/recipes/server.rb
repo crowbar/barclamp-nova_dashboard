@@ -276,7 +276,9 @@ template local_settings do
     :session_timeout => node[:nova_dashboard][:session_timeout],
     :memcached_locations => memcached_locations,
     :can_set_mount_point => node["nova_dashboard"]["can_set_mount_point"],
-    :can_set_password => node["nova_dashboard"]["can_set_password"]
+    :can_set_password => node["nova_dashboard"]["can_set_password"],
+    :horizon_dir => dashboard_path
+
   )
   action :create
 end
