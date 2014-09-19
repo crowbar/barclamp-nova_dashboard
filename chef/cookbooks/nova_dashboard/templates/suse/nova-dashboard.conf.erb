@@ -28,7 +28,7 @@ RewriteRule / https://%1:<%= @bind_port_ssl %>%{REQUEST_URI} [L,R]
 
     DocumentRoot <%= @horizon_dir %>
     Alias /media <%= @horizon_dir %>/openstack_dashboard/media
-    Alias /static <%= @horizon_dir %>/openstack_dashboard/static
+    Alias /static <%= @horizon_dir %>/static
 
     <Location /static>
         SetOutputFilter DEFLATE
