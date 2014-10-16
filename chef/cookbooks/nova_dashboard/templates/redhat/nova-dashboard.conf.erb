@@ -8,6 +8,8 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
 
 <VirtualHost <%= @bind_host %>:<%= @bind_port_ssl %>>
     SSLEngine On
+    SSLCipherSuite ALL:!aNULL:!eNULL:!SSLv2:!LOW:!EXP:!MD5:@STRENGTH
+    SSLProtocol all -SSLv2 -SSLv3
     SSLCertificateFile <%= @ssl_crt_file %>
     SSLCertificateKeyFile <%= @ssl_key_file %>
     <% unless @ssl_crt_chain_file.nil? or @ssl_crt_chain_file.empty? %>
