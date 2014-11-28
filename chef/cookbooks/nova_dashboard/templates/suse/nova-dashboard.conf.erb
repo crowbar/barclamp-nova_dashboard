@@ -2,12 +2,27 @@
 <IfDefine SSL>
 <IfDefine !NOSSL>
 
-RewriteEngine On
-RewriteCond %{SERVER_PORT} ^<%= @bind_port %>$
-RewriteCond %{REQUEST_URI} !^/server-status
-# Remove port from HTTP_HOST
-RewriteCond %{HTTP_HOST} ^([^:]+)(:[0-9]+)?$
-RewriteRule / https://%1:<%= @bind_port_ssl %>%{REQUEST_URI} [L,R]
+# Redirect non-SSL traffic to SSL
+<VirtualHost <%= @bind_host %>:<%= @bind_port %>>
+    RewriteEngine On
+
+    # If request was explicit about this port, then we redirect with the
+    # explicit SSL port. This is needed in the HA case, where we use
+    # non-standard ports.
+    RewriteCond %{REQUEST_URI} !^/server-status
+    # Extract port
+    RewriteCond %{HTTP_HOST} ^([^:]+)(:[0-9]+)?$
+    RewriteCond %2 ^:<%= @bind_port %>$
+    # Remove port from HTTP_HOST
+    RewriteCond %{HTTP_HOST} ^([^:]+)(:[0-9]+)?$
+    RewriteRule / https://%1:<%= @bind_port_ssl %>%{REQUEST_URI} [L,R]
+
+    # Otherwise, we simply redirect to https.
+    RewriteCond %{REQUEST_URI} !^/server-status
+    # Remove port from HTTP_HOST
+    RewriteCond %{HTTP_HOST} ^([^:]+)(:[0-9]+)?$
+    RewriteRule / https://%1%{REQUEST_URI} [L,R]
+</VirtualHost>
 
 <VirtualHost <%= @bind_host %>:<%= @bind_port_ssl %>>
     SSLEngine On
