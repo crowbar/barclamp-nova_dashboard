@@ -16,17 +16,18 @@
 #
 
 barclamp:
-  name: nova_dashboard
-  display: Horizon
+  name: 'nova_dashboard'
+  display: 'Horizon'
   description: 'OpenStack Dashboard: Web User Interface to access, provision and automate Cloud-based resources'
   version: 0
+  user_managed: true
   requires:
-    - pacemaker
-    - database
-    - keystone
-    - nova
+    - 'pacemaker'
+    - 'database'
+    - 'keystone'
+    - 'nova'
   member:
-    - openstack
+    - 'openstack'
 
 crowbar:
   layout: 1
@@ -35,65 +36,5 @@ crowbar:
   chef_order: 96
   proposal_schema_version: 3
 
-debs:
-  ubuntu-10.10:
-    repos:
-      - deb http://ops.rcb.me/packages maverick diablo-final
-  ubuntu-11.04:
-    repos:
-      - deb http://ops.rcb.me/packages natty diablo-final
-  ubuntu-11.10:
-    repos:
-      - deb http://ops.rcb.me/packages oneiric diablo-final
-  ubuntu-12.04:
-    pkgs:
-      - python-django-horizon
-      - python-django-nose
-  pkgs:
-    - openstack-dashboard
-    - python-django
-    - openstackx
-    - python-mysqldb
-    - python-httplib2
-    - python-keystone
-    - python-glance
-    - python-novaclient
-    - python-swift
-    - apache2
-    - python-lesscpy
-    - python-ply
-    - libapache2-mod-wsgi
-    - nodejs
-    - python-netaddr
-    - node-less
-
-rpms:
-  centos-6.4:
-    repos:
-      - bare openstack icehouse http://repos.fedorapeople.org/repos/openstack/openstack-icehouse/epel-6/
-  redhat-6.4:
-    repos:
-      - bare openstack icehouse http://repos.fedorapeople.org/repos/openstack/openstack-icehouse/epel-6/
-  pkgs:
-    - openstack-dashboard
-    - httpd
-    - python-memcached
-    - python-swiftclient
-    - python-django-horizon
-    - nodejs
-    - nodejs-less
-    - memcached
-    - python-lesscpy
-
-gems:
-  pkgs:
-    # put your gems here.
-    # - i18n
-
-pips:
-  - lesscpy
-  - ply
-  - python-memcached
-
 git_repo:
-  - nova_dashboard https://github.com/openstack/horizon.git stable/icehouse
+  - 'nova_dashboard https://github.com/openstack/horizon.git stable/juno'
