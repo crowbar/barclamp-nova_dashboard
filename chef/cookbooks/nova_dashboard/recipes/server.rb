@@ -186,6 +186,7 @@ if neutrons.length > 0
   neutron = neutrons[0]
   neutron_insecure = neutron[:neutron][:api][:protocol] == 'https' && neutron[:neutron][:ssl][:insecure]
   neutron_networking_plugin = neutron[:neutron][:networking_plugin]
+  neutron_networking_mode = neutron[:neutron][:networking_mode]
   neutron_use_ml2 = neutron[:neutron][:use_ml2]
   neutron_use_lbaas = neutron[:neutron][:use_lbaas]
   neutron_use_vpnaas = neutron[:neutron][:use_vpnaas]
@@ -272,6 +273,7 @@ template local_settings do
     :site_branding => node[:nova_dashboard][:site_branding],
     :site_branding_link => node[:nova_dashboard][:site_branding_link],
     :neutron_networking_plugin => neutron_networking_plugin,
+    :neutron_networking_mode => neutron_networking_mode,
     :neutron_use_ml2 => neutron_use_ml2,
     :session_timeout => node[:nova_dashboard][:session_timeout],
     :memcached_locations => memcached_locations,
