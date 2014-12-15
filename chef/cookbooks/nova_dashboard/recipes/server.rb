@@ -193,6 +193,7 @@ if neutrons.length > 0
 else
   neutron_insecure = false
   neutron_networking_plugin = ""
+  neutron_networking_mode = "*"
   neutron_use_ml2 = false
   neutron_use_lbaas = false
   neutron_use_vpnaas = false
