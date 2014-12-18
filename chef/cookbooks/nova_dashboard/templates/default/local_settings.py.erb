@@ -34,7 +34,7 @@ ALLOWED_HOSTS = ['*']
 # use of the decimal point, so valid options would be "2.0" or "3".
 OPENSTACK_API_VERSIONS = {
     "data_processing": 1.1,
-    "identity": 2.0,
+    "identity": <%= @keystone_settings['api_version'] %>,
     "volume": 2
 }
 
