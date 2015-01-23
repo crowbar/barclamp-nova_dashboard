@@ -33,6 +33,9 @@ class NovaDashboardService < PacemakerServiceObject
         "nova_dashboard-server" => {
           "unique" => false,
           "count" => 1,
+          "exclude_platform" => {
+            "suse" => "12.0"
+          },
           "cluster" => true
         }
       }
