@@ -17,6 +17,7 @@
             "keystone_instance": { "type": "str", "required": true },
             "database_instance": { "type": "str", "required": true },
             "site_branding": { "type": "str", "required": true },
+            "site_theme": { "type": "str", "required": true },
             "site_branding_link": { "type": "str", "required": true },
             "session_timeout": { "type": "int", "required": true },
             "db" : {

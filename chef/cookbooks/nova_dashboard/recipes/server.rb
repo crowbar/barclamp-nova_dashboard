@@ -50,6 +50,14 @@ unless node[:nova_dashboard][:use_gitrepo]
   else
     # On SUSE, the package has the correct list of dependencies
     package "openstack-dashboard"
+
+    # Install the configured branding
+    unless node[:nova_dashboard][:site_theme].empty?
+      package "openstack-dashboard-theme-#{node[:nova_dashboard][:site_theme]}" do
+        action :install
+        notifies :reload, resources(:service => "apache2")
+      end
+    end
   end
 else
   venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" : nil
