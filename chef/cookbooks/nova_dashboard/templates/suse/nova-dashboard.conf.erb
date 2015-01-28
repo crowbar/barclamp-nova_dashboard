@@ -44,8 +44,8 @@
     WSGIProcessGroup horizon
 
     DocumentRoot <%= @horizon_dir %>
-    Alias /media <%= @horizon_dir %>/openstack_dashboard/media
-    Alias /static <%= @horizon_dir %>/openstack_dashboard/static
+    Alias /media <%= @horizon_dir %>/media
+    Alias /static <%= @horizon_dir %>/static
 
     <Location /static>
         SetOutputFilter DEFLATE
