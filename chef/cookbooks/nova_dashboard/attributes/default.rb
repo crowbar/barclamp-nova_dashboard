@@ -18,7 +18,7 @@ default[:nova_dashboard][:db][:user] = "horizon"
 default[:nova_dashboard][:db][:password] = nil # must be set by wrapper
 
 default[:nova_dashboard][:debug] = false
-default[:nova_dashboard][:site_branding] = "OpenStack Dashboard"
+default[:nova_dashboard][:site_branding] = ""
 default[:nova_dashboard][:site_theme] = ""
 default[:nova_dashboard][:site_branding_link] = ""
 default[:nova_dashboard][:help_url] = "http://docs.openstack.org/"
