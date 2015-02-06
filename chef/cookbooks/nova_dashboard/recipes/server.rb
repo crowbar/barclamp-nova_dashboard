@@ -329,6 +329,7 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
   source "nova-dashboard.conf.erb"
   mode 0644
   variables(
+    :behind_proxy => ha_enabled,
     :bind_host => bind_host,
     :bind_port => bind_port,
     :bind_port_ssl => bind_port_ssl,
