@@ -8,6 +8,7 @@
       "keystone_instance": "none",
       "database_instance": "none",
       "site_branding": "OpenStack Dashboard",
+      "site_theme": "",
       "site_branding_link": "http://docs.openstack.org/",
       "session_timeout": 1440,
       "db": {
@@ -51,7 +52,7 @@
     "nova_dashboard": {
       "crowbar-revision": 0,
       "crowbar-applied": false,
-      "schema-revision": 10,
+      "schema-revision": 20,
       "element_states": {
         "nova_dashboard-server": [ "readying", "ready", "applying" ]
       },
