@@ -568,7 +568,9 @@ DATABASES = {
 }
 
 SITE_BRANDING = "<%= @site_branding %>"
+<% unless @site_branding_link.empty? -%>
 SITE_BRANDING_LINK = "<%= @site_branding_link %>"
+<% end -%>
 
 <% if node[:nova_dashboard].has_key?(:external_monitoring) -%>
 EXTERNAL_MONITORING = [

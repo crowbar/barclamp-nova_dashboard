@@ -9,7 +9,7 @@
       "database_instance": "none",
       "site_branding": "OpenStack Dashboard",
       "site_theme": "",
-      "site_branding_link": "http://docs.openstack.org/",
+      "site_branding_link": "",
       "session_timeout": 1440,
       "db": {
         "database": "horizon",
