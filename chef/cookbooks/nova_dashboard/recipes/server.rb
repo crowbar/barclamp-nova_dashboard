@@ -282,6 +282,7 @@ template local_settings do
     :site_branding => node[:nova_dashboard][:site_branding],
     :site_branding_link => node[:nova_dashboard][:site_branding_link],
     :neutron_ml2_type_drivers => neutron_ml2_type_drivers,
+    :help_url => node[:nova_dashboard][:help_url],
     :session_timeout => node[:nova_dashboard][:session_timeout],
     :memcached_locations => memcached_locations,
     :can_set_mount_point => node["nova_dashboard"]["can_set_mount_point"],

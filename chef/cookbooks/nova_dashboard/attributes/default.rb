@@ -21,6 +21,7 @@ default[:nova_dashboard][:debug] = false
 default[:nova_dashboard][:site_branding] = "OpenStack Dashboard"
 default[:nova_dashboard][:site_theme] = ""
 default[:nova_dashboard][:site_branding_link] = ""
+default[:nova_dashboard][:help_url] = "http://docs.openstack.org/"
 
 default[:nova_dashboard][:apache][:ssl] = false
 default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/openstack-dashboard-server.crt'
