@@ -117,6 +117,8 @@ else
   end
 end
 
+ha_enabled = node[:nova_dashboard][:ha][:enabled]
+
 db_settings = fetch_database_settings
 include_recipe "database::client"
 include_recipe "#{db_settings[:backend_name]}::client"
@@ -137,6 +139,7 @@ database "create #{node[:nova_dashboard][:db][:database]} database" do
     database_name node[:nova_dashboard][:db][:database]
     provider db_settings[:provider]
     action :create
+    only_if { !ha_enabled || CrowbarPacemakerHelper.is_cluster_founder?(node) }
 end
 
 database_user "create dashboard database user" do
@@ -147,6 +150,7 @@ database_user "create dashboard database user" do
     host '%'
     provider db_settings[:user_provider]
     action :create
+    only_if { !ha_enabled || CrowbarPacemakerHelper.is_cluster_founder?(node) }
 end
 
 database_user "grant database access for dashboard database user" do
@@ -158,6 +162,7 @@ database_user "grant database access for dashboard database user" do
     privileges db_settings[:privs]
     provider db_settings[:user_provider]
     action :grant
+    only_if { !ha_enabled || CrowbarPacemakerHelper.is_cluster_founder?(node) }
 end
 
 crowbar_pacemaker_sync_mark "create-nova_dashboard_database"
@@ -216,8 +221,6 @@ directory "/var/lib/openstack-dashboard" do
   mode "0700"
   action :create
 end
-
-ha_enabled = node[:nova_dashboard][:ha][:enabled]
 
 # We're going to use memcached as a cache backend for Django
 
