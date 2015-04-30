@@ -29,31 +29,14 @@
         "ssl_key_file": "/etc/apache2/ssl.key/openstack-dashboard-server.key",
         "ssl_crt_chain_file": ""
       },
-      "external_monitoring": {},
-      "gitrepo": "http://github.com/openstack/horizon.git",
-      "git_instance": "",
-      "git_refspec": "stable/icehouse",
-      "use_gitbarclamp": true,
-      "use_pip_cache": true,
-      "use_virtualenv": true,
-      "pfs_deps": [
-        "apache2",
-        "libapache2-mod-wsgi",
-        "pip://setuptools-git",
-        "pip://distribute>=0.6.28",
-        "pip://MySQL-python",
-        "pip://python-memcached",
-        "pip://ply",
-        "pip://lesscpy"
-      ],
-      "use_gitrepo": false
+      "external_monitoring": {}
     }
   },
   "deployment": {
     "nova_dashboard": {
       "crowbar-revision": 0,
       "crowbar-applied": false,
-      "schema-revision": 21,
+      "schema-revision": 30,
       "element_states": {
         "nova_dashboard-server": [ "readying", "ready", "applying" ]
       },
