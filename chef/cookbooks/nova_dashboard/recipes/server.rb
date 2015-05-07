@@ -17,6 +17,28 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
+keystone_settings = KeystoneHelper.keystone_settings(node, @cookbook_name)
+
+# TODO(aplanas): Remove this block, and the "use_keystone_v3"
+# attribute when keystone API 'v3' works for every OpenStack
+# configuration file.
+#
+# Because these two variables will disappear, also revert the changes
+# in local_settings.py.erb to use directly keystone_settings in
+# 'OPENSTACK_API_VERSIONS' and 'OPENSTACK_KEYSTONE_URL'
+keystone_api_version = keystone_settings['api_version']
+keystone_internal_auth_url = keystone_settings['internal_auth_url']
+
+if node["nova_dashboard"]["use_keystone_v3"] && keystone_api_version.to_f < 3
+  keystone_api_version = '3'
+  keystone_internal_auth_url = KeystoneHelper.versioned_service_URL(
+    keystone_settings["protocol"],
+    keystone_settings["internal_url_host"],
+    keystone_settings["service_port"],
+    keystone_api_version)
+end
+
+
 if %w(suse).include? node.platform
   dashboard_path = "/srv/www/openstack-dashboard"
 else
@@ -175,8 +197,6 @@ db_settings = {
   'HOST' => "'#{db_settings[:address]}'",
   'default-character-set' => "'utf8'"
 }
-
-keystone_settings = KeystoneHelper.keystone_settings(node, @cookbook_name)
 
 glances = search(:node, "roles:glance-server") || []
 if glances.length > 0
