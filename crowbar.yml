@@ -35,6 +35,3 @@ crowbar:
   run_order: 96
   chef_order: 96
   proposal_schema_version: 3
-
-git_repo:
-  - 'nova_dashboard https://github.com/openstack/horizon.git stable/juno'

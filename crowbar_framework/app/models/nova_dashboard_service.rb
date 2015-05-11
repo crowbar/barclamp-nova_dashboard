@@ -46,9 +46,6 @@ class NovaDashboardService < PacemakerServiceObject
   def proposal_dependencies(role)
     answer = []
     answer << { "barclamp" => "database", "inst" => role.default_attributes["nova_dashboard"]["database_instance"] }
-    if role.default_attributes[@bc_name]["use_gitrepo"]
-      answer << { "barclamp" => "git", "inst" => role.default_attributes[@bc_name]["git_instance"] }
-    end
     answer << { "barclamp" => "keystone", "inst" => role.default_attributes["nova_dashboard"]["keystone_instance"] }
     answer << { "barclamp" => "nova", "inst" => role.default_attributes["nova_dashboard"]["nova_instance"] }
     answer
@@ -67,7 +64,6 @@ class NovaDashboardService < PacemakerServiceObject
       }
     end
 
-    base["attributes"][@bc_name]["git_instance"] = find_dep_proposal("git", true)
     base["attributes"][@bc_name]["database_instance"] = find_dep_proposal("database")
     base["attributes"][@bc_name]["keystone_instance"] = find_dep_proposal("keystone")
     base["attributes"][@bc_name]["nova_instance"] = find_dep_proposal("nova")
@@ -80,10 +76,6 @@ class NovaDashboardService < PacemakerServiceObject
 
   def validate_proposal_after_save proposal
     validate_one_for_role proposal, "nova_dashboard-server"
-
-    if proposal["attributes"][@bc_name]["use_gitrepo"]
-      validate_dep_proposal_is_active "git", proposal["attributes"][@bc_name]["git_instance"]
-    end
 
     super
   end

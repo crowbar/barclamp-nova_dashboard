@@ -27,49 +27,35 @@ if node[:nova_dashboard][:apache][:ssl]
   include_recipe "apache2::mod_ssl"
 end
 
-unless node[:nova_dashboard][:use_gitrepo]
-  if %w(debian ubuntu).include?(node.platform)
-    # Explicitly added client dependencies for now.
-    packages = [ "python-lesscpy", "python-ply", "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
-    packages.each do |pkg|
-      package pkg do
-        action :install
-      end
-    end
-
-    rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
-    rm_pkgs.each do |pkg|
-      package pkg do
-        action :purge
-      end
-    end
-  elsif %w(redhat centos).include?(node.platform)
-    package "openstack-dashboard"
-    package "python-lesscpy"
-    package "python-memcached"
-  else
-    # On SUSE, the package has the correct list of dependencies
-    package "openstack-dashboard"
-
-    # Install the configured branding
-    unless node[:nova_dashboard][:site_theme].empty?
-      package "openstack-dashboard-theme-#{node[:nova_dashboard][:site_theme]}" do
-        action :install
-        notifies :reload, resources(:service => "apache2")
-      end
+if %w(debian ubuntu).include?(node.platform)
+  # Explicitly added client dependencies for now.
+  packages = [ "python-lesscpy", "python-ply", "openstack-dashboard", "python-novaclient", "python-glance", "python-swift", "python-keystone", "openstackx", "python-django", "python-django-horizon", "python-django-nose" ]
+  packages.each do |pkg|
+    package pkg do
+      action :install
     end
   end
+
+  rm_pkgs = [ "openstack-dashboard-ubuntu-theme" ]
+  rm_pkgs.each do |pkg|
+    package pkg do
+      action :purge
+    end
+  end
+elsif %w(redhat centos).include?(node.platform)
+  package "openstack-dashboard"
+  package "python-lesscpy"
+  package "python-memcached"
 else
-  venv_path = node[:nova_dashboard][:use_virtualenv] ? "#{dashboard_path}/.venv" : nil
-  venv_prefix = node[:nova_dashboard][:use_virtualenv] ? ". #{venv_path}/bin/activate &&" : nil
+  # On SUSE, the package has the correct list of dependencies
+  package "openstack-dashboard"
 
-  pfs_and_install_deps "nova_dashboard" do
-    path dashboard_path
-    virtualenv venv_path
-  end
-
-  execute "chown_#{node[:apache][:user]}" do
-    command "chown -R #{node[:apache][:user]}:#{node[:apache][:group]} #{dashboard_path}"
+  # Install the configured branding
+  unless node[:nova_dashboard][:site_theme].empty?
+    package "openstack-dashboard-theme-#{node[:nova_dashboard][:site_theme]}" do
+      action :install
+      notifies :reload, resources(:service => "apache2")
+    end
   end
 end
 
@@ -257,7 +243,7 @@ local_settings = "#{dashboard_path}/openstack_dashboard/local/local_settings.py"
 execute "python manage.py syncdb" do
   cwd dashboard_path
   environment ({'PYTHONPATH' => dashboard_path})
-  command "#{venv_prefix} python manage.py syncdb --noinput"
+  command "python manage.py syncdb --noinput"
   user node[:apache][:user]
   group node[:apache][:group]
   action :nothing
@@ -341,22 +327,10 @@ template "#{node[:apache][:dir]}/sites-available/nova-dashboard.conf" do
     :use_ssl => node[:nova_dashboard][:apache][:ssl],
     :ssl_crt_file => node[:nova_dashboard][:apache][:ssl_crt_file],
     :ssl_key_file => node[:nova_dashboard][:apache][:ssl_key_file],
-    :ssl_crt_chain_file => node[:nova_dashboard][:apache][:ssl_crt_chain_file],
-    :venv => node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo],
-    :venv_path => venv_path
+    :ssl_crt_chain_file => node[:nova_dashboard][:apache][:ssl_crt_chain_file]
   )
   if ::File.symlink?("#{node[:apache][:dir]}/sites-enabled/nova-dashboard.conf") or node.platform == "suse"
     notifies :reload, resources(:service => "apache2")
-  end
-end
-
-if node[:nova_dashboard][:use_virtualenv] && node[:nova_dashboard][:use_gitrepo]
-  template "/usr/share/openstack-dashboard/openstack_dashboard/wsgi/django_venv.wsgi" do
-    source "django_venv.wsgi.erb"
-    mode 0644
-    variables(
-      :venv_path => venv_path
-    )
   end
 end
 
