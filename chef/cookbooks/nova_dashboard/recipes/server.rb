@@ -289,7 +289,11 @@ template local_settings do
     :session_timeout => node[:nova_dashboard][:session_timeout],
     :memcached_locations => memcached_locations,
     :can_set_mount_point => node["nova_dashboard"]["can_set_mount_point"],
-    :can_set_password => node["nova_dashboard"]["can_set_password"]
+    :can_set_password => node["nova_dashboard"]["can_set_password"],
+    :keystone_api_version => keystone_api_version,
+    :keystone_internal_auth_url => keystone_internal_auth_url,
+    :policy_file_path => nova["nova_dashboard"]["policy_file_path"],
+    :policy_file => node["nova_dashboard"]["policy_file"]
   )
   action :create
 end
@@ -366,4 +370,3 @@ end
 
 node[:nova_dashboard][:monitor][:svcs] <<["nova_dashboard-server"]
 node.save
-
