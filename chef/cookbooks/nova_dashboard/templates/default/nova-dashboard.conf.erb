@@ -38,8 +38,12 @@ RewriteRule / https://%{HTTP_HOST}%{REQUEST_URI} [L,R]
     <Directory <%= @horizon_dir %>/>
         Options Indexes FollowSymLinks MultiViews
         AllowOverride None
+        <%- if node[:apache][:version].to_f < 2.4 %>
         Order allow,deny
         allow from all
+        <%- else %>
+        Require all granted
+        <%- end %>
     </Directory>
 
     ErrorLog /var/log/apache2/error.log

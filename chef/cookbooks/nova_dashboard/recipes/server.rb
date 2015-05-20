@@ -45,7 +45,6 @@ if %w(debian ubuntu).include?(node.platform)
 elsif %w(redhat centos).include?(node.platform)
   package "openstack-dashboard"
   package "python-lesscpy"
-  package "python-memcached"
 else
   # On SUSE, the package has the correct list of dependencies
   package "openstack-dashboard"
@@ -231,6 +230,8 @@ when "suse"
   package "python-python-memcached"
 when "debian", "ubuntu"
   package "python-memcache"
+when "redhat", "centos"
+  package "python-memcached"
 end
 
 crowbar_pacemaker_sync_mark "wait-nova_dashboard_config"

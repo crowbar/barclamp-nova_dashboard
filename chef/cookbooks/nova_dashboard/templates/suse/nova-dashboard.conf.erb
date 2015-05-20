@@ -56,15 +56,23 @@
     <Directory />
         Options None
         AllowOverride None
+        <%- if node[:apache][:version].to_f < 2.4 %>
         Order deny,allow
         Deny from all
+        <%- else %>
+        Require all denied
+        <%- end %>
     </Directory>
 
     <Directory <%= @horizon_dir %>/>
         Options FollowSymLinks MultiViews
         AllowOverride None
+        <%- if node[:apache][:version].to_f < 2.4 %>
         Order allow,deny
         allow from all
+        <%- else %>
+        Require all granted
+        <%- end %>
     </Directory>
 
     ErrorLog /var/log/apache2/openstack-dashboard-error_log
