@@ -23,6 +23,15 @@ default[:nova_dashboard][:site_theme] = ""
 default[:nova_dashboard][:site_branding_link] = ""
 default[:nova_dashboard][:help_url] = "http://docs.openstack.org/"
 
+default[:nova_dashboard][:policy_file_path] = ""
+
+default[:nova_dashboard][:policy_file][:identity] = "keystone_policy.json"
+default[:nova_dashboard][:policy_file][:compute] = "nova_policy.json"
+default[:nova_dashboard][:policy_file][:volume] = "cinder_policy.json"
+default[:nova_dashboard][:policy_file][:image] = "glance_policy.json"
+default[:nova_dashboard][:policy_file][:orchestration] = "heat_policy.json"
+default[:nova_dashboard][:policy_file][:network] = "neutron_policy.json"
+
 default[:nova_dashboard][:apache][:ssl] = false
 default[:nova_dashboard][:apache][:ssl_crt_file] = '/etc/apache2/ssl.crt/openstack-dashboard-server.crt'
 default[:nova_dashboard][:apache][:ssl_key_file] = '/etc/apache2/ssl.key/openstack-dashboard-server.key'
