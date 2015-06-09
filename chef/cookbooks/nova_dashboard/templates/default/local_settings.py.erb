@@ -293,16 +293,16 @@ TIME_ZONE = "<%= @timezone %>"
 <% if @policy_file_path.empty? -%>
 #POLICY_FILES_PATH = os.path.join(ROOT_PATH, 'conf')
 <% else -%>
-POLICY_FILES_PATH = '<%= @policy_file_path =>'
+POLICY_FILES_PATH = '<%= @policy_file_path %>'
 <% end -%>
 # Map of local copy of service policy files
 POLICY_FILES = {
-    'identity': '<%= @policy_file[:identity] =>',
-    'compute': '<%= @policy_file[:compute] =>',
-    'volume': '<%= @policy_file[:volume] =>',
-    'image': '<%= @policy_file[:image] =>',
-    'orchestration': '<%= @policy_file[:orchestration] =>',
-    'network': '<%= @policy_file[:network] =>',
+    'identity': '<%= @policy_file[:identity] %>',
+    'compute': '<%= @policy_file[:compute] %>',
+    'volume': '<%= @policy_file[:volume] %>',
+    'image': '<%= @policy_file[:image] %>',
+    'orchestration': '<%= @policy_file[:orchestration] %>',
+    'network': '<%= @policy_file[:network] %>',
 }
 
 # Trove user and database extension support. By default support for
