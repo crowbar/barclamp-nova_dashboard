@@ -299,7 +299,7 @@ template local_settings do
     :can_set_password => node["nova_dashboard"]["can_set_password"],
     :keystone_api_version => keystone_api_version,
     :keystone_internal_auth_url => keystone_internal_auth_url,
-    :policy_file_path => nova["nova_dashboard"]["policy_file_path"],
+    :policy_file_path => node["nova_dashboard"]["policy_file_path"],
     :policy_file => node["nova_dashboard"]["policy_file"]
   )
   action :create
