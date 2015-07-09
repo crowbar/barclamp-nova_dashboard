@@ -115,8 +115,8 @@ class NovaDashboardService < PacemakerServiceObject
       # nova_dashboard-server role (otherwise, we'd need to check to which
       # cluster each node belongs to create the link).
       # Good news, the assumption is correct :-)
-      public_db = ProposalObject.find_data_bag_item "crowbar/public_network"
-      admin_db = ProposalObject.find_data_bag_item "crowbar/admin_network"
+      public_db = Chef::DataBag.load("crowbar/public_network") rescue nil
+      admin_db = Chef::DataBag.load("crowbar/admin_network") rescue nil
 
       hostname = nil
       server_elements.each do |element|
