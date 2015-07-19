@@ -21,6 +21,15 @@
         "regex": ".{8,}",
         "help_text": "Your password must be at least 8 characters long."
       },
+      "policy_file_path": "",
+      "policy_file": {
+        "identity": "keystone_policy.json",
+        "compute": "nova_policy.json",
+        "volume": "cinder_policy.json",
+        "image": "glance_policy.json",
+        "orchestration": "heat_policy.json",
+        "network": "neutron_policy.json"
+      },
       "can_set_mount_point": false,
       "can_set_password": false,
       "apache": {
@@ -53,7 +62,7 @@
     "nova_dashboard": {
       "crowbar-revision": 0,
       "crowbar-applied": false,
-      "schema-revision": 21,
+      "schema-revision": 22,
       "element_states": {
         "nova_dashboard-server": [ "readying", "ready", "applying" ]
       },
@@ -71,4 +80,3 @@
     }
   }
 }
-

@@ -290,16 +290,20 @@ TIME_ZONE = "<%= @timezone %>"
 # target installation.
 
 # Path to directory containing policy.json files
-#POLICY_FILES_PATH = os.path.join(ROOT_PATH, "conf")
+<% if @policy_file_path.empty? -%>
+#POLICY_FILES_PATH = os.path.join(ROOT_PATH, 'conf')
+<% else -%>
+POLICY_FILES_PATH = '<%= @policy_file_path %>'
+<% end -%>
 # Map of local copy of service policy files
-#POLICY_FILES = {
-#    'identity': 'keystone_policy.json',
-#    'compute': 'nova_policy.json',
-#    'volume': 'cinder_policy.json',
-#    'image': 'glance_policy.json',
-#    'orchestration': 'heat_policy.json',
-#    'network': 'neutron_policy.json',
-#}
+POLICY_FILES = {
+    'identity': '<%= @policy_file[:identity] %>',
+    'compute': '<%= @policy_file[:compute] %>',
+    'volume': '<%= @policy_file[:volume] %>',
+    'image': '<%= @policy_file[:image] %>',
+    'orchestration': '<%= @policy_file[:orchestration] %>',
+    'network': '<%= @policy_file[:network] %>',
+}
 
 # Trove user and database extension support. By default support for
 # creating users and databases on database instances is turned on.

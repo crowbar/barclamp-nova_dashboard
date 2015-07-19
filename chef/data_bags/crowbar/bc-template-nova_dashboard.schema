@@ -38,6 +38,19 @@
                 "help_text": { "type": "str", "required": true }
               }
             },
+            "policy_file_path" : { "type": "str", "required": true },
+            "policy_file" : {
+              "type" : "map",
+              "required" : true,
+              "mapping": {
+                "identity" : { "type": "str", "required": true },
+                "compute" : { "type": "str", "required": true },
+                "volume" : { "type": "str", "required": true },
+                "image" : { "type": "str", "required": true },
+                "orchestration" : { "type": "str", "required": true },
+                "network" : { "type": "str", "required": true }
+              }
+            },
             "can_set_mount_point": { "type": "bool", "required": false },
             "can_set_password": { "type": "bool", "required": false },
             "apache" : {
