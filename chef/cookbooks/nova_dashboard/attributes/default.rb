@@ -50,3 +50,7 @@ node[:nova_dashboard][:monitor][:ports]={}
 default["nova_dashboard"]["can_set_mount_point"] = false
 # Display password fields for Nova password injection
 default["nova_dashboard"]["can_set_password"] = false
+
+# Transient attribute.  Remove it when all OpenStack is deployed with
+# Keystone v3
+default["nova_dashboard"]["use_keystone_v3"] = false
