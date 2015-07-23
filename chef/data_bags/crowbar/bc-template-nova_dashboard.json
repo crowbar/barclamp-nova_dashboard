@@ -32,6 +32,7 @@
       },
       "can_set_mount_point": false,
       "can_set_password": false,
+      "multi_domain_support": true,
       "apache": {
         "ssl": false,
         "ssl_crt_file": "/etc/apache2/ssl.crt/openstack-dashboard-server.crt",
@@ -45,7 +46,7 @@
     "nova_dashboard": {
       "crowbar-revision": 0,
       "crowbar-applied": false,
-      "schema-revision": 33,
+      "schema-revision": 34,
       "element_states": {
         "nova_dashboard-server": [ "readying", "ready", "applying" ]
       },

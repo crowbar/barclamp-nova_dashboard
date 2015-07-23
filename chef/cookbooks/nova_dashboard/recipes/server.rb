@@ -252,6 +252,10 @@ execute "python manage.py syncdb" do
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
+# Force-disable multidomain support when the default keystoneapi version is too
+# old
+multi_domain_support = keystone_settings["api_version"].to_f < 3.0 ? false : node["nova_dashboard"]["multi_domain_support"]
+
 # Need to template the "EXTERNAL_MONITORING" array
 template local_settings do
   source "local_settings.py.erb"
@@ -277,6 +281,7 @@ template local_settings do
     :memcached_locations => memcached_locations,
     :can_set_mount_point => node["nova_dashboard"]["can_set_mount_point"],
     :can_set_password => node["nova_dashboard"]["can_set_password"],
+    :multi_domain_support => multi_domain_support,
     :policy_file_path => node["nova_dashboard"]["policy_file_path"],
     :policy_file => node["nova_dashboard"]["policy_file"]
   )
