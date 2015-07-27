@@ -76,6 +76,15 @@ class NovaDashboardService < PacemakerServiceObject
   def validate_proposal_after_save proposal
     validate_one_for_role proposal, "nova_dashboard-server"
 
+    ks_svc = KeystoneService.new @logger
+    keystone = Proposal.where(barclamp: ks_svc.bc_name,
+                              name: proposal["attributes"]["nova_dashboard"]["keystone_instance"]).first
+    # Using domains requires API Version 3 or newer
+    if proposal["attributes"][@bc_name]["multi_domain_support"] &&
+        keystone["attributes"][ks_svc.bc_name]["api"]["version"].to_f < 3.0
+      validation_error("API version 3 or newer is required when enabling multi domain support.")
+    end
+
     super
   end
 

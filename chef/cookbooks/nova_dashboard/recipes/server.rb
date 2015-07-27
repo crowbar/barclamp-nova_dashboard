@@ -17,28 +17,6 @@ include_recipe "apache2"
 include_recipe "apache2::mod_wsgi"
 include_recipe "apache2::mod_rewrite"
 
-keystone_settings = KeystoneHelper.keystone_settings(node, @cookbook_name)
-
-# TODO(aplanas): Remove this block, and the "use_keystone_v3"
-# attribute when keystone API 'v3' works for every OpenStack
-# configuration file.
-#
-# Because these two variables will disappear, also revert the changes
-# in local_settings.py.erb to use directly keystone_settings in
-# 'OPENSTACK_API_VERSIONS' and 'OPENSTACK_KEYSTONE_URL'
-keystone_api_version = keystone_settings['api_version']
-keystone_internal_auth_url = keystone_settings['internal_auth_url']
-
-if node["nova_dashboard"]["use_keystone_v3"] && keystone_api_version.to_f < 3
-  keystone_api_version = '3'
-  keystone_internal_auth_url = KeystoneHelper.versioned_service_URL(
-    keystone_settings["protocol"],
-    keystone_settings["internal_url_host"],
-    keystone_settings["service_port"],
-    keystone_api_version)
-end
-
-
 if %w(suse).include? node.platform
   dashboard_path = "/srv/www/openstack-dashboard"
 else
@@ -183,6 +161,8 @@ db_settings = {
   'default-character-set' => "'utf8'"
 }
 
+keystone_settings = KeystoneHelper.keystone_settings(node, @cookbook_name)
+
 glances = search(:node, "roles:glance-server") || []
 if glances.length > 0
   glance = glances[0]
@@ -272,6 +252,10 @@ execute "python manage.py syncdb" do
   notifies :restart, resources(:service => "apache2"), :immediately
 end
 
+# Force-disable multidomain support when the default keystoneapi version is too
+# old
+multi_domain_support = keystone_settings["api_version"].to_f < 3.0 ? false : node["nova_dashboard"]["multi_domain_support"]
+
 # Need to template the "EXTERNAL_MONITORING" array
 template local_settings do
   source "local_settings.py.erb"
@@ -297,8 +281,7 @@ template local_settings do
     :memcached_locations => memcached_locations,
     :can_set_mount_point => node["nova_dashboard"]["can_set_mount_point"],
     :can_set_password => node["nova_dashboard"]["can_set_password"],
-    :keystone_api_version => keystone_api_version,
-    :keystone_internal_auth_url => keystone_internal_auth_url,
+    :multi_domain_support => multi_domain_support,
     :policy_file_path => node["nova_dashboard"]["policy_file_path"],
     :policy_file => node["nova_dashboard"]["policy_file"]
   )
