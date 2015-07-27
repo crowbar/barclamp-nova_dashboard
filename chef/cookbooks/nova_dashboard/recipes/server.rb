@@ -206,13 +206,13 @@ if neutrons.length > 0
   if neutron[:neutron][:networking_plugin] == 'ml2'
     neutron_ml2_type_drivers = neutron[:neutron][:ml2_type_drivers]
   else
-    neutron_ml2_type_drivers = "*"
+    neutron_ml2_type_drivers = "'*'"
   end
   neutron_use_lbaas = neutron[:neutron][:use_lbaas]
   neutron_use_vpnaas = neutron[:neutron][:use_vpnaas]
 else
   neutron_insecure = false
-  neutron_ml2_type_drivers = "*"
+  neutron_ml2_type_drivers = "'*'"
   neutron_use_lbaas = false
   neutron_use_vpnaas = false
 end
