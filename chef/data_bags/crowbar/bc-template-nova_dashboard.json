@@ -7,7 +7,7 @@
       "nova_instance": "none",
       "keystone_instance": "none",
       "database_instance": "none",
-      "site_branding": "OpenStack Dashboard",
+      "site_branding": "",
       "site_theme": "",
       "site_branding_link": "",
       "help_url": "http://docs.openstack.org/",

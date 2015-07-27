@@ -567,8 +567,20 @@ DATABASES = {
     },
 }
 
+<% unless @site_branding.empty? -%>
+try:
+    from local_settings_theme import SITE_BRANDING  # noqa
+except ImportError:
+    logging.debug("No SITE_BRANDING found in local_settings_theme.")
+<% else -%>
 SITE_BRANDING = "<%= @site_branding %>"
+<% end -%>
 <% unless @site_branding_link.empty? -%>
+try:
+    from local_settings_theme import SITE_BRANDING_LINK  # noqa
+except ImportError:
+    logging.debug("No SITE_BRANDING_LINK found in local_settings_theme.")
+<% else -%>
 SITE_BRANDING_LINK = "<%= @site_branding_link %>"
 <% end -%>
 
