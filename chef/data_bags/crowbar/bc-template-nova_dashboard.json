@@ -11,7 +11,7 @@
       "site_theme": "",
       "site_branding_link": "",
       "help_url": "http://docs.openstack.org/",
-      "session_timeout": 1440,
+      "session_timeout": 240,
       "db": {
         "database": "horizon",
         "user": "horizon",
