@@ -50,3 +50,6 @@ node[:nova_dashboard][:monitor][:ports]={}
 default["nova_dashboard"]["can_set_mount_point"] = false
 # Display password fields for Nova password injection
 default["nova_dashboard"]["can_set_password"] = false
+
+# Display "Domain" text field on login page
+default[:nova_dashboard][:multi_domain_support] = false
