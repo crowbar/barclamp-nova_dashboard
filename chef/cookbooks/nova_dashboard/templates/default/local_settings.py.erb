@@ -34,7 +34,7 @@ ALLOWED_HOSTS = ['*']
 # use of the decimal point, so valid options would be "2.0" or "3".
 OPENSTACK_API_VERSIONS = {
     "data_processing": 1.1,
-    "identity": <%= @keystone_api_version %>,
+    "identity": <%= @keystone_settings['api_version'] %>,
     "volume": 2
 }
 
@@ -147,7 +147,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # ]
 
 OPENSTACK_HOST = "<%= @keystone_settings['internal_url_host'] %>"
-OPENSTACK_KEYSTONE_URL = "<%= @keystone_internal_auth_url %>"
+OPENSTACK_KEYSTONE_URL = "<%= @keystone_settings['internal_auth_url'] %>"
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
 # Disable SSL certificate checks (useful for self-signed certificates):
