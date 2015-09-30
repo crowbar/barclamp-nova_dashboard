@@ -85,6 +85,15 @@ class NovaDashboardService < PacemakerServiceObject
       validate_dep_proposal_is_active "git", proposal["attributes"][@bc_name]["git_instance"]
     end
 
+    if proposal["attributes"][@bc_name]["multi_domain_support"]
+      ks_svc = KeystoneService.new @logger
+      keystone = ProposalObject.find_proposal(ks_svc.bc_name, proposal["attributes"][@bc_name]["keystone_instance"])
+      # Using domains requires API Version 3 or newer
+      if keystone["attributes"][ks_svc.bc_name]["api"]["version"].to_f < 3.0
+        validation_error("Multi domain support requires enabling Keystone V3 API in the keystone proposal first.")
+      end
+    end
+
     super
   end
 

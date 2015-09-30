@@ -53,7 +53,7 @@
             },
             "can_set_mount_point": { "type": "bool", "required": false },
             "can_set_password": { "type": "bool", "required": false },
-            "use_keystone_v3": { "type": "bool", "required": true },
+            "multi_domain_support": { "type": "bool", "required": true },
             "apache" : {
               "type" : "map",
               "required" : true,
