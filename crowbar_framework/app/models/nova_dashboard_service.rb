@@ -93,6 +93,18 @@ class NovaDashboardService < PacemakerServiceObject
         validation_error("Multi domain support requires enabling Keystone V3 API in the keystone proposal first.")
       end
     end
+    
+    horizon_timeout = proposal["attributes"]["nova_dashboard"]["session_timeout"]
+    keystone_proposal = ProposalObject.find_proposal("keystone", "default")
+    unless keystone_proposal.nil?
+      keystone_timeout = keystone_proposal["attributes"]["keystone"]["token_expiration"]
+
+      # keystone_timeout is in seconds and horizon_timeout is in minutes
+      if horizon_timeout * 60 > keystone_timeout
+        validation_error("Setting the Horizon timeout (#{horizon_timeout} minutes) longer than the "\
+          "Keystone token expiration timeout (#{keystone_timeout / 60} minutes) is not supported.")
+      end
+    end
 
     super
   end
