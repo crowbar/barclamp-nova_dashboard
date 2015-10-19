@@ -37,7 +37,9 @@ end
 crowbar_pacemaker_sync_mark "sync-nova_dashboard_before_ha"
 
 # Avoid races when creating pacemaker resources
-crowbar_pacemaker_sync_mark "wait-nova_dashboard_ha_resources"
+crowbar_pacemaker_sync_mark "wait-nova_dashboard_ha_resources" do
+  timeout 180
+end
 
 include_recipe "crowbar-pacemaker::apache"
 
