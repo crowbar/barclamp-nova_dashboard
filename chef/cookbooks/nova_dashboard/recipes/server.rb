@@ -269,6 +269,17 @@ end
 # old
 multi_domain_support = keystone_settings["api_version"].to_f < 3.0 ? false : node["nova_dashboard"]["multi_domain_support"]
 
+# Verify that we have the certificate available before configuring things to use it
+if node[:nova_dashboard][:apache][:ssl]
+  unless ::File.size? node[:nova_dashboard][:apache][:ssl_crt_file]
+    message = "The file \"#{node[:nova_dashboard][:apache][:ssl_crt_file]}\" does not exist or is empty."
+    Chef::Log.fatal(message)
+    raise message
+  end
+  # we do not check for existence of keyfile, as the private key is allowed
+  # to be in the certfile
+end
+
 # Need to template the "EXTERNAL_MONITORING" array
 template local_settings do
   source "local_settings.py.erb"
