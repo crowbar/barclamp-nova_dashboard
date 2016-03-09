@@ -270,7 +270,7 @@ end
 multi_domain_support = keystone_settings["api_version"].to_f < 3.0 ? false : node["nova_dashboard"]["multi_domain_support"]
 
 # Verify that we have the certificate available before configuring things to use it
-if node[:nova_dashboard][:apache][:ssl]
+if node[:nova_dashboard][:apache][:ssl] and node[:nova_dashboard][:apache][:ssl_crt_file] != "/etc/apache2/ssl.crt/openstack-dashboard-server.crt"
   unless ::File.size? node[:nova_dashboard][:apache][:ssl_crt_file]
     message = "The file \"#{node[:nova_dashboard][:apache][:ssl_crt_file]}\" does not exist or is empty."
     Chef::Log.fatal(message)
