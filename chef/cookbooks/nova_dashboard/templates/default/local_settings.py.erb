@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 
 from django.utils.translation import ugettext_lazy as _
@@ -73,7 +75,11 @@ HORIZON_CONFIG = {
 # Specify a regular expression to validate user passwords.
 HORIZON_CONFIG["password_validator"] = {
     "regex": '<%= @password_validator_regex != "" ? @password_validator_regex : ".*" %>',
-    "help_text": <%= @password_validator_help_text != "" ? "'#{@password_validator_help_text}'" : '_("Your password does not meet the requirements.")' %>
+<% unless @password_validator_help_text.empty? %>
+    "help_text": <%= @password_validator_help_text.dump %>
+<% else -%>
+    "help_text": _("Your password does not meet the requirements.")
+<% end -%>
 }
 
 # Disable simplified floating IP address management for deployments with
