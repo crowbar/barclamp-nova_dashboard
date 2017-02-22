@@ -51,6 +51,8 @@ unless node[:nova_dashboard][:use_gitrepo]
     package "python-memcached"
   else
     # On SUSE, the package has the correct list of dependencies
+    package "python-horizon-branding-SLE"
+    package "openstack-dashboard-branding-SLE"
     package "openstack-dashboard"
   end
 else
